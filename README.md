@@ -1,8 +1,10 @@
-`@author: Teun Ouwehand (teun@nextpertise.nl)`
+autorsyncbackup
+---------------
 
-`@company: Nextpertise B.V.`
+#`@author: Teun Ouwehand (teun@nextpertise.nl)`
+#`@company: Nextpertise B.V.`
 
-autorsyncbackup is a backup solutuon completely written in bash as wrapper around rsync. currently it's only tested for Debian Wheezy. Please create a issue if you find any problem.
+autorsyncbackup is a backup solutuon completely written in bash as wrapper around rsync. Currently it's only tested for Debian Wheezy. Please create a issue if you find any problem.
 
 How to use:
 -----------
@@ -14,6 +16,7 @@ copy both bash files to: /usr/share/autorsyncbackup
     $ cp rsync_lib.sh /usr/share/autorsyncbackup/
 
 create a job directory, this directory will contain .yml files with rsync hosts
+
     $ mkdir /etc/autorsyncbackup
 
 yaml config example
@@ -35,9 +38,9 @@ create a directory which contain the backups
 
 create a directory for output XML files, these contain information about the executed jobs
 
-    $ mkdir /var/spool/rsyncbackup
+    $ mkdir /var/spool/autorsyncbackup
 
 Finally execute the backup (You can cron this command)
 
     $ cd /usr/share/autorsyncbackup
-    $ ./autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/rsyncbackup/
+    $ ./autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
