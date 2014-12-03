@@ -29,6 +29,7 @@ yaml config example
     share: rsyncshare
     backupdir: /var/data/backups_rsync
     speedlimitkb: 1600
+    maxcycles: 32
     fileset:
       0: /etc/
       1: /home/
