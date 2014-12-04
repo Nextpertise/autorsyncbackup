@@ -10,20 +10,20 @@ autorsyncbackup is a backup solutuon completely written in bash as wrapper aroun
 How to use:
 -----------
 
-Export by example to: /usr/local/share/autorsyncbackup
+Export by example to: `/usr/local/share/autorsyncbackup`
 
     $ cd /usr/local/share/
     $ git clone git@github.com:Nextpertise/autorsyncbackup.git
     
-create symlink:
+Create symlink:
 
     $ ln -s /usr/local/share/autorsyncbackup/autorsyncbackup-main/autorsyncbackup /usr/local/bin/autorsyncbackup
 
-create a job directory, this directory will contain .yml files with rsync hosts
+Create a job directory, this directory will contain .yml files with rsync hosts:
 
     $ mkdir /etc/autorsyncbackup
 
-yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
+Yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
 
     --
     hostname: host.domain.tld
@@ -39,15 +39,14 @@ yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
 
 Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld/`
 
-create a directory which contain the backups
+Create a directory which contain the backups:
 
     $ mkdir /var/data/backups_rsync
 
-create a directory for output XML files, these contain information about the executed jobs
+Create a directory for output XML files, these contain information about the executed jobs:
 
     $ mkdir /var/spool/autorsyncbackup
 
-Finally execute the backup (You can cron this command)
+Finally execute the backup (you can cron this command)
 
-    $ cd /usr/share/autorsyncbackup
-    $ ./autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
+    $ cd /usr/share/autorsyncbackup; ./autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
