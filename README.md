@@ -10,11 +10,14 @@ autorsyncbackup is a backup solutuon completely written in bash as wrapper aroun
 How to use:
 -----------
 
-copy both bash files to: /usr/share/autorsyncbackup
+Export by example to: /usr/local/share/autorsyncbackup
 
-    $ mkdir /usr/share/autorsyncbackup`
-    $ cp autorsyncbackup /usr/share/autorsyncbackup/
-    $ cp rsync_lib.sh /usr/share/autorsyncbackup/
+    $ cd /usr/local/share/
+    $ git clone git@github.com:Nextpertise/autorsyncbackup.git
+    
+create symlink:
+
+    $ ln -s /usr/local/share/autorsyncbackup/autorsyncbackup-main/autorsyncbackup /usr/local/bin/autorsyncbackup
 
 create a job directory, this directory will contain .yml files with rsync hosts
 
