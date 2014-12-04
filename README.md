@@ -23,7 +23,7 @@ create a job directory, this directory will contain .yml files with rsync hosts
 
     $ mkdir /etc/autorsyncbackup
 
-yaml config example
+yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
 
     --
     hostname: host.domain.tld
