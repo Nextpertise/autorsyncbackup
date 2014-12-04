@@ -22,8 +22,17 @@
 #  along with autorsyncbackup. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Set script directory to $DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 # Source the library file
-. /usr/share/autorsyncbackup/rsync_lib.sh
+. $DIR/rsync_lib.sh
 
 # Usage info
 show_help() {
