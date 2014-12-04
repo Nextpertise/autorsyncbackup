@@ -37,6 +37,8 @@ yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
       0: /etc/
       1: /home/
 
+Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld`
+
 create a directory which contain the backups
 
     $ mkdir /var/data/backups_rsync
