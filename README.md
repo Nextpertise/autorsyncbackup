@@ -49,4 +49,4 @@ Create a directory for output XML files, these contain information about the exe
 
 Finally execute the backup (you can cron this command)
 
-    $ cd /usr/share/autorsyncbackup; ./autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
+    $ /usr/local/bin/autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
