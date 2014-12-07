@@ -177,7 +177,7 @@ getHardlinkOption() {
   return 0
 }
 
-startjobs() {
+startJobs() {
   printf 'Read jobs from jobdir: %s\n' "$job_dir"
   for i in `ls $1/*.yml 2> /dev/null`; do
     if [ -f $i ]; then

@@ -95,4 +95,4 @@ if [[ "$log" == "1" ]]; then
   fi
 fi
 
-startjobs $job_dir
+startJobs $job_dir
