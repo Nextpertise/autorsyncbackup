@@ -63,13 +63,13 @@ setAfterDateTime() {
 
 # @param backupfolder
 getBackupId() {
-  retint=0
+  local retint=0
   if [ -d $1 ]; then
     for i in `ls $1`; do
       if [[ $i =~ .*_backup\.([[:digit:]]+) ]]; then
         if [[ ${BASH_REMATCH[1]} -ge $retint ]]; then
           if [ ! $(contains "${processedBackups[@]}" "${BASH_REMATCH[1]}") == "y" ]; then
-            retint=${BASH_REMATCH[1]}
+            local retint=${BASH_REMATCH[1]}
           fi
         fi
       fi
@@ -169,7 +169,7 @@ checkRemoteHost() {
 
 getHardlinkOption() {
   # Check if folder 1 exists
-  folder=`ls -d $1/*_backup.1 2>/dev/null`
+  local folder=`ls -d $1/*_backup.1 2>/dev/null`
   if [[ "$?" == "0" ]]; then
     echo "--link-dest=$folder"
   fi
@@ -271,7 +271,7 @@ generateFilesetLog() {
 
 writeXmlOutput() {
   generateFilesetLog
-  logfile="$log_dir/${config_hostname}_$(date '+%s')"
+  local logfile="$log_dir/${config_hostname}_$(date '+%s')"
   printf 'Create log file: %s\n' "$logfile"
   echo -e "<?xml version=\"1.0\"?>\n<backup>" > $logfile
   echo -e "  <jobfile>$jobfile</jobfile>" >> $logfile
