@@ -305,7 +305,7 @@ executeRsync() {
   rsyncreturncode=$?
 }
 
-executeJob() {   
+executeJob() {
   jobfile="$@"
   autorsyncbackuperror=0
   autorsyncbackuperrormsg=""
