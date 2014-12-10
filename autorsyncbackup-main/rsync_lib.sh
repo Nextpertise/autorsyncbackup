@@ -177,16 +177,6 @@ getHardlinkOption() {
   return 0
 }
 
-startJobs() {
-  printf 'Read jobs from jobdir: %s\n' "$job_dir"
-  for i in `ls $1/*.yml 2> /dev/null`; do
-    if [ -f $i ]; then
-      executeJob $i
-      unsetHostVariables
-    fi
-  done
-}
-
 readHostConfig() {
   eval $(parseYaml $jobfile "config_")
   # Check if values are set:
@@ -313,4 +303,14 @@ executeJob() {
   if [[ "$log" == "1" ]]; then
     writeXmlOutput
   fi
+}
+
+startJobs() {
+  printf 'Read jobs from jobdir: %s\n' "$job_dir"
+  for i in `ls $1/*.yml 2> /dev/null`; do
+    if [ -f $i ]; then
+      executeJob $i
+      unsetHostVariables
+    fi
+  done
 }
