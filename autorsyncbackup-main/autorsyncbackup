@@ -51,7 +51,7 @@ EOF
 log=1
 config_maxcycles=10
 
-OPTIND=1 # Reset is necessary if getopts was used previously in the script. 
+OPTIND=1
 while getopts "hj:l:L" opt; do
     case "$opt" in
         h)
