@@ -100,13 +100,15 @@ rotateBackupFolders() {
     fi
     # check if folder a exists
     if [ ! -d $foldera ]; then
-      printf '%s should exist, exiting..\n' "$foldera"
-      exit 1
+      autorsyncbackuperror=1
+      autorsyncbackuperrormsg="rotateBackupFolders: ${foldera} should exist"
+      return 1
     fi
     # check if folder b does NOT exists
     if [ -d $folderb ]; then
-      printf 'folderb: %s should NOT exist, exiting..\n' "$folderb"
-      exit 2
+      autorsyncbackuperror=2
+      autorsyncbackuperrormsg="rotateBackupFolders: ${folderb} should NOT exist"
+      return 2
     fi
     if [[ $id -ge $config_maxcycles ]]; then
       rotatelog="${rotatelog}delete: $foldera\n"
@@ -128,8 +130,9 @@ createFolderZero() {
   # Check if folder 0 exists
   folder=`ls -d $1/*_backup.0 2>/dev/null`
   if [[ "$?" == "0" ]]; then
-    printf 'Folder 0 should not exists: %s\n' "$folder"
-    exit 3
+    autorsyncbackuperror=3
+    autorsyncbackuperrormsg="createFolderZero: Folder 0 should not exists: ${folder}"
+    return 3
   fi
 
   # Create the directory
@@ -137,16 +140,18 @@ createFolderZero() {
 
   # Check if folder 0 exists
   if [ ! -d $bkdir0 ] ; then
-    printf 'Folder 0 should exists after creating: %s\n' "$folder"
-    exit 4
+    autorsyncbackuperror=4
+    autorsyncbackuperrormsg="createFolderZero: Folder 0 should exists after creating: ${folder}"
+    return 4
   fi
   echo $bkdir0
 }
 
 checkBackupEnvironment() {
   if [ ! -d ${config_backupdir} ]; then
-    printf 'Backupdir does not exists..\n'
-    exit 1
+    autorsyncbackuperror=1
+    autorsyncbackuperrormsg="checkBackupEnvironment: Backupdir does not exists: ${config_backupdir}"
+    return 1
   fi
   
   # Add ${hostname} to ${bkdir}
@@ -162,8 +167,9 @@ checkRemoteHost() {
   # Test rsync connection
   test=`rsync rsync://${config_username}@${config_hostname} &>/dev/null`
   if [[ "$?" != "0" ]]; then
-    printf 'Rsync connection error (%s@%s)\n' "${config_username}" "${config_hostname}"
-    exit 5
+    autorsyncbackuperror=5
+    autorsyncbackuperrormsg="checkRemoteHost: Rsync connection error (${config_username}@${config_hostname})"
+    return 5
   fi
 }
 
@@ -183,26 +189,36 @@ readHostConfig() {
   # hostname
   if [[  ! "$config_hostname" ]]; then
     echo "Error: 'hostname' not set in: ${jobfile}"
-    exit 2
+    autorsyncbackuperror=6
+    autorsyncbackuperrormsg="readHostConfig: 'hostname' not set in: ${jobfile}"
+    return 6
   fi
   # username
   if [[  ! "$config_username" ]]; then
     echo "Error: 'username' not set in: ${jobfile}"
-    exit 2
+    autorsyncbackuperror=6
+    autorsyncbackuperrormsg="readHostConfig: 'username' not set in: ${jobfile}"
+    return 6
   fi
   # password
   if [[  ! "$config_password" ]]; then
     echo "Error: 'password' not set in: ${jobfile}"
-    exit 2
+    autorsyncbackuperror=6
+    autorsyncbackuperrormsg="readHostConfig: 'password' not set in: ${jobfile}"
+    return 6
   fi
   # share
   if [[  ! "$config_share" ]]; then
     echo "Error: 'share' not set in: ${jobfile}"
-    exit 2
+    autorsyncbackuperror=6
+    autorsyncbackuperrormsg="readHostConfig: 'share' not set in: ${jobfile}"
+    return 6
   fi
   if [[  ! "$config_backupdir" ]]; then
     echo "Error 'backupdir' not set in: ${jobfile}"
-    exit 2
+    autorsyncbackuperror=6
+    autorsyncbackuperrormsg="readHostConfig: 'backupdir' not set in: ${jobfile}"
+    return 6
   fi
   if [[  ! "$config_speedlimitkb" ]]; then
     config_speedlimitkb=0
@@ -278,6 +294,8 @@ writeXmlOutput() {
   echo -e "  <filesetrotate>${rotatelog}</filesetrotate>" >> $logfile
   echo -e "  <rsyncoutput>${rsyncoutput}</rsyncoutput>" >> $logfile
   echo -e "  <rsyncreturncode>${rsyncreturncode}</rsyncreturncode>" >> $logfile
+  echo -e "  <autorsyncbackuperrorcode>${autorsyncbackuperror}</autorsyncbackuperrorcode>" >> $logfile
+  echo -e "  <autorsyncbackuperrormsg>${autorsyncbackuperrormsg}</autorsyncbackuperrormsg>" >> $logfile
   echo -e "</backup>" >> $logfile
 }
 
@@ -287,8 +305,11 @@ executeRsync() {
   rsyncreturncode=$?
 }
 
-executeJob() {
+executeJob() {   
   jobfile="$@"
+  autorsyncbackuperror=0
+  autorsyncbackuperrormsg=""
+  
   printf 'Execute job file: %s\n' "$jobfile"
   setBeforeDateTime
   readHostConfig
