@@ -22,6 +22,7 @@
 #  along with autorsyncbackup. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# In array implementation
 contains() {
     local n=$#
     local value=${!n}
@@ -35,6 +36,17 @@ contains() {
     return 1
 }
 
+# Left and right trim spaces
+trim() {
+  shopt -s extglob
+  local output=$1
+  local output="${output##*( )}"
+  local output=${output%%*( )}
+  echo $output
+  shopt -u extglob
+}
+
+# Parser found at pastebin.com, thank you @gron (http://pastebin.com/Pm1PcRmx)
 parseYaml() {
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
