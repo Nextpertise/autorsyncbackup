@@ -163,7 +163,6 @@ checkBackupEnvironment() {
   if [ ! -d ${config_backupdir} ]; then
     autorsyncbackuperror=1
     autorsyncbackuperrormsg="checkBackupEnvironment: Backupdir does not exists: ${config_backupdir}"
-    return 1
   fi
   
   # Add ${hostname} to ${bkdir}
@@ -177,7 +176,7 @@ checkRemoteHost() {
   # Export password for rsync
   export RSYNC_PASSWORD=${config_password}
   # Test rsync connection
-  test=`rsync rsync://${config_username}@${config_hostname} &>/dev/null`
+  test=`rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null`
   if [[ "$?" != "0" ]]; then
     autorsyncbackuperror=5
     autorsyncbackuperrormsg="checkRemoteHost: Rsync connection error (${config_username}@${config_hostname})"
@@ -318,11 +317,11 @@ writeXmlOutput() {
 
 executeRsync() {
   # TODO: implement rsync dryrun for testing as -d flag.
-  rsyncoutput=`rsync $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
+  rsyncoutput=`rsync --contimeout=5 $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
   rsyncreturncode=$?
 }
 
-executeJob() {   
+executeJob() {
   jobfile="$@"
   autorsyncbackuperror=0
   autorsyncbackuperrormsg=""
