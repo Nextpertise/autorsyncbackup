@@ -49,7 +49,6 @@ EOF
 
 # Initialize our own variables:
 log=1
-config_maxcycles=10
 
 OPTIND=1
 while getopts "hj:l:L" opt; do
