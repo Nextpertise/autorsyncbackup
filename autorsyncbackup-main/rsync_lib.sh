@@ -160,17 +160,24 @@ createFolderZero() {
 }
 
 checkBackupEnvironment() {
+  local ret=0
   if [ ! -d ${config_backupdir} ]; then
     autorsyncbackuperror=1
     autorsyncbackuperrormsg="checkBackupEnvironment: Backupdir does not exists: ${config_backupdir}"
     local ret=1
   else
     # Add ${hostname} to ${bkdir}
-    bkdir="${config_backupdir}/${config_hostname}"
+    local bkdir="${config_backupdir}/${config_hostname}"
     
     # Be sure the backup server directory exists
-    mkdir -p ${bkdir}
-    local ret=0
+    mkdir -p ${bkdir} &>/dev/null
+    if [[ "$?" != "0" ]]; then
+      autorsyncbackuperror=5
+      autorsyncbackuperrormsg="checkBackupEnvironment: Can't create directory: ${bkdir}"
+      local ret=1
+    else
+      echo "${bkdir}"
+    fi 
   fi
   return $ret
 }
@@ -332,8 +339,9 @@ executeJob() {
   setBeforeDateTime
   readHostConfig
   checkRemoteHost
-  checkBackupEnvironment
+  bkdir=`checkBackupEnvironment`
   if [[ "$?" == "0" ]]; then
+    echo "test123"
     rotateBackupFolders "${bkdir}"
     folder=`createFolderZero "${bkdir}"`
     hardlink=`getHardlinkOption "${bkdir}"`
