@@ -90,6 +90,8 @@ getBackupId() {
   echo $retint
 }
 
+# This function rotates the backup in the given folder, when number of backups is greater than maxcycles the oldest backup will be removed.
+# @param $folder
 rotateBackupFolders() {
   id=0
   folder=`ls -d $1/*_backup.0 2>/dev/null`
