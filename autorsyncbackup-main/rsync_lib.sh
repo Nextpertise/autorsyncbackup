@@ -163,13 +163,16 @@ checkBackupEnvironment() {
   if [ ! -d ${config_backupdir} ]; then
     autorsyncbackuperror=1
     autorsyncbackuperrormsg="checkBackupEnvironment: Backupdir does not exists: ${config_backupdir}"
+    local ret=1
+  else
+    # Add ${hostname} to ${bkdir}
+    bkdir="${config_backupdir}/${config_hostname}"
+    
+    # Be sure the backup server directory exists
+    mkdir -p ${bkdir}
+    local ret=0
   fi
-  
-  # Add ${hostname} to ${bkdir}
-  bkdir="${config_backupdir}/${config_hostname}"
-
-  # Be sure the backup server directory exists
-  mkdir -p ${bkdir}
+  return $ret
 }
 
 checkRemoteHost() {
@@ -325,17 +328,18 @@ executeJob() {
   jobfile="$@"
   autorsyncbackuperror=0
   autorsyncbackuperrormsg=""
-  
   printf 'Execute job file: %s\n' "$jobfile"
   setBeforeDateTime
   readHostConfig
   checkRemoteHost
   checkBackupEnvironment
-  rotateBackupFolders "${bkdir}"
-  folder=`createFolderZero "${bkdir}"`
-  hardlink=`getHardlinkOption "${bkdir}"`
-  generateFileset
-  executeRsync
+  if [[ "$?" == "0" ]]; then
+    rotateBackupFolders "${bkdir}"
+    folder=`createFolderZero "${bkdir}"`
+    hardlink=`getHardlinkOption "${bkdir}"`
+    generateFileset
+    executeRsync
+  fi
   setAfterDateTime
   if [[ "$log" == "1" ]]; then
     writeXmlOutput
