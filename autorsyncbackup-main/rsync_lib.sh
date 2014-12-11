@@ -135,11 +135,28 @@ rotateBackupFolders() {
   done
 }
 
-createFolderZero() {
+createFolderCurrent() {
+  local bkdircurrent="$1/current"
+
+  # Create the directory
+  mkdir -p ${bkdircurrent}
+
+  # Check if folder 0 exists
+  if [ ! -d ${bkdircurrent} ] ; then
+    autorsyncbackuperror=4
+    autorsyncbackuperrormsg="createFolderCurrent: Folder current should exists after creating: ${bkdircurrent}"
+    return 1
+  fi
+  echo ${bkdircurrent}
+}
+
+# If rsync backup successfull, copy current to backup folder zero.
+mvCurrentToZero() {
+  local bkdircurrent="$1/current"
   #Timestamp used for naming directories.
-  tstamp=$(date +%Y-%m-%d_%H-%M-%S)
+  local tstamp=$(date +%Y-%m-%d_%H-%M-%S)
   #This starts the naming convention. It sets the name and directory for the current backup. 
-  bkdir0="$1/${tstamp}_backup.0"
+  local bkdir0="$1/${tstamp}_backup.0"
 
   # Check if folder 0 exists
   folder=`ls -d $1/*_backup.0 2>/dev/null`
@@ -148,17 +165,15 @@ createFolderZero() {
     autorsyncbackuperrormsg="createFolderZero: Folder 0 should not exists: ${folder}"
     return 3
   fi
-
-  # Create the directory
-  mkdir $bkdir0
-
+  
+  # preform actual move
+  mv ${bkdircurrent} ${bkdir0}
   # Check if folder 0 exists
   if [ ! -d $bkdir0 ] ; then
     autorsyncbackuperror=4
-    autorsyncbackuperrormsg="createFolderZero: Folder 0 should exists after creating: ${folder}"
+    autorsyncbackuperrormsg="createFolderZero: Folder 0 should exists after creating: ${bkdir0}"
     return 4
   fi
-  echo $bkdir0
 }
 
 checkBackupEnvironment() {
@@ -200,7 +215,7 @@ checkRemoteHost() {
 
 getHardlinkOption() {
   # Check if folder 1 exists
-  local folder=`ls -d $1/*_backup.1 2>/dev/null`
+  folder=`ls -d $1/*_backup.0 2>/dev/null`
   if [[ "$?" == "0" ]]; then
     echo "--link-dest=$folder"
   fi
@@ -331,8 +346,10 @@ writeXmlOutput() {
 
 executeRsync() {
   # TODO: implement rsync dryrun for testing as -d flag.
+  local folder=$1
   rsyncoutput=`rsync --contimeout=5 $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
   rsyncreturncode=$?
+  return ${rsyncreturncode}
 }
 
 executeJob() {
@@ -348,11 +365,16 @@ executeJob() {
   if [[ "$?" == "0" ]]; then
     bkdir=`checkBackupEnvironment`
     if [[ "$?" == "0" ]]; then
-      rotateBackupFolders "${bkdir}"
-      folder=`createFolderZero "${bkdir}"`
-      hardlink=`getHardlinkOption "${bkdir}"`
-      generateFileset
-      executeRsync
+      folder=`createFolderCurrent "${bkdir}"`
+      if [[ "$?" == "0" ]]; then
+        hardlink=`getHardlinkOption "${bkdir}"`
+        generateFileset
+        executeRsync "$folder"
+        if [[ "$?" == "0" ]] || [[ "$?" == "24" ]]; then
+          rotateBackupFolders "${bkdir}"
+          mvCurrentToZero "${bkdir}"
+        fi
+      fi
     fi
   fi
   setAfterDateTime
