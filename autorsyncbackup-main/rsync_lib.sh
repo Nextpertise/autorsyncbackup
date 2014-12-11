@@ -349,6 +349,12 @@ executeRsync() {
   local folder=$1
   rsyncoutput=`rsync --contimeout=5 $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
   rsyncreturncode=$?
+  
+  # Return code 24, isn't an error, it's a warning about vanished files. Normal behaviour for example tmp files in large backups
+  if [[ "$?" == "24" ]]; then
+    rsyncreturncode=0
+  fi
+  
   return ${rsyncreturncode}
 }
 
@@ -370,7 +376,7 @@ executeJob() {
         hardlink=`getHardlinkOption "${bkdir}"`
         generateFileset
         executeRsync "$folder"
-        if [[ "$?" == "0" ]] || [[ "$?" == "24" ]]; then
+        if [[ "$?" == "0" ]]; then
           rotateBackupFolders "${bkdir}"
           mvCurrentToZero "${bkdir}"
         fi
