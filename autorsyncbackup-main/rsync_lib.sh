@@ -333,6 +333,8 @@ executeRsync() {
 
 executeJob() {
   jobfile="$@"
+  rsyncreturncode=9
+  rsyncoutput="Rsync was never invoked"
   autorsyncbackuperror=0
   autorsyncbackuperrormsg=""
   printf 'Execute job file: %s\n' "$jobfile"
