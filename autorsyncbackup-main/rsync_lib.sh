@@ -199,6 +199,7 @@ readHostConfig() {
   eval $(parseYaml $jobfile "config_")
   # Check if values are set:
   # hostname
+  config_hostname=`trim "$config_hostname"`
   if [[  ! "$config_hostname" ]]; then
     echo "Error: 'hostname' not set in: ${jobfile}"
     autorsyncbackuperror=6
@@ -206,6 +207,7 @@ readHostConfig() {
     return 6
   fi
   # username
+  config_username=`trim "$config_username"`
   if [[  ! "$config_username" ]]; then
     echo "Error: 'username' not set in: ${jobfile}"
     autorsyncbackuperror=6
@@ -213,6 +215,7 @@ readHostConfig() {
     return 6
   fi
   # password
+  config_password=`trim "$config_password"`
   if [[  ! "$config_password" ]]; then
     echo "Error: 'password' not set in: ${jobfile}"
     autorsyncbackuperror=6
@@ -220,12 +223,14 @@ readHostConfig() {
     return 6
   fi
   # share
+  config_share=`trim "$config_share"`
   if [[  ! "$config_share" ]]; then
     echo "Error: 'share' not set in: ${jobfile}"
     autorsyncbackuperror=6
     autorsyncbackuperrormsg="readHostConfig: 'share' not set in: ${jobfile}"
     return 6
   fi
+  config_backupdir=`trim "$config_backupdir"`
   if [[  ! "$config_backupdir" ]]; then
     echo "Error 'backupdir' not set in: ${jobfile}"
     autorsyncbackuperror=6
