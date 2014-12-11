@@ -353,7 +353,7 @@ executeRsync() {
 }
 
 executeJob() {
-  jobfile="$@"
+  jobfile=$1
   rsyncreturncode=9
   rsyncoutput="Rsync was never invoked"
   autorsyncbackuperror=0
@@ -387,7 +387,7 @@ startJobs() {
   printf 'Read jobs from jobdir: %s\n' "$job_dir"
   for i in `ls $1/*.yml 2> /dev/null`; do
     if [ -f $i ]; then
-      executeJob $i
+      executeJob "$i"
       unsetHostVariables
     fi
   done
