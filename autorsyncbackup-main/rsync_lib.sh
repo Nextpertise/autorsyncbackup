@@ -162,7 +162,7 @@ createFolderZero() {
 checkBackupEnvironment() {
   local ret=0
   if [ ! -d ${config_backupdir} ]; then
-    autorsyncbackuperror=1
+    autorsyncbackuperror=5
     autorsyncbackuperrormsg="checkBackupEnvironment: Backupdir does not exists: ${config_backupdir}"
     local ret=1
   else
@@ -172,7 +172,7 @@ checkBackupEnvironment() {
     # Be sure the backup server directory exists
     mkdir -p ${bkdir} &>/dev/null
     if [[ "$?" != "0" ]]; then
-      autorsyncbackuperror=5
+      autorsyncbackuperror=6
       autorsyncbackuperrormsg="checkBackupEnvironment: Can't create directory: ${bkdir}"
       local ret=1
     else
@@ -188,7 +188,7 @@ checkRemoteHost() {
   # Test rsync connection
   test=`rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null`
   if [[ "$?" != "0" ]]; then
-    autorsyncbackuperror=5
+    autorsyncbackuperror=7
     autorsyncbackuperrormsg="checkRemoteHost: Rsync connection error (${config_username}@${config_hostname})"
     return 5
   fi
@@ -211,7 +211,7 @@ readHostConfig() {
   config_hostname=`trim "$config_hostname"`
   if [[  ! "$config_hostname" ]]; then
     echo "Error: 'hostname' not set in: ${jobfile}"
-    autorsyncbackuperror=6
+    autorsyncbackuperror=8
     autorsyncbackuperrormsg="readHostConfig: 'hostname' not set in: ${jobfile}"
     return 6
   fi
@@ -219,7 +219,7 @@ readHostConfig() {
   config_username=`trim "$config_username"`
   if [[  ! "$config_username" ]]; then
     echo "Error: 'username' not set in: ${jobfile}"
-    autorsyncbackuperror=6
+    autorsyncbackuperror=8
     autorsyncbackuperrormsg="readHostConfig: 'username' not set in: ${jobfile}"
     return 6
   fi
@@ -227,7 +227,7 @@ readHostConfig() {
   config_password=`trim "$config_password"`
   if [[  ! "$config_password" ]]; then
     echo "Error: 'password' not set in: ${jobfile}"
-    autorsyncbackuperror=6
+    autorsyncbackuperror=8
     autorsyncbackuperrormsg="readHostConfig: 'password' not set in: ${jobfile}"
     return 6
   fi
@@ -235,14 +235,14 @@ readHostConfig() {
   config_share=`trim "$config_share"`
   if [[  ! "$config_share" ]]; then
     echo "Error: 'share' not set in: ${jobfile}"
-    autorsyncbackuperror=6
+    autorsyncbackuperror=8
     autorsyncbackuperrormsg="readHostConfig: 'share' not set in: ${jobfile}"
     return 6
   fi
   config_backupdir=`trim "$config_backupdir"`
   if [[  ! "$config_backupdir" ]]; then
     echo "Error 'backupdir' not set in: ${jobfile}"
-    autorsyncbackuperror=6
+    autorsyncbackuperror=8
     autorsyncbackuperrormsg="readHostConfig: 'backupdir' not set in: ${jobfile}"
     return 6
   fi
@@ -341,7 +341,6 @@ executeJob() {
   checkRemoteHost
   bkdir=`checkBackupEnvironment`
   if [[ "$?" == "0" ]]; then
-    echo "test123"
     rotateBackupFolders "${bkdir}"
     folder=`createFolderZero "${bkdir}"`
     hardlink=`getHardlinkOption "${bkdir}"`
