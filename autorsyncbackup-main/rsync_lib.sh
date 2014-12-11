@@ -187,7 +187,7 @@ checkRemoteHost() {
   # Export password for rsync
   export RSYNC_PASSWORD=${config_password}
   # Test rsync connection
-  test=`rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null`
+  rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null
   if [[ "$?" != "0" ]]; then
     autorsyncbackuperror=7
     autorsyncbackuperrormsg="checkRemoteHost: Rsync connection error (${config_username}@${config_hostname})"
