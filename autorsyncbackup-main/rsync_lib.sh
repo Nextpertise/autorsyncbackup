@@ -348,18 +348,18 @@ executeRsync() {
   # TODO: implement rsync dryrun for testing as -d flag.
   local folder=$1
   rsyncoutput=`rsync --contimeout=5 $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
-  rsyncreturncode=$?
+  local ret=$?
+  rsyncreturncode=${ret}
   
   # Return code 23, could be a warning about directories/files in fileset which doesn't exists
-  if [[ "$?" == "23" ]]; then
-    rsyncreturncode=0
+  if [[ "${ret}" == "23" ]]; then
+    local ret=0
   fi
   # Return code 24, isn't an error, it's a warning about vanished files. Normal behaviour for example tmp files in large backups
-  if [[ "$?" == "24" ]]; then
-    rsyncreturncode=0
+  if [[ "${ret}" == "24" ]]; then
+    local ret=0
   fi
-  
-  return ${rsyncreturncode}
+  return ${ret}
 }
 
 executeJob() {
