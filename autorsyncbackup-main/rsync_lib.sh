@@ -183,15 +183,17 @@ checkBackupEnvironment() {
 }
 
 checkRemoteHost() {
+  local ret=0
   # Export password for rsync
   export RSYNC_PASSWORD=${config_password}
   # Test rsync connection
-  local test=`rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null`
+  test=`rsync --contimeout=5 rsync://${config_username}@${config_hostname} &>/dev/null`
   if [[ "$?" != "0" ]]; then
     autorsyncbackuperror=7
     autorsyncbackuperrormsg="checkRemoteHost: Rsync connection error (${config_username}@${config_hostname})"
-    return 5
+    local ret=1
   fi
+  return $ret
 }
 
 getHardlinkOption() {
@@ -341,13 +343,15 @@ executeJob() {
   setBeforeDateTime
   readHostConfig
   checkRemoteHost
-  bkdir=`checkBackupEnvironment`
   if [[ "$?" == "0" ]]; then
-    rotateBackupFolders "${bkdir}"
-    folder=`createFolderZero "${bkdir}"`
-    hardlink=`getHardlinkOption "${bkdir}"`
-    generateFileset
-    executeRsync
+    bkdir=`checkBackupEnvironment`
+    if [[ "$?" == "0" ]]; then
+      rotateBackupFolders "${bkdir}"
+      folder=`createFolderZero "${bkdir}"`
+      hardlink=`getHardlinkOption "${bkdir}"`
+      generateFileset
+      executeRsync
+    fi
   fi
   setAfterDateTime
   if [[ "$log" == "1" ]]; then
