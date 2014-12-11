@@ -350,6 +350,10 @@ executeRsync() {
   rsyncoutput=`rsync --contimeout=5 $hardlink --stats --bwlimit=${config_speedlimitkb} -aR --delete ${fileset} $folder 2>&1`
   rsyncreturncode=$?
   
+  # Return code 23, could be a warning about directories/files in fileset which doesn't exists
+  if [[ "$?" == "23" ]]; then
+    rsyncreturncode=0
+  fi
   # Return code 24, isn't an error, it's a warning about vanished files. Normal behaviour for example tmp files in large backups
   if [[ "$?" == "24" ]]; then
     rsyncreturncode=0
