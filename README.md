@@ -1,11 +1,10 @@
 autorsyncbackup
 ---------------
 
-`@author: Teun Ouwehand (teun@nextpertise.nl)`
-
-`@company: Nextpertise B.V.`
-
 autorsyncbackup is a backup solutuon completely written in bash as wrapper around rsync. Currently it's only tested for Debian Wheezy. Please create a issue if you find any problem.
+
+    @author: Teun Ouwehand (teun@nextpertise.nl)
+    @company: Nextpertise B.V.
 
 How to use:
 -----------
