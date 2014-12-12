@@ -18,11 +18,11 @@ Create symlink:
 
     $ ln -s /usr/local/share/autorsyncbackup/autorsyncbackup-main/autorsyncbackup /usr/local/bin/autorsyncbackup
 
-Create a job directory, this directory will contain .yml files with rsync hosts:
+Create a job directory, this directory will contain .job files with rsync hosts:
 
     $ mkdir /etc/autorsyncbackup
 
-Yaml config example: `/etc/autorsyncbackup/host.domain.tld.yml`
+The job files are written in YAML syntax and will only apply with the `.job` file extension, config example: `/etc/autorsyncbackup/host.domain.tld.job`
 
     --
     hostname: host.domain.tld
