@@ -46,6 +46,45 @@ Create a directory for output XML files, these contain information about the exe
 
     $ mkdir /var/spool/autorsyncbackup
 
-Finally execute the backup (you can cron this command)
+Finally execute the backup (you can cron this command):
 
     $ /usr/local/bin/autorsyncbackup -j /etc/autorsyncbackup -l /var/spool/autorsyncbackup/
+    
+Install rsync as deamon
+-----------------------
+    
+Install the debian package:
+
+    $ apt-get install rsync
+    
+Enable deamon in `/etc/default/rsync`:
+    
+    RSYNC_ENABLE=true
+    
+Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup server):
+    
+    uid = root
+    gid = root
+    pid file = /var/run/rsyncd.pid
+    log file = /var/log/rsync.log
+    hosts allow = 1.2.3.4
+    max connections = 2
+    
+    [backup]
+            comment = backup share
+            path = /
+            read only = no
+            auth users= backup
+            secrets file = /etc/rsyncd.secrets
+    
+Configure a password in `/etc/rsyncd.secrets`:
+    
+    backup:VerySecretPasswordHere
+    
+Adjust permissions on `/etc/rsyncd.secrets`:
+    
+    chmod 500 /etc/rsyncd.secrets
+
+Start the rsync daemon with the init script:
+
+    $ /etc/init.d/rsync start
