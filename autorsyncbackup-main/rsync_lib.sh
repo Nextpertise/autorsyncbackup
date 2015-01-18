@@ -193,7 +193,7 @@ checkBackupEnvironment() {
       autorsyncbackuperrormsg="checkBackupEnvironment: Can't create directory: ${bkdir}"
       local ret=1
     else
-      echo "${bkdir}"
+      checkBackupEnvironment_return="${bkdir}"
     fi 
   fi
   return $ret
@@ -366,23 +366,26 @@ executeJob() {
   jobfile=$1
   rsyncreturncode=9
   rsyncoutput="Rsync was never invoked"
-  autorsyncbackuperror=0
+  autorsyncbackuperror=1
   autorsyncbackuperrormsg=""
   printf 'Execute job file: %s\n' "$jobfile"
   setBeforeDateTime
   readHostConfig
   checkRemoteHost
   if [[ "$?" == "0" ]]; then
-    bkdir=`checkBackupEnvironment`
+    checkBackupEnvironment
     if [[ "$?" == "0" ]]; then
-      folder=`createFolderCurrent "${bkdir}"`
+      bkdir="${checkBackupEnvironment_return}"
       if [[ "$?" == "0" ]]; then
-        hardlink=`getHardlinkOption "${bkdir}"`
-        generateFileset
-        executeRsync "$folder"
+        folder=`createFolderCurrent "${bkdir}"`
         if [[ "$?" == "0" ]]; then
-          rotateBackupFolders "${bkdir}"
-          mvCurrentToZero "${bkdir}"
+          hardlink=`getHardlinkOption "${bkdir}"`
+          generateFileset
+          executeRsync "$folder"
+          if [[ "$?" == "0" ]]; then
+            rotateBackupFolders "${bkdir}"
+            mvCurrentToZero "${bkdir}"
+          fi
         fi
       fi
     fi
