@@ -9,7 +9,7 @@ class config():
         mainconfigpath = "/etc/autorsyncbackup/main.yaml"
         jobconfigdirectory = "/etc/autorsyncbackup/"
         jobspooldirectory = "/var/spool/autorsyncbackup/"
-        backupdir = "/var/data/backups/"
+        backupdir = "/var/data/backups/autorsyncbackup/"
         speedlimitkb = 0
         dailyrotation = 8
         weeklyrotation = 5

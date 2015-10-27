@@ -13,4 +13,8 @@ if __name__ == "__main__":
     director = director()
     jobs = director.getJobArray()
     
-    director.checkRemoteHost(jobs[0])
+    job = jobs[0]
+    director.checkRemoteHost(job)
+    director.checkBackupEnvironment(job)
+    latest = director.checkForPreviousBackup(job)
+    director.executeRsync(job, latest)

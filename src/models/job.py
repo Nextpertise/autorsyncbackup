@@ -43,6 +43,13 @@ class job():
                 print "DEBUG: %s: No SSH jobconfig variable set." % self.filepath
         
         try:
+            self.username = jobconfig['username']
+        except:
+            print "%s: No username is set, skipping job." % self.filepath
+            self.enabled = False
+            return False
+
+        try:
             if not self.ssh:
                 self.password = jobconfig['password']
         except:
@@ -61,7 +68,7 @@ class job():
             self.backupdir = jobconfig['backupdir']
         except:
             self.backupdir = config().backupdir
-            if config()().debug:
+            if config().debug:
                 print "DEBUG: %s: No backupdir is set, using default" % self.filepath
             
         try:
