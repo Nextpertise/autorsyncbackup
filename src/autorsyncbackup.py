@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from director import director
-from models.configparser import configparser
+from models.config import config
 
 import pprint
 
@@ -11,4 +11,6 @@ if __name__ == "__main__":
     
     # Run director
     director = director()
-    director.getJobArray()
+    jobs = director.getJobArray()
+    
+    director.checkRemoteHost(jobs[0])

@@ -1,6 +1,6 @@
 import yaml
 
-class configparser():
+class config():
     
     class __impl:
         """ Implementation of the singleton interface """
@@ -26,9 +26,9 @@ class configparser():
     def __init__(self, mainconfigpath=None):
         """ Create singleton instance """
         # Check whether we already have an instance
-        if configparser.__instance is None:
+        if config.__instance is None:
             # Create and remember instance
-            configparser.__instance = configparser.__impl()
+            config.__instance = config.__impl()
             
             if(mainconfigpath):
                 self.mainconfigpath = mainconfigpath
@@ -36,7 +36,7 @@ class configparser():
             self.init = False
 
         # Store instance reference as the only member in the handle
-        self.__dict__['_configparser__instance'] = configparser.__instance
+        self.__dict__['_config__instance'] = config.__instance
 
     def __getattr__(self, attr):
         """ Delegate access to implementation """

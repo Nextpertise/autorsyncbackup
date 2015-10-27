@@ -1,5 +1,5 @@
 import yaml
-from configparser import configparser
+from config import config
 
 class job():
     enabled = True
@@ -39,7 +39,7 @@ class job():
         try:
             self.ssh = jobconfig['ssh']
         except:
-            if configparser().debug:
+            if config().debug:
                 print "DEBUG: %s: No SSH jobconfig variable set." % self.filepath
         
         try:
@@ -60,36 +60,36 @@ class job():
         try:
             self.backupdir = jobconfig['backupdir']
         except:
-            self.backupdir = configparser().backupdir
-            if configparser()().debug:
+            self.backupdir = config().backupdir
+            if config()().debug:
                 print "DEBUG: %s: No backupdir is set, using default" % self.filepath
             
         try:
             self.speedlimitkb = jobconfig['speedlimitkb']
         except:
-            self.speedlimitkb = configparser().speedlimitkb
-            if configparser().debug:
+            self.speedlimitkb = config().speedlimitkb
+            if config().debug:
                 print "DEBUG: %s: No speedlimitkb is set, using default" % self.filepath
             
         try:
             self.dailyrotation = jobconfig['dailyrotation']
         except:
-            self.dailyrotation = configparser().dailyrotation
-            if configparser().debug:
+            self.dailyrotation = config().dailyrotation
+            if config().debug:
                 print "DEBUG: %s: No dailyrotation is set, using default" % self.filepath
             
         try:
             self.weeklyrotation = jobconfig['weeklyrotation']
         except:
-            self.weeklyrotation = configparser().weeklyrotation
-            if configparser().debug:
+            self.weeklyrotation = config().weeklyrotation
+            if config().debug:
                 print "DEBUG: %s: No weeklyrotation is set, using default" % self.filepath
             
         try:
             self.monthlyrotation = jobconfig['monthlyrotation']
         except:
-            self.monthlyrotation = configparser().monthlyrotation
-            if configparser().debug:
+            self.monthlyrotation = config().monthlyrotation
+            if config().debug:
                 print "DEBUG: %s: No monthlyrotation is set, using default" % self.filepath
             
         try:
