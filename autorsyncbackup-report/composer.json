@@ -1,0 +1,26 @@
+{
+  "name": "ivodvb/autorsyncbackupreport",
+  "description": "Generates nice HTML reports from Autoryncbackup log files",
+  "minimum-stability": "stable",
+  "license": "GPL-1.0+",
+  "authors": [
+    {
+      "name": "Teun Ouwehand",
+      "email": "teun@nextpertise.nl"
+    },
+    {
+      "name": "Ivo van Beek",
+      "email": "ivo@dehostdivisie.nl"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/ivodvb/AutoRsyncBackup-Report/issues"
+  },
+  "require": {
+    "smarty/smarty": "3.1.x-dev",
+    "php": ">=5.3",
+    "phpmailer/phpmailer": "v5.2.9",
+    "phpunit/phpunit": "4.6.x-dev",
+    "mustangostang/spyc": "0.5.1"
+  }
+}

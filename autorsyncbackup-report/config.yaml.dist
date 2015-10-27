@@ -1,0 +1,18 @@
+---
+timezone: Europe/Amsterdam
+title: autorsyncbackup-report
+spooldir: /var/spool/autorsyncbackup/
+phpdebug: false
+maxBackupThresholdInHours: 24
+emailReportRecipients:
+  - peter@example.com
+  - mike@example.com
+emailReportCc:
+  - jane@example.com
+  - josh@example.com
+emailReportBcc:
+  - noc@example.com
+hostsToBackup:
+  - hostname1.ext
+  - hostname2.ext
+logdir: log
