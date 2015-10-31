@@ -72,11 +72,11 @@ class job():
                 print "DEBUG: %s: No backupdir is set, using default" % self.filepath
             
         try:
-            self.speedlimitkb = jobconfig['speedlimitkb']
+            self.speedlimitkb = int(jobconfig['speedlimitkb'])
         except:
             self.speedlimitkb = config().speedlimitkb
             if config().debug:
-                print "DEBUG: %s: No speedlimitkb is set, using default" % self.filepath
+                print "DEBUG: %s: No or invalid speedlimitkb is set, using default" % self.filepath
             
         try:
             self.dailyrotation = jobconfig['dailyrotation']

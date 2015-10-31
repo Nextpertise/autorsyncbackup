@@ -42,7 +42,7 @@ class rsync():
     def executeRsyncViaRsyncProtocol(self, job, latest):
         """Execute rsync command via rsync protocol"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
-        options = "--contimeout=5 -aR --delete --stats"
+        options = "--contimeout=5 -aR --delete --stats --bwlimit=%d" % job.speedlimitkb
         fileset = self.generateFileset(job)        
         
         # Link files to the same inodes as last backup to save disk space and boost backup performance
