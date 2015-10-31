@@ -7,6 +7,7 @@ class config():
         
         # Default config values
         mainconfigpath = "/etc/autorsyncbackup/main.yaml"
+        rsyncpath = "/usr/bin/rsync"
         jobconfigdirectory = "/etc/autorsyncbackup/"
         jobspooldirectory = "/var/spool/autorsyncbackup/"
         backupdir = "/var/data/backups/autorsyncbackup/"
@@ -14,7 +15,9 @@ class config():
         dailyrotation = 8
         weeklyrotation = 5
         monthlyrotation = 13
-        debug = False
+        weeklybackup = 7
+        monthlybackup = 1
+        debug = True
 
         def spam(self):
             """ Test method, return singleton id """
@@ -59,6 +62,12 @@ class config():
             self.debug = config['debug']
         except:
             pass
+            
+        try:
+            self.rsyncpath = config['rsyncpath']
+        except:
+            if self.debug:
+                print "DEBUG: %s: No rsyncpath is set, using default value: %s" % (self.mainconfigpath, self.rsyncpath)
 
         try:
             self.jobconfigdirectory = config['jobconfigdirectory']
@@ -101,3 +110,15 @@ class config():
         except:
             if self.debug:
                 print "DEBUG: %s: No monthlyrotation is set, using default value: %d" % (self.mainconfigpath, self.monthlyrotation)
+                
+        try:
+            self.weeklybackup = config['weeklybackup']
+        except:
+            if self.debug:
+                print "DEBUG: %s: No weeklybackup is set, using default value: %d" % (self.mainconfigpath, self.weeklybackup)
+                
+        try:
+            self.monthlybackup = config['monthlybackup']
+        except:
+            if self.debug:
+                print "DEBUG: %s: No monthlybackup is set, using default value: %d" % (self.mainconfigpath, self.monthlybackup)

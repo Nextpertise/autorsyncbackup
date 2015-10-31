@@ -4,7 +4,7 @@ import subprocess
 class rsync():
     
     def checkRemoteHost(self, job):
-        "Determine if we should use the SSH or Rsync protocol"
+        """Determine if we should use the SSH or Rsync protocol"""
         if job.ssh:
             ret = self.checkRemoteHostViaSshProtocol(job)
         else:
@@ -14,16 +14,17 @@ class rsync():
     def checkRemoteHostViaRsyncProtocol(self, job):
         """Check if remote host is up and able to accept connections with our credentials"""
         command = "export RSYNC_PASSWORD=\"%s\"; rsync --contimeout=5 rsync://%s@%s/%s" % (job.password, job.username, job.hostname, job.share)
+        errcode, stdout = self.executeCommand(command)
         
-        # TODO: Move command execution to seperate function, return errorcode, stdout
-        try:
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-        except subprocess.CalledProcessError as exc:
-            print "Error while connecting to host (%s) - %s" % (exc.returncode, exc.output)
-            return False
-        if config().debug:
-            print "DEBUG: Succesfully connected to host via rsync protocol (%s)" % job.hostname
-        return True
+        if errcode != 0:
+            print "Error while connecting to host (%s) - %s" % (errcode, stdout)
+            ret = False
+        else:
+            ret = True
+            if config().debug:
+                print "DEBUG: Succesfully connected to host via rsync protocol (%s)" % job.hostname
+        
+        return ret
           
     def checkRemoteHostViaSshProtocol(self, job):
         """TODO: Needs to be implemented"""
@@ -31,7 +32,7 @@ class rsync():
         return False
         
     def executeRsync(self, job, latest):
-        "Determine if we should use the SSH or Rsync protocol"
+        """Determine if we should use the SSH or Rsync protocol"""
         if job.ssh:
             ret = self.executeRsyncViaSshProtocol(job, latest)
         else:
@@ -39,15 +40,30 @@ class rsync():
         return ret
         
     def executeRsyncViaRsyncProtocol(self, job, latest):
+        """Execute rsync command via rsync protocol"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         options = "--contimeout=5 -aR --delete --stats"
-        rsyncpath = "/usr/bin/rsync"
+        fileset = self.generateFileset(job)        
         
+        # Link files to the same inodes as last backup to save disk space and boost backup performance
         if(latest):
-            command = "export RSYNC_PASSWORD=\"%s\"; %s %s --link-dest=%s %s %s" % (job.password, rsyncpath, options, latest, self.generateFileset(job), dir)
+            latest = "--link-dest=%s" % latest
         else:
-            command = "export RSYNC_PASSWORD=\"%s\"; %s %s %s %s" % (job.password, rsyncpath, options, self.generateFileset(job), dir)
-        print command
+            latest = ""
+        
+        # Generate rsync CLI command and execute it  
+        if(fileset):  
+            password = "export RSYNC_PASSWORD=\"%s\"" % job.password
+            rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
+            command = "%s; %s" % (password, rsyncCommand)
+            if config().debug:
+                print "DEBUG: Executing rsync command (%s)" % rsyncCommand
+            errcode, stdout = self.executeCommand(command)
+        else:
+            stdout = "Fileset is missing, Rsync is never invoked"
+            errcode = 9
+        
+        return errcode, stdout
     
     def executeRsyncViaSshProtocol(self, job, latest):
         """TODO: Needs to be implemented"""
@@ -56,6 +72,7 @@ class rsync():
         return False
         
     def generateFileset(self, job):
+        """Create fileset string"""
         if not job.fileset:
             print "ERROR: No fileset specified"
             return False
@@ -66,3 +83,13 @@ class rsync():
             else:
                 fileset = fileset + " rsync://%s@%s:/%s%s" % (job.username, job.hostname, job.share, fs)
         return fileset
+    
+    def executeCommand(self, command):
+        stdout = ""
+        errcode = 0
+        try:
+            stdout = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+        except subprocess.CalledProcessError as exc:
+            stdout = exc.output
+            errcode = exc.returncode
+        return errcode, stdout

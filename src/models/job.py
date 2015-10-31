@@ -98,6 +98,20 @@ class job():
             self.monthlyrotation = config().monthlyrotation
             if config().debug:
                 print "DEBUG: %s: No monthlyrotation is set, using default" % self.filepath
+                
+        try:
+            self.weeklybackup = jobconfig['weeklybackup']
+        except:
+            self.weeklybackup = config().weeklybackup
+            if config().debug:
+                print "DEBUG: %s: No weeklybackup is set, using default" % self.filepath
+                
+        try:
+            self.monthlybackup = jobconfig['monthlybackup']
+        except:
+            self.monthlybackup = config().monthlybackup
+            if config().debug:
+                print "DEBUG: %s: No monthlybackup is set, using default" % self.filepath
             
         try:
             self.fileset = jobconfig['fileset']
