@@ -15,6 +15,7 @@ class job():
     weeklyrotation = None
     monthlyrotation = None
     fileset = []
+    backupstatus = {}
     
     def __init__(self, filepath=None):
         self.filepath = filepath

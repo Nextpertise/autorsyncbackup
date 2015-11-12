@@ -63,6 +63,8 @@ class rsync():
             stdout = "Fileset is missing, Rsync is never invoked"
             errcode = 9
         
+        job.backupstatus['rsync_stdout'] = stdout
+        job.backupstatus['rsync_return_code'] = errcode
         return errcode, stdout
     
     def executeRsyncViaSshProtocol(self, job, latest):

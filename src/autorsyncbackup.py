@@ -30,8 +30,7 @@ if __name__ == "__main__":
     
     # TODO: Run multiple jobs at the same time
     # TODO: Create logfile, write debug always to log?
-    # TODO: Write XML file
-    # TODO: Create XML mail parser
+    # TODO: Create status mail
     
     for job in jobs:
         if(job.enabled):
@@ -41,3 +40,4 @@ if __name__ == "__main__":
                 latest = director.checkForPreviousBackup(job)
                 director.executeRsync(job, latest)
                 director.backupRotate(job)
+                director.processBackupStatus(job)

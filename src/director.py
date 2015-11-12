@@ -1,6 +1,7 @@
-import glob, os, re, datetime, shutil
+import glob, os, re, time, datetime, shutil
 from models.job import job
 from models.config import config
+from models.jobrunhistory import jobrunhistory
 from lib.rsync import rsync
 
 class director():
@@ -26,7 +27,10 @@ class director():
         return rsync().checkRemoteHost(job)
         
     def executeRsync(self, job, latest):
-        return rsync().executeRsync(job, latest)
+        job.backupstatus['startdatetime'] = int(time.time())
+        ret = rsync().executeRsync(job, latest)
+        job.backupstatus['enddatetime'] = int(time.time())
+        return ret
         
     def checkBackupEnvironment(self, job):
         backupdir = job.backupdir.rstrip('/')
@@ -75,7 +79,7 @@ class director():
         ret = False
         p = re.compile(self.regexp_backupdirectory)
         m = p.match(backupDirectoryInstance)
-        if p.match(backupDirectoryInstance):
+        if m:
             ret = int(m.group(2))
         return ret
         
@@ -83,7 +87,7 @@ class director():
         ret = False
         p = re.compile(self.regexp_backupdirectory)
         m = p.match(backupDirectoryInstance)
-        if p.match(backupDirectoryInstance):
+        if m:
             ret = m.group(1)
         return ret  
         
@@ -218,3 +222,32 @@ class director():
         """Check if workingDirectory is daily/weekly/monthly"""
         check = ["daily", "weekly", "monthly"]
         return workingDirectory in check
+        
+    def processBackupStatus(self, job):
+        job.backupstatus['hostname'] = job.hostname
+        job.backupstatus['username'] = job.username
+        if(job.ssh):
+            ssh = 'True'
+        else:
+            ssh = 'False'
+        job.backupstatus['ssh'] = ssh
+        job.backupstatus['share'] = job.share
+        job.backupstatus['fileset'] = ':'.join(job.fileset)
+        job.backupstatus['backupdir'] = job.backupdir
+        job.backupstatus['type'] = self.getWorkingDirectory()
+        p = re.compile(r"^\s*?Number of files: (\d+)\s*Number of files transferred: (\d+)\s*Total file size: (\d+) bytes\s*Total transferred file size: (\d+)\s* bytes\s*Literal data: (\d+) bytes\s*Matched data: (\d+) bytes\s*File list size: (\d+)\s*File list generation time: (\S+)\s* seconds?\s*File list transfer time: (\S+)\s*seconds?\s*Total bytes sent: (\d+)\s*Total bytes received: (\d+)(\s|\S)*$")
+        m = p.match(job.backupstatus['rsync_stdout'])
+        if m:
+            job.backupstatus['rsync_number_of_files'] = m.group(1)
+            job.backupstatus['rsync_number_of_files_transferred'] =  m.group(2)
+            job.backupstatus['rsync_total_file_size'] =  m.group(3)
+            job.backupstatus['rsync_total_transferred_file_size'] =  m.group(4)
+            job.backupstatus['rsync_literal_data'] =  m.group(5)
+            job.backupstatus['rsync_matched_data'] =  m.group(6)
+            job.backupstatus['rsync_file_list_size'] =  m.group(7)
+            job.backupstatus['rsync_file_list_generation_time'] =  float(m.group(8))
+            job.backupstatus['rsync_file_list_transfer_time'] =  float(m.group(9))
+            job.backupstatus['rsync_total_bytes_sent'] =  m.group(10)
+            job.backupstatus['rsync_total_bytes_received'] =  m.group(11)
+            
+        jobrunhistory().insertJob(job.backupstatus)
