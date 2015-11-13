@@ -72,6 +72,7 @@ class jobrunhistory():
                                     speedlimitkb INTEGER, \
                                     filesrotate TEXT, \
                                     type TEXT, \
+                                    rsync_backup_status INTEGER, \
                                     rsync_return_code INTEGER, \
                                     rsync_stdout TEXT, \
                                     rsync_number_of_files INTEGER, \
@@ -103,3 +104,24 @@ class jobrunhistory():
             self.conn.commit()
         except:
             print "ERROR: Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db")
+            
+    def getJobHistory(self, hosts):
+        ret = None
+        if hosts:
+            try:
+                c = self.conn.cursor()
+                c.row_factory = self.dict_factory
+                placeholders = ', '.join(['?'] * len(hosts))
+                # TODO: Only report backups of last 24h / make this variabel in config
+                query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
+                c.execute(query, hosts)
+                ret = c.fetchall()
+            except:
+                pass
+        return ret
+        
+    def dict_factory(self, cursor, row):
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d

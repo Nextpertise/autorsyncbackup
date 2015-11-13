@@ -234,6 +234,7 @@ class director():
         job.backupstatus['share'] = job.share
         job.backupstatus['fileset'] = ':'.join(job.fileset)
         job.backupstatus['backupdir'] = job.backupdir
+        job.backupstatus['speedlimitkb'] = job.speedlimitkb
         job.backupstatus['type'] = self.getWorkingDirectory()
         p = re.compile(r"^\s*?Number of files: (\d+)\s*Number of files transferred: (\d+)\s*Total file size: (\d+) bytes\s*Total transferred file size: (\d+)\s* bytes\s*Literal data: (\d+) bytes\s*Matched data: (\d+) bytes\s*File list size: (\d+)\s*File list generation time: (\S+)\s* seconds?\s*File list transfer time: (\S+)\s*seconds?\s*Total bytes sent: (\d+)\s*Total bytes received: (\d+)(\s|\S)*$")
         m = p.match(job.backupstatus['rsync_stdout'])

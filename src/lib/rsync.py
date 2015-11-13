@@ -37,6 +37,8 @@ class rsync():
             ret = self.executeRsyncViaSshProtocol(job, latest)
         else:
             ret = self.executeRsyncViaRsyncProtocol(job, latest)
+        ret = self.rsyncErrorCodeToBoolean(ret[0])
+        job.backupstatus['rsync_backup_status'] = int(ret)
         return ret
         
     def executeRsyncViaRsyncProtocol(self, job, latest):
@@ -95,3 +97,11 @@ class rsync():
             stdout = exc.output
             errcode = exc.returncode
         return errcode, stdout
+        
+    def rsyncErrorCodeToBoolean(self, errorCode):
+        ret = False
+        if errorCode == 0:
+            ret = True
+        elif errorCode == 24:
+            ret = True
+        return ret

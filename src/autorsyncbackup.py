@@ -3,6 +3,7 @@
 from optparse import OptionParser
 from director import director
 from models.config import config
+from lib.statusemail import statusemail
 
 def setupCliArguments():
     parser = OptionParser()
@@ -30,7 +31,6 @@ if __name__ == "__main__":
     
     # TODO: Run multiple jobs at the same time
     # TODO: Create logfile, write debug always to log?
-    # TODO: Create status mail
     
     for job in jobs:
         if(job.enabled):
@@ -38,6 +38,8 @@ if __name__ == "__main__":
             if not options.dryrun:
                 director.checkBackupEnvironment(job)
                 latest = director.checkForPreviousBackup(job)
-                director.executeRsync(job, latest)
-                director.backupRotate(job)
+                if director.executeRsync(job, latest):
+                    director.backupRotate(job)
                 director.processBackupStatus(job)
+                
+    statusemail().sendStatusEmail(jobs)
