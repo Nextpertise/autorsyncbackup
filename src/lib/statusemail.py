@@ -3,6 +3,7 @@ from models.config import config
 from models.jobrunhistory import jobrunhistory
 from mailer import Mailer, Message
 from jinja2 import Environment, PackageLoader
+from collections import OrderedDict
 
 class statusemail():
     
@@ -21,7 +22,7 @@ class statusemail():
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = self._epochToStrDate
         env.filters['bytesformat'] = self._bytesToReadableStr
-        # TODO: Create seconds, hours, days formatter
+        env.filters['secondsformat'] = self._secondsToReadableStr
         # TODO: Create thousend seperator formatter
         template = env.get_template('email.tpl')
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, jobrunhistory=jobrunhistory, jobs=jobs)
@@ -118,3 +119,22 @@ class statusemail():
             i = i + 1
             bytesStr = "%.1f" % bytes
         return bytesStr + byteUnits[i]
+        
+    def _secondsToReadableStr(self, seconds):
+        try:
+          seconds = int(seconds)
+        except:
+          seconds = 0
+        if seconds == 0:
+            return "0 seconds"
+        ret = ""
+        units = OrderedDict([('week', 7*24*3600), ('day', 24*3600), ('hour', 3600), ('minute', 60), ('second', 1)])
+        for unit in units:
+            quot = seconds / units[unit]
+            if quot:
+               ret = ret + str(quot) + " " + unit
+               seconds = seconds - (quot * units[unit])
+               if abs(quot) > 1:
+                   ret = ret + "s"
+               ret = ret + ", "
+        return ret[:-2]

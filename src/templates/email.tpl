@@ -276,11 +276,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total backup duration</td>
-                                                    <td class="data-value">{{ stats.total_backup_duration }} seconds</td>
+                                                    <td class="data-value">{{ stats.total_backup_duration|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Average backup duration</td>
-                                                    <td class="data-value">{{ stats.average_backup_duration }} seconds</td>
+                                                    <td class="data-value">{{ stats.average_backup_duration|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Average speed limit in KBs</td>
@@ -316,11 +316,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total file list generation time</td>
-                                                    <td class="data-value">{{ stats.total_file_list_generation_time }} seconds</td>
+                                                    <td class="data-value">{{ stats.total_file_list_generation_time|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total file list transfer time</td>
-                                                    <td class="data-value">{{ stats.total_file_list_transfer_time }} seconds</td>
+                                                    <td class="data-value">{{ stats.total_file_list_transfer_time|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total sent</td>
@@ -375,7 +375,7 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Backup duration</td>
-                                                    <td class="data-value">{{ jrh.enddatetime - jrh.startdatetime }} seconds</td>
+                                                    <td class="data-value">{{ (jrh.enddatetime - jrh.startdatetime)|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Backup speed limit</td>
@@ -411,11 +411,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">File list generation time</td>
-                                                    <td class="data-value">{{ jrh.rsync_file_list_generation_time }} seconds</td>
+                                                    <td class="data-value">{{ jrh.rsync_file_list_generation_time|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">File list transfer time</td>
-                                                    <td class="data-value">{{ jrh.rsync_file_list_transfer_time }} seconds</td>
+                                                    <td class="data-value">{{ jrh.rsync_file_list_transfer_time|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total sent</td>
@@ -441,14 +441,14 @@
                         </tr>
                         <tr>
                           <td style="padding-top:20px;background-color:#ffffff;">Kind Regards,<br>
-                          Auto Rsync Backup report tool</td>
+                          AutoRsyncBackup</td>
                         </tr>
                       </table>
                     </td>
                   </tr>
                   <tr>
                     <td class="footer-cell" valign="top">
-                      <a href="https://github.com/ivodvb/AutoRsyncBackup-Report">Auto Rsync Backup report on Github</a>
+                      <a href="https://github.com/Nextpertise/autorsyncbackupw">AutoRsyncBackup on Github</a>
                     </td>
                   </tr>
                 </table>
