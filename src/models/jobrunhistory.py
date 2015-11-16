@@ -112,7 +112,7 @@ class jobrunhistory():
                 c = self.conn.cursor()
                 c.row_factory = self.dict_factory
                 placeholders = ', '.join(['?'] * len(hosts))
-                # TODO: Only report backups of last 24h / make this variabel in config
+                # Get last run history of given hosts
                 query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
