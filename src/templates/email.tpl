@@ -288,11 +288,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total number of files</td>
-                                                    <td class="data-value">{{ stats.total_number_of_files }}</td>
+                                                    <td class="data-value">{{ stats.total_number_of_files|numberformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total number of files transferred</td>
-                                                    <td class="data-value">{{ stats.total_number_of_files_transferred }}</td>
+                                                    <td class="data-value">{{ stats.total_number_of_files_transferred|numberformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="30%">Total file size</td>
@@ -383,11 +383,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Number of files</td>
-                                                    <td class="data-value">{{ jrh.rsync_number_of_files }}</td>
+                                                    <td class="data-value">{{ jrh.rsync_number_of_files|numberformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Number of files transferred</td>
-                                                    <td class="data-value">{{ jrh.rsync_number_of_files_transferred }}</td>
+                                                    <td class="data-value">{{ jrh.rsync_number_of_files_transferred|numberformat }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total file size</td>
