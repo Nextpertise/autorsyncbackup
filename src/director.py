@@ -236,19 +236,25 @@ class director():
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb
         job.backupstatus['type'] = self.getWorkingDirectory()
-        p = re.compile(r"^\s*?Number of files: (\d+)\s*Number of files transferred: (\d+)\s*Total file size: (\d+) bytes\s*Total transferred file size: (\d+)\s* bytes\s*Literal data: (\d+) bytes\s*Matched data: (\d+) bytes\s*File list size: (\d+)\s*File list generation time: (\S+)\s* seconds?\s*File list transfer time: (\S+)\s*seconds?\s*Total bytes sent: (\d+)\s*Total bytes received: (\d+)(\s|\S)*$")
+        p = re.compile(r"^(.*)\s*?Number of files: (\d+)\s*Number of files transferred: (\d+)\s*Total file size: (\d+) bytes\s*Total transferred file size: (\d+)\s* bytes\s*Literal data: (\d+) bytes\s*Matched data: (\d+) bytes\s*File list size: (\d+)\s*File list generation time: (\S+)\s* seconds?\s*File list transfer time: (\S+)\s*seconds?\s*Total bytes sent: (\d+)\s*Total bytes received: (\d+)(\s|\S)*$", re.MULTILINE|re.DOTALL)
         m = p.match(job.backupstatus['rsync_stdout'])
         if m:
-            job.backupstatus['rsync_number_of_files'] = m.group(1)
-            job.backupstatus['rsync_number_of_files_transferred'] =  m.group(2)
-            job.backupstatus['rsync_total_file_size'] =  m.group(3)
-            job.backupstatus['rsync_total_transferred_file_size'] =  m.group(4)
-            job.backupstatus['rsync_literal_data'] =  m.group(5)
-            job.backupstatus['rsync_matched_data'] =  m.group(6)
-            job.backupstatus['rsync_file_list_size'] =  m.group(7)
-            job.backupstatus['rsync_file_list_generation_time'] =  float(m.group(8))
-            job.backupstatus['rsync_file_list_transfer_time'] =  float(m.group(9))
-            job.backupstatus['rsync_total_bytes_sent'] =  m.group(10)
-            job.backupstatus['rsync_total_bytes_received'] =  m.group(11)
-            
+            # Limit output on max 10.000 characters incase of thousends of vanished files will fill up the SQLite db / e-mail output
+            job.backupstatus['rsync_stdout'] = job.backupstatus['rsync_stdout'][:10000]
+            job.backupstatus['rsync_pre_stdout'] = m.group(1)[:10000]
+            # Set backupstatus vars via regexp group capture
+            job.backupstatus['rsync_number_of_files'] = m.group(2)
+            job.backupstatus['rsync_number_of_files_transferred'] =  m.group(3)
+            job.backupstatus['rsync_total_file_size'] = m.group(4)
+            job.backupstatus['rsync_total_transferred_file_size'] =  m.group(5)
+            job.backupstatus['rsync_literal_data'] = m.group(6)
+            job.backupstatus['rsync_matched_data'] = m.group(7)
+            job.backupstatus['rsync_file_list_size'] = m.group(8)
+            job.backupstatus['rsync_file_list_generation_time'] = float(m.group(9))
+            job.backupstatus['rsync_file_list_transfer_time'] = float(m.group(10))
+            job.backupstatus['rsync_total_bytes_sent'] = m.group(11)
+            job.backupstatus['rsync_total_bytes_received'] = m.group(12)
+        else:
+            if job.backupstatus['rsync_backup_status'] == 1:
+                print "Error unhandled output in rsync command (%s)" % job.backupstatus['rsync_stdout']
         jobrunhistory().insertJob(job.backupstatus)

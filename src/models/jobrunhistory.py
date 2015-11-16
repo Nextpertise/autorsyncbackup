@@ -74,6 +74,7 @@ class jobrunhistory():
                                     type TEXT, \
                                     rsync_backup_status INTEGER, \
                                     rsync_return_code INTEGER, \
+                                    rsync_pre_stdout TEXT, \
                                     rsync_stdout TEXT, \
                                     rsync_number_of_files INTEGER, \
                                     rsync_number_of_files_transferred INTEGER, \

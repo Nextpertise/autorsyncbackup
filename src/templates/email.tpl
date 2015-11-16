@@ -357,7 +357,7 @@
                                                     <td class="data-heading" width="50%">Rsync errors</td>
                                                     <td class="data-value">
                                                       <ul>
-                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - {{ jrh.rsync_stdout}}{%- else %}No errors{%- endif %}</li>
+                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - {{ jrh.rsync_stdout }}{%- else %}No errors ({{ jrh.rsync_return_code}}){%- endif %}</li>
                                                       </ul>
                                                     </td>
                                                   </tr>
@@ -365,7 +365,7 @@
                                                     <td class="data-heading" width="50%">Missing files and directories</td>
                                                     <td class="data-value">
                                                       <ul>
-                                                        <li>TODO: To be implemented</li>
+                                                        <li>{%- if jrh.rsync_backup_status == 1 and jrh.rsync_return_code != 0 %}{{ jrh.rsync_pre_stdout }}{%- else %}None{%- endif %}</li>
                                                       </ul>
                                                     </td>
                                                   </tr>
