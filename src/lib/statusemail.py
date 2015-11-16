@@ -15,8 +15,9 @@ class statusemail():
         stats = self.getStats(jobs)
         jrh = jobrunhistory().getJobHistory(self.getBackupHosts(jobs))
         
+        subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
         body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, jrh, jobs)
-        self._send(htmlbody=body)
+        self._send(subject=subject, htmlbody=body)
         
     def getHtmlEmailBody(self, state, hosts, missinghosts, stats, jobrunhistory, jobs):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
@@ -56,6 +57,7 @@ class statusemail():
         result = jobrunhistory().getJobHistory(self.getBackupHosts(jobs))
         ret = {}
         ret['total_host_count'] = len(result)
+        ret['total_backups_failed'] = 0
         ret['total_backup_duration'] = 0
         ret['total_number_of_files'] = 0
         ret['total_number_of_files_transferred'] = 0
@@ -86,17 +88,20 @@ class statusemail():
                 ret['total_bytes_received'] = ret['total_bytes_received'] + i['rsync_total_bytes_received']
                 if i['speedlimitkb']:
                     ret['total_speed_limit_kb'] = ret['total_speed_limit_kb'] + i['speedlimitkb']
+            else:
+                ret['total_backups_failed'] = ret['total_backups_failed'] + 1
         
+        ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
         ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_host_count']
         ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_host_count']
         return ret
         
-    def _send(self, htmlbody):
+    def _send(self, subject, htmlbody):
         # TODO: Load config variabelen for sender, recipient(s)
         # TODO: Hardcode Subject with error counter
         # TODO: Alternative SMTP host config option
         message = Message(From="backup@nextpertise.nl", To="teun@nextpertise.nl", charset="utf-8")
-        message.Subject = "An HTML Email"
+        message.Subject = subject
         message.Html = htmlbody
         message.Body = """This is an HTML e-mail with the backup overview, please use a HTML enabled e-mail client."""
         sender = Mailer('localhost')

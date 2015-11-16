@@ -203,7 +203,7 @@
               <td class="wrap-cell" style="padding-top:30px; padding-bottom:30px;" valign="top">
                 <table cellpadding="0" cellspacing="0" class="force-full-width">
                   <tr>
-                    <td class="header-cell" height="60" style="padding-top:15px;" valign="top">Auto Rsync Backup report (test mail)</td>
+                    <td class="header-cell" height="60" style="padding-top:15px;" valign="top">AutoRsyncBackup report</td>
                   </tr>
                   <tr>
                     <td class="body-cell" valign="top">
