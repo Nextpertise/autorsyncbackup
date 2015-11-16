@@ -2,12 +2,12 @@ import yaml
 from config import config
 
 class job():
-    enabled = True
+    enabled = None
     filepath = None
     hostname = None
     username = None
     password = None
-    ssh = False
+    ssh = None
     share = None
     backupdir = None
     speedlimitkb = None
@@ -33,6 +33,13 @@ class job():
             return False
 
         try:
+            self.enabled = jobconfig['enabled']
+        except:
+            self.enabled = True
+            if config().debug:
+                print "%s: No enabled tag is set, using default value: True" % self.filepath
+
+        try:
             self.hostname = jobconfig['hostname']
         except:
             print "%s: No hostname, skipping job." % self.filepath
@@ -42,6 +49,7 @@ class job():
         try:
             self.ssh = jobconfig['ssh']
         except:
+            self.ssh = False
             if config().debug:
                 print "DEBUG: %s: No SSH jobconfig variable set." % self.filepath
         
