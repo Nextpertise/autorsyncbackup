@@ -90,8 +90,8 @@ class statusemail():
                 ret['total_backups_failed'] = ret['total_backups_failed'] + 1
         
         ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
-        ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_host_count']
-        ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_host_count']
+        ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_backups_success']
+        ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
         
     def _send(self, subject, htmlbody):
