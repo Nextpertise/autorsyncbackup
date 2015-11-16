@@ -6,9 +6,7 @@ from jinja2 import Environment, PackageLoader
 from collections import OrderedDict
 
 class statusemail():
-    
     def sendStatusEmail(self, jobs):
-        # TODO: produce e-mail with template
         state = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
@@ -97,15 +95,13 @@ class statusemail():
         return ret
         
     def _send(self, subject, htmlbody):
-        # TODO: Load config variabelen for sender, recipient(s)
-        # TODO: Hardcode Subject with error counter
-        # TODO: Alternative SMTP host config option
-        message = Message(From="backup@nextpertise.nl", To="teun@nextpertise.nl", charset="utf-8")
-        message.Subject = subject
-        message.Html = htmlbody
-        message.Body = """This is an HTML e-mail with the backup overview, please use a HTML enabled e-mail client."""
-        sender = Mailer('localhost')
-        sender.send(message)
+        for to in config().backupmailrecipients:
+            message = Message(From=config().backupmailfrom, To=to, charset="utf-8")
+            message.Subject = subject
+            message.Html = htmlbody
+            message.Body = """This is an HTML e-mail with the backup overview, please use a HTML enabled e-mail client."""
+            sender = Mailer(config().smtphost)
+            sender.send(message)
         
     # Jinja filters
     def _epochToStrDate(self, epoch, strftime):

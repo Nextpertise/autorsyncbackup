@@ -1,4 +1,4 @@
-import yaml
+import yaml, socket
 
 class config():
     
@@ -17,6 +17,8 @@ class config():
         monthlyrotation = 13
         weeklybackup = 7
         monthlybackup = 1
+        backupmailfrom = ""
+        backupmailrecipients = []
         debug = True
 
         def spam(self):
@@ -122,3 +124,26 @@ class config():
         except:
             if self.debug:
                 print "DEBUG: %s: No monthlybackup is set, using default value: %d" % (self.mainconfigpath, self.monthlybackup)
+                
+        try:
+            self.smtphost = config['smtphost']
+        except:
+            self.smtphost = 'localhost'
+            if self.debug:
+                print "DEBUG: %s: No smtphost is set, using default value: %s" % (self.mainconfigpath, self.smtphost)
+
+        try:
+            self.backupmailfrom = config['backupmailfrom']
+        except:
+            defaultPrefix = "backup@"
+            fqdn = socket.getfqdn()
+            self.backupmailfrom = "%s%s" % (defaultPrefix, fqdn)
+            if self.debug:
+                print "DEBUG: %s: No backupmailfrom is set, using default value: %s" % (self.mainconfigpath, self.monthlybackup)
+                
+        try:
+            if type(config['backupmailrecipients']) is list:
+                self.backupmailrecipients = config['backupmailrecipients']
+        except:
+            if self.debug:
+                print "DEBUG: %s: No backupmailrecipient(s) are set, there will no backup report be sent" % self.mainconfigpath
