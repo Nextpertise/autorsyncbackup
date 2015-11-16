@@ -30,7 +30,7 @@ class statusemail():
         """Overall backup state = 'ok' unless there is at least one failed backup"""
         ret = "ok"
         for j in jobrunhistory().getJobHistory(self.getBackupHosts(jobs)):
-            if j['rsync_backup_status'] != "1":
+            if j['rsync_backup_status'] != 1:
                 ret = "error"        
         return ret
     
@@ -38,14 +38,16 @@ class statusemail():
         """Get all configured hosts"""
         ret = []
         for j in jobs:
-            ret.append(j.hostname)
+            if j.enabled:
+                ret.append(j.hostname)
         return ret
         
     def getMissingHosts(self, jobs):
         """Add all configured hosts, remove all runned hosts, incase there are elements left we have 'missing' hosts"""
         hosts = []
         for i in jobs:
-            hosts.append(i.hostname)
+            if i.enabled:
+                hosts.append(i.hostname)
         for j in jobrunhistory().getJobHistory(self.getBackupHosts(jobs)):
             hosts.remove(j['hostname'])
         return hosts
