@@ -14,11 +14,13 @@ class job():
     dailyrotation = None
     weeklyrotation = None
     monthlyrotation = None
-    fileset = []
-    backupstatus = {}
+    fileset = None
+    backupstatus = None
     
     def __init__(self, filepath=None):
         self.filepath = filepath
+        self.fileset = []
+        self.backupstatus = {}
         self.readJob()
     
     def readJob(self):

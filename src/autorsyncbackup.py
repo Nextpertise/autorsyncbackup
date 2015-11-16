@@ -33,8 +33,6 @@ if __name__ == "__main__":
     # TODO: Create logfile, write debug always to log?
     
     for job in jobs:
-        # Clear backupstatus
-        job.backupstatus = {}
         if(job.enabled):
             director.checkRemoteHost(job)
             if not options.dryrun:
