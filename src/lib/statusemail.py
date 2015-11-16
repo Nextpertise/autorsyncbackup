@@ -1,9 +1,9 @@
 import datetime
 from models.config import config
 from models.jobrunhistory import jobrunhistory
+from lib.jinjafilters import jinjafilters
 from mailer import Mailer, Message
 from jinja2 import Environment, PackageLoader
-from collections import OrderedDict
 
 class statusemail():
     def sendStatusEmail(self, jobs):
@@ -19,10 +19,10 @@ class statusemail():
         
     def getHtmlEmailBody(self, state, hosts, missinghosts, stats, jobrunhistory, jobs):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
-        env.filters['datetimeformat'] = self._epochToStrDate
-        env.filters['bytesformat'] = self._bytesToReadableStr
-        env.filters['secondsformat'] = self._secondsToReadableStr
-        env.filters['numberformat'] = self._intToReadableStr
+        env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
+        env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
+        env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
+        env.filters['numberformat'] = jinjafilters()._intToReadableStr
         template = env.get_template('email.tpl')
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, jobrunhistory=jobrunhistory, jobs=jobs)
         
@@ -102,53 +102,3 @@ class statusemail():
             message.Body = """This is an HTML e-mail with the backup overview, please use a HTML enabled e-mail client."""
             sender = Mailer(config().smtphost)
             sender.send(message)
-        
-    # Jinja filters
-    def _epochToStrDate(self, epoch, strftime):
-        return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
-        
-    def _bytesToReadableStr(self, bytes):
-        try:
-          bytes = float(bytes)
-        except:
-          bytes = 0
-        i = 0
-        byteUnits = [' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
-        bytesStr = "%.0f" % bytes
-        while bytes > 1024:
-            bytes = bytes / 1024
-            i = i + 1
-            bytesStr = "%.1f" % bytes
-        return bytesStr + byteUnits[i]
-        
-    def _secondsToReadableStr(self, seconds):
-        try:
-          seconds = int(seconds)
-        except:
-          seconds = 0
-        if seconds == 0:
-            return "0 seconds"
-        ret = ""
-        units = OrderedDict([('week', 7*24*3600), ('day', 24*3600), ('hour', 3600), ('minute', 60), ('second', 1)])
-        for unit in units:
-            quot = seconds / units[unit]
-            if quot:
-               ret = ret + str(quot) + " " + unit
-               seconds = seconds - (quot * units[unit])
-               if abs(quot) > 1:
-                   ret = ret + "s"
-               ret = ret + ", "
-        return ret[:-2]
-        
-    def _intToReadableStr(self, x):
-        try:
-            x = int(x)
-        except:
-            x = 0
-        if x < 0:
-            return '-' + intWithCommas(-x)
-        result = ''
-        while x >= 1000:
-            x, r = divmod(x, 1000)
-            result = ".%03d%s" % (r, result)
-        return "%d%s" % (x, result)

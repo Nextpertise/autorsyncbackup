@@ -219,7 +219,7 @@
                                         <td style="background-color:{%- if state == "ok" %}green{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup state: {{ state }}</td>
                                       </tr>
                                       <tr>
-                                        <td style="border:1px solid {% if state == "ok" %}green{% else %}red{% endif %};">
+                                        <td style="border:1px solid {% if state == "ok" %}green{% else %}red{% endif %}; padding: 10px;">
                                           {%- if state == "ok" %}No errors found, backup succeeded{% else %}Errors found, investigate this e-mail!{% endif %}
                                           <table cellpadding="0" cellspacing="20" width="100%"></table>
                                         </td>
@@ -235,7 +235,7 @@
                                   <center>
                                     <table cellpadding="0" cellspacing="0" class="card">
                                       <tr>
-                                        <td style="background-color:white; text-align:center; padding:10px; color:black;">Overall backup info</td>
+                                        <td style="background-color:{%- if state == "ok" %}green{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup info</td>
                                       </tr>
                                       <tr>
                                         <td style="border:1px solid {% if state == "ok" %}green{% else %}red{% endif %}; padding: 20px 0 20px;">
@@ -267,9 +267,10 @@
                                                   <tr>
                                                     <td class="data-heading" width="50%">Missing hosts:</td>
                                                     <td class="data-value">
+                                                    {%- if missinghosts %}
                                                     {%- for item in missinghosts %}
                                                     {{ item }}<br>
-                                                    {% endfor %}</td>
+                                                    {% endfor %}{% else %}None<br>{% endif %}</td>
                                                   </tr>
                                                   <tr>
                                                     <td colspan="2">&nbsp;</td>
