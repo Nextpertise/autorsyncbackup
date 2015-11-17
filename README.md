@@ -1,7 +1,7 @@
 AutoRsyncbackup
 ---------------
 
-AutoRsyncBackup is a backup solutuon written in Python as wrapper around rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create a issue if you find any problem.
+AutoRsyncBackup is a backup solution written in Python as wrapper around rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create a issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
     @company: Nextpertise B.V.
