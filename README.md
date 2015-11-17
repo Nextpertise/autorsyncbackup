@@ -1,12 +1,12 @@
 AutoRsyncbackup
 ---------------
 
-AutoRsyncBackup is a backup solution written in Python as wrapper around rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create a issue if you find any problem.
+AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create an issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
     @company: Nextpertise B.V.
 
-How to use:
+Install AutoRsyncbackup (Server):
 -----------
 
 Export by example to: `/usr/local/share/autorsyncbackup`
@@ -16,7 +16,7 @@ Export by example to: `/usr/local/share/autorsyncbackup`
     
 Create symlink:
 
-    $ ln -s /usr/local/share/autorsyncbackup/autorsyncbackup.py /usr/local/bin/autorsyncbackup
+    $ ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup
 
 Create a job directory, this directory will contain .job files with rsync hosts:
 
@@ -52,7 +52,7 @@ Finally execute the backup (you can cron this command):
 
     $ /usr/local/bin/autorsyncbackup
     
-Install rsync as deamon
+Install rsync as deamon (Client)
 -----------------------
     
 Install the debian package:
@@ -75,7 +75,7 @@ Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup s
     [backup]
             comment = backup share
             path = /
-            read only = no
+            read only = yes
             auth users= backup
             secrets file = /etc/rsyncd.secrets
     
