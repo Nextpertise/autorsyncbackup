@@ -72,6 +72,8 @@ class statusemail():
         ret['total_bytes_sent'] = 0
         ret['total_bytes_received'] = 0
         ret['total_speed_limit_kb'] = 0
+        ret['average_backup_duration'] = 0
+        ret['average_speed_limit_kb'] = 0
         
         for i in result:
             if i['rsync_backup_status'] == 1:
@@ -93,8 +95,9 @@ class statusemail():
                 ret['total_backups_failed'] = ret['total_backups_failed'] + 1
         
         ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
-        ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_backups_success']
-        ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
+        if ret['total_backups_success'] > 0:
+            ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_backups_success']
+            ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
         
     def _send(self, subject, htmlbody):
