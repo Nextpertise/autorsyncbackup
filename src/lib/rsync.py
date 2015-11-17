@@ -22,8 +22,7 @@ class rsync():
             ret = False
         else:
             ret = True
-            if config().debug:
-                logger().debug("DEBUG: Succesfully connected to host via rsync protocol (%s)" % job.hostname)
+            logger().info("INFO: Succesfully connected to host via rsync protocol (%s)" % job.hostname)
         
         return ret
           
