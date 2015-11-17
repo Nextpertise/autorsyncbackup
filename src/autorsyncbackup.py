@@ -47,4 +47,5 @@ if __name__ == "__main__":
                 director.processBackupStatus(job)
     
     # Sent status report
-    statusemail().sendStatusEmail(jobs)
+    if not options.dryrun:
+        statusemail().sendStatusEmail(jobs)
