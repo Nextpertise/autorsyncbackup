@@ -3,6 +3,7 @@ from models.job import job
 from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.rsync import rsync
+from lib.logger import logger
 
 class director():
     
@@ -17,7 +18,7 @@ class director():
                 for file in glob.glob("*.job"):
                     jobArray.append(job(dir + "/" + file))
             else:
-                print "Job directory (%s) doesn't exists, exiting (1)" % dir
+                logger().error("Job directory (%s) doesn't exists, exiting (1)" % dir)
         else:
             jobArray.append(job(jobpath))
             
@@ -35,7 +36,7 @@ class director():
     def checkBackupEnvironment(self, job):
         backupdir = job.backupdir.rstrip('/')
         if not os.path.exists(backupdir):
-            print "Backup path (%s) doesn't exists" % backupdir
+            logger().error("Backup path (%s) doesn't exists" % backupdir)
             return False
         try:
             dir = backupdir + "/" + job.hostname + "/current"
@@ -51,7 +52,7 @@ class director():
             if not os.path.exists(dir):
                 os.makedirs(dir)
         except:
-            print "Error creating backup directory (%s) for host (%s)" % (dir, job.hostname)
+            logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
             return False
     
     def checkForPreviousBackup(self, job):
@@ -66,7 +67,7 @@ class director():
         try:
             list = os.listdir(dir)
         except:
-            print "Error while listing working directory (%s) for host (%s)" % (dir, job.hostname)
+            logger().error("Error while listing working directory (%s) for host (%s)" % (dir, job.hostname))
             retlist = False
         retlist = []
         if(list):
@@ -113,19 +114,19 @@ class director():
                 if(self._updateLatestSymlink(job, latest)):
                     pass
                 else:
-                    print "Error updating current symlink for host: %s" % job.hostname
+                    logger().error("Error updating current symlink for host: %s" % job.hostname)
             else:
-                print "Error moving current backup failed for host: %s" % job.hostname
+                logger().error("Error moving current backup failed for host: %s" % job.hostname)
         else:
-            print "Error rotating backups for host: %s" % job.hostname
+            logger().error("Error rotating backups for host: %s" % job.hostname)
         
     def _unlinkExpiredBackups(self, job, workingDirectory):
         """Unlink oldest backup(s) if applicable"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
         
         if not self.checkWorkingDirectory(workingDirectory):
-          print "Error working directory not found (%s)" % dir
-          return False
+            logger().error("Error working directory not found (%s)" % dir)
+            return False
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
         
@@ -138,11 +139,11 @@ class director():
     def _unlinkExpiredBackup(self, job, backupdirectory):
         ret = True
         if config().debug:
-            print "DEBUG: Unlink expired backup (rm -rf %s)" % backupdirectory
+            logger().debug("DEBUG: Unlink expired backup (rm -rf %s)" % backupdirectory)
         try:
             shutil.rmtree(backupdirectory)
         except:
-            print "Error while removing (%s)" % backupdirectory
+            logger().error("Error while removing (%s)" % backupdirectory)
             ret = False
         return ret
         
@@ -167,7 +168,7 @@ class director():
                         ret = False
                     
                     if config().debug:
-                        print "DEBUG: mv %s %s" % (src, dest) 
+                        logger().debug("DEBUG: mv %s %s" % (src, dest))
                     id = id - 1
                 else:
                     ret = False
@@ -190,14 +191,14 @@ class director():
             ret = False
         
         if config().debug:
-            print "DEBUG: mv %s %s " % (src, dest)
+            logger().debug("DEBUG: mv %s %s " % (src, dest))
         return ret
     
     def _updateLatestSymlink(self, job, latest):
         ret = True
         symlinkfile = job.backupdir.rstrip('/') + "/" + job.hostname + "/latest"
         if config().debug:
-            print "DEBUG: Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile)
+            logger().debug("DEBUG: Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile))
         try:
             os.unlink(symlinkfile)
         except:
@@ -256,5 +257,5 @@ class director():
             job.backupstatus['rsync_total_bytes_received'] = m.group(12)
         else:
             if job.backupstatus['rsync_backup_status'] == 1:
-                print "Error unhandled output in rsync command (%s)" % job.backupstatus['rsync_stdout']
+                logger().error("Error unhandled output in rsync command (%s)" % job.backupstatus['rsync_stdout'])
         jobrunhistory().insertJob(job.backupstatus)

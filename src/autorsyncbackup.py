@@ -4,6 +4,7 @@ from optparse import OptionParser
 from director import director
 from models.config import config
 from lib.statusemail import statusemail
+from lib.logger import logger
 
 def setupCliArguments():
     parser = OptionParser()
@@ -20,18 +21,21 @@ def setupCliArguments():
 
 if __name__ == "__main__":
     # Welcome message
-    print "Starting autoRsyncBackup"
+    print "Starting AutoRsyncBackup"
     
     options = setupCliArguments()
     config(options.mainconfig)
+    
+    # Set logpath
+    logger(config().logfile)
+    for msg in config().debugmessages:
+        logger().debug(msg)
     
     # Run director
     director = director()
     jobs = director.getJobArray(options.job)
     
-    # TODO: Run multiple jobs at the same time
-    # TODO: Create logfile, write debug always to log?
-    
+    # Execute jobs
     for job in jobs:
         if(job.enabled):
             director.checkRemoteHost(job)
@@ -41,5 +45,6 @@ if __name__ == "__main__":
                 if director.executeRsync(job, latest):
                     director.backupRotate(job)
                 director.processBackupStatus(job)
-                
+    
+    # Sent status report
     statusemail().sendStatusEmail(jobs)

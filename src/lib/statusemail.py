@@ -2,6 +2,7 @@ import datetime
 from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters
+from lib.logger import logger
 from mailer import Mailer, Message
 from jinja2 import Environment, PackageLoader
 
@@ -98,6 +99,7 @@ class statusemail():
         
     def _send(self, subject, htmlbody):
         for to in config().backupmailrecipients:
+            logger().info("INFO: Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))
             message = Message(From=config().backupmailfrom, To=to, charset="utf-8")
             message.Subject = subject
             message.Html = htmlbody
