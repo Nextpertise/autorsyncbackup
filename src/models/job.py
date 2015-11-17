@@ -15,6 +15,8 @@ class job():
     dailyrotation = None
     weeklyrotation = None
     monthlyrotation = None
+    weeklybackup = None
+    monthlybackup = None
     fileset = None
     backupstatus = None
     
