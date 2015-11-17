@@ -75,7 +75,7 @@ Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup s
     [backup]
             comment = backup share
             path = /
-            read only = no
+            read only = yes
             auth users= backup
             secrets file = /etc/rsyncd.secrets
     
