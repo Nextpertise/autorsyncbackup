@@ -6,7 +6,7 @@ AutoRsyncBackup is a backup solution written in Python as wrapper around rsync. 
     @author: Teun Ouwehand (teun@nextpertise.nl)
     @company: Nextpertise B.V.
 
-How to use:
+Install AutoRsyncbackup (Server):
 -----------
 
 Export by example to: `/usr/local/share/autorsyncbackup`
@@ -52,7 +52,7 @@ Finally execute the backup (you can cron this command):
 
     $ /usr/local/bin/autorsyncbackup
     
-Install rsync as deamon
+Install rsync as deamon (Client)
 -----------------------
     
 Install the debian package:
