@@ -24,7 +24,7 @@ class statusemail():
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
         env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
-        template = env.get_template('email.tpl')
+        template = env.get_template('email.j2')
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, jobrunhistory=jobrunhistory, jobs=jobs)
         
     def getOverallBackupState(self, jobs):
