@@ -1,7 +1,7 @@
 AutoRsyncbackup
 ---------------
 
-AutoRsyncBackup is a backup solution written in Python as wrapper around rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create a issue if you find any problem.
+AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create an issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
     @company: Nextpertise B.V.
@@ -16,7 +16,7 @@ Export by example to: `/usr/local/share/autorsyncbackup`
     
 Create symlink:
 
-    $ ln -s /usr/local/share/autorsyncbackup/autorsyncbackup.py /usr/local/bin/autorsyncbackup
+    $ ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup
 
 Create a job directory, this directory will contain .job files with rsync hosts:
 
