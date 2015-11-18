@@ -14,6 +14,10 @@ Export by example to: `/usr/local/share/autorsyncbackup`
     $ cd /usr/local/share/
     $ git clone git@github.com:Nextpertise/autorsyncbackup.git
     
+Install dependencies:
+
+    $ apt-get install python python-yaml python-jinja2 python-mailer
+    
 Create symlink:
 
     $ ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup
