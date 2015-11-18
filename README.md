@@ -38,6 +38,15 @@ The job files are written in YAML syntax and will only apply with the `.job` fil
       - /etc/
       - /home/
 
+Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
+
+    ---
+    debug: True
+    weeklybackup: 7
+    monthlybackup: 1
+    backupmailrecipients:
+        - your@mail.com
+    
 Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld/`
 
 Create a directory which contain the backups:
