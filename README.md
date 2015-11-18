@@ -44,7 +44,7 @@ Create a directory which contain the backups:
 
     $ mkdir /var/data/backups_rsync
 
-Create the directory where the SQLite database file will be stored:
+Create the directory where the SqLite database file will be stored:
 
     $ mkdir /var/lib/autorsyncbackup
 
