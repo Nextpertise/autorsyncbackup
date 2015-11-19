@@ -20,11 +20,11 @@ def setupCliArguments():
     return options
 
 if __name__ == "__main__":
-    # Welcome message
-    print "Starting AutoRsyncBackup"
-    
     options = setupCliArguments()
     config(options.mainconfig)
+    
+    # Welcome message
+    print "Starting AutoRsyncBackup"
     
     # Set logpath
     logger(config().logfile)
