@@ -7,7 +7,7 @@ from mailer import Mailer, Message
 from jinja2 import Environment, PackageLoader
 
 class statusemail():
-    def sendStatusEmail(self, jobs):
+    def sendStatusEmail(self, jobs, durationstats):
         state = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
@@ -15,17 +15,17 @@ class statusemail():
         jrh = jobrunhistory().getJobHistory(self.getBackupHosts(jobs))
         
         subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, jrh, jobs)
+        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, jrh, jobs)
         self._send(subject=subject, htmlbody=body)
         
-    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, jobrunhistory, jobs):
+    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
         env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         template = env.get_template('email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, jobrunhistory=jobrunhistory, jobs=jobs)
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs)
         
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup"""
@@ -59,7 +59,7 @@ class statusemail():
         ret = {}
         ret['total_host_count'] = len(result)
         ret['total_backups_failed'] = 0
-        ret['total_backup_duration'] = 0
+        ret['total_rsync_duration'] = 0
         ret['total_number_of_files'] = 0
         ret['total_number_of_files_transferred'] = 0
         ret['total_file_size'] = 0
@@ -77,7 +77,7 @@ class statusemail():
         
         for i in result:
             if i['rsync_backup_status'] == 1:
-                ret['total_backup_duration'] = ret['total_backup_duration'] + (i['enddatetime'] - i['startdatetime'])
+                ret['total_rsync_duration'] = ret['total_rsync_duration'] + (i['enddatetime'] - i['startdatetime'])
                 ret['total_number_of_files'] = ret['total_number_of_files'] + i['rsync_number_of_files']
                 ret['total_number_of_files_transferred'] = ret['total_number_of_files_transferred'] + i['rsync_number_of_files_transferred']
                 ret['total_file_size'] = ret['total_file_size'] + i['rsync_total_file_size']
@@ -96,7 +96,7 @@ class statusemail():
         
         ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
         if ret['total_backups_success'] > 0:
-            ret['average_backup_duration'] = ret['total_backup_duration'] / ret['total_backups_success']
+            ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']
             ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
         

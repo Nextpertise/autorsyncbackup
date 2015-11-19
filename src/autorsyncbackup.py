@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+import time
 from optparse import OptionParser
 from director import director
 from models.config import config
@@ -36,16 +36,26 @@ if __name__ == "__main__":
     jobs = director.getJobArray(options.job)
     
     # Execute jobs
+    durationstats = {}
+    durationstats['backupstartdatetime'] = int(time.time())
     for job in jobs:
         if(job.enabled):
             director.checkRemoteHost(job)
             if not options.dryrun:
                 director.checkBackupEnvironment(job)
                 latest = director.checkForPreviousBackup(job)
-                if director.executeRsync(job, latest):
-                    director.backupRotate(job)
+                director.executeRsync(job, latest)
                 director.processBackupStatus(job)
-    
-    # Sent status report
+    durationstats['backupenddatetime'] = int(time.time())
+
     if not options.dryrun:
-        statusemail().sendStatusEmail(jobs)
+        # Do housekeeping
+        durationstats['housekeepingstartdatetime'] = int(time.time())
+        for job in jobs:
+            if(job.enabled):
+                if job.backupstatus['rsync_backup_status'] == 1:
+                    director.backupRotate(job)
+        durationstats['housekeepingenddatetime'] = int(time.time())
+        
+        # Sent status report
+        statusemail().sendStatusEmail(jobs, durationstats)

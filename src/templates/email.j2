@@ -276,11 +276,27 @@
                                                     <td colspan="2">&nbsp;</td>
                                                   </tr>
                                                   <tr>
-                                                    <td class="data-heading" width="50%">Total backup duration</td>
-                                                    <td class="data-value">{{ stats.total_backup_duration|secondsformat }}</td>
+                                                    <td class="data-heading" width="50%">Backup start time</td>
+                                                    <td class="data-value">{{ durationstats.backupstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
                                                   </tr>
                                                   <tr>
-                                                    <td class="data-heading" width="50%">Average backup duration</td>
+                                                    <td class="data-heading" width="50%">Total backup duration</td>
+                                                    <td class="data-value">{{ (durationstats.backupenddatetime - durationstats.backupstartdatetime)|secondsformat }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Housekeeping start time</td>
+                                                    <td class="data-value">{{ durationstats.housekeepingstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Total housekeeping duration</td>
+                                                    <td class="data-value">{{ (durationstats.housekeepingenddatetime - durationstats.housekeepingstartdatetime)|secondsformat }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Total rsync duration</td>
+                                                    <td class="data-value">{{ stats.total_rsync_duration|secondsformat }}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Average rsync duration</td>
                                                     <td class="data-value">{{ stats.average_backup_duration|secondsformat }}</td>
                                                   </tr>
                                                   <tr>
