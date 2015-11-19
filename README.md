@@ -14,6 +14,10 @@ Export by example to: `/usr/local/share/autorsyncbackup`
     $ cd /usr/local/share/
     $ git clone git@github.com:Nextpertise/autorsyncbackup.git
     
+Install dependencies:
+
+    $ apt-get install python python-yaml python-jinja2 python-mailer
+    
 Create symlink:
 
     $ ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup
@@ -38,13 +42,22 @@ The job files are written in YAML syntax and will only apply with the `.job` fil
       - /etc/
       - /home/
 
+Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
+
+    ---
+    debug: True
+    weeklybackup: 7
+    monthlybackup: 1
+    backupmailrecipients:
+        - your@mail.com
+    
 Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld/`
 
 Create a directory which contain the backups:
 
     $ mkdir /var/data/backups_rsync
 
-Create the directory where the SQLite database file will be stored:
+Create the directory where the SqLite database file will be stored:
 
     $ mkdir /var/lib/autorsyncbackup
 
