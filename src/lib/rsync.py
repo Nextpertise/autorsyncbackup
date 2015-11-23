@@ -1,6 +1,6 @@
 from models.config import config
 from lib.logger import logger
-import subprocess
+import subprocess, paramiko, time, socket;
 
 class rsync():
     
@@ -29,9 +29,18 @@ class rsync():
         
         return ret
           
-    def checkRemoteHostViaSshProtocol(self, job):
-        """TODO: Needs to be implemented"""
-        logger().info("INFO: checkRemoteHostViaSshProtocol - Needs to be implemented")
+    def checkRemoteHostViaSshProtocol(self, job, initial_wait=0, interval=0, retries=1):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        time.sleep(initial_wait)
+        for x in range(retries):
+            try:
+                ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+                logger().info("INFO: Succesfully connected to host via ssh protocol (%s)" % job.hostname)
+                return True
+            except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
+                logger().error("ERROR: while connecting to host (%s) - %s" % (job.hostname, e))
+                time.sleep(interval)
         return False
         
     def executeRsync(self, job, latest):
@@ -74,8 +83,13 @@ class rsync():
     def executeRsyncViaSshProtocol(self, job, latest):
         """TODO: Needs to be implemented"""
         # rsync -aR --delete --stats -e ssh root@stage1.netwerven.nl:/etc root@stage1.netwerven.nl:/var/spool/cron/crontabs /var/data/backups/autorsyncbackup/stage1.netwerven.nl/current/
-        logger().info("INFO: executeRsyncViaSshProtocol - Needs to be implemented")
-        return False
+        logger().error("ERROR: executeRsyncViaSshProtocol - Needs to be implemented")
+        stdout = "ExecuteRsyncViaSshProtocol - Needs to be implemented"
+        errcode = 1
+        
+        job.backupstatus['rsync_stdout'] = stdout
+        job.backupstatus['rsync_return_code'] = errcode
+        return errcode, stdout
         
     def generateFileset(self, job):
         """Create fileset string"""
