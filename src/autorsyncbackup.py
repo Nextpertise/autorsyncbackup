@@ -48,12 +48,12 @@ if __name__ == "__main__":
             durationstats['backupstartdatetime'] = int(time.time())
             for job in jobs:
                 if(job.enabled):
-                    director.checkRemoteHost(job)
-                    if not options.dryrun:
-                        director.checkBackupEnvironment(job)
-                        latest = director.checkForPreviousBackup(job)
-                        director.executeRsync(job, latest)
-                        director.processBackupStatus(job)
+                    if director.checkRemoteHost(job):
+                        if not options.dryrun:
+                            director.checkBackupEnvironment(job)
+                            latest = director.checkForPreviousBackup(job)
+                            director.executeRsync(job, latest)
+                            director.processBackupStatus(job)
             durationstats['backupenddatetime'] = int(time.time())
         
             if not options.dryrun:
