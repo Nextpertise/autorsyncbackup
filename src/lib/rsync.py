@@ -10,6 +10,7 @@ class rsync():
             ret = self.checkRemoteHostViaSshProtocol(job)
         else:
             ret = self.checkRemoteHostViaRsyncProtocol(job)
+        job.backupstatus['rsync_backup_status'] = int(ret)
         return ret
     
     def checkRemoteHostViaRsyncProtocol(self, job):
