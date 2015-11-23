@@ -69,3 +69,6 @@ class Pidfile():
                 
 class ProcessRunningException(BaseException):
     pass
+    
+class PidfileProcessRunningException(BaseException):
+    pass
