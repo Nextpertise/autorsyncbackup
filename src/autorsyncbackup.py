@@ -3,6 +3,7 @@ import time
 from optparse import OptionParser
 from director import director
 from models.config import config
+from lib.pidfile import *
 from lib.statusemail import statusemail
 from lib.logger import logger
 
@@ -36,31 +37,35 @@ if __name__ == "__main__":
     for msg in config().debugmessages:
         logger().debug(msg)
     
-    # Run director
-    director = director()
-    jobs = director.getJobArray(options.job)
-    
-    # Execute jobs
-    durationstats = {}
-    durationstats['backupstartdatetime'] = int(time.time())
-    for job in jobs:
-        if(job.enabled):
-            director.checkRemoteHost(job)
-            if not options.dryrun:
-                director.checkBackupEnvironment(job)
-                latest = director.checkForPreviousBackup(job)
-                director.executeRsync(job, latest)
-                director.processBackupStatus(job)
-    durationstats['backupenddatetime'] = int(time.time())
-
-    if not options.dryrun:
-        # Do housekeeping
-        durationstats['housekeepingstartdatetime'] = int(time.time())
-        for job in jobs:
-            if(job.enabled):
-                if job.backupstatus['rsync_backup_status'] == 1:
-                    director.backupRotate(job)
-        durationstats['housekeepingenddatetime'] = int(time.time())
+    try:
+        with Pidfile(config().lockfile, logger().debug, logger().error):
+            # Run director
+            director = director()
+            jobs = director.getJobArray(options.job)
+            
+            # Execute jobs
+            durationstats = {}
+            durationstats['backupstartdatetime'] = int(time.time())
+            for job in jobs:
+                if(job.enabled):
+                    director.checkRemoteHost(job)
+                    if not options.dryrun:
+                        director.checkBackupEnvironment(job)
+                        latest = director.checkForPreviousBackup(job)
+                        director.executeRsync(job, latest)
+                        director.processBackupStatus(job)
+            durationstats['backupenddatetime'] = int(time.time())
         
-        # Sent status report
-        statusemail().sendStatusEmail(jobs, durationstats)
+            if not options.dryrun:
+                # Do housekeeping
+                durationstats['housekeepingstartdatetime'] = int(time.time())
+                for job in jobs:
+                    if(job.enabled):
+                        if job.backupstatus['rsync_backup_status'] == 1:
+                            director.backupRotate(job)
+                durationstats['housekeepingenddatetime'] = int(time.time())
+                
+                # Sent status report
+                statusemail().sendStatusEmail(jobs, durationstats)
+    except ProcessRunningException as m:
+        logger().error(m)

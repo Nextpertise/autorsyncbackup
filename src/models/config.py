@@ -8,6 +8,7 @@ class config():
         # Default config values
         mainconfigpath = "/etc/autorsyncbackup/main.yaml"
         rsyncpath = "/usr/bin/rsync"
+        lockfile = "/var/run/autorsyncbackup.pid"
         jobconfigdirectory = "/etc/autorsyncbackup/"
         jobspooldirectory = "/var/spool/autorsyncbackup/"
         backupdir = "/var/data/backups/autorsyncbackup/"
@@ -72,6 +73,11 @@ class config():
             self.rsyncpath = config['rsyncpath']
         except:
             self.debugmessages.append("DEBUG: %s: No rsyncpath is set, using default value: %s" % (self.mainconfigpath, self.rsyncpath))
+            
+        try:
+            self.lockfile = config['lockfile']
+        except:
+            self.debugmessages.append("DEBUG: %s: No lockfile path is set, using default value: %s" % (self.mainconfigpath, self.lockfile))
 
         try:
             self.jobconfigdirectory = config['jobconfigdirectory']
