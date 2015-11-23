@@ -9,6 +9,7 @@ class job():
     username = None
     password = None
     ssh = None
+    sshpublickey = None
     port = None
     share = None
     backupdir = None
@@ -69,6 +70,14 @@ class job():
             logger().info("INFO: %s: No password is set while not using SSH, skipping job." % self.filepath)
             self.enabled = False
             return False
+            
+        try:
+            self.sshpublickey = jobconfig['sshpublickey']
+        except:
+            if self.ssh:
+                logger().error("ERROR: %s: SSH is set, but no sshpublickey is configured, disabling backup" % self.filepath)
+                self.enabled = False
+                return False
             
         try:
             self.port = jobconfig['port']
