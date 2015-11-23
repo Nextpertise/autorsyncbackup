@@ -58,8 +58,7 @@ class rsync():
             password = "export RSYNC_PASSWORD=\"%s\"" % job.password
             rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
             command = "%s; %s" % (password, rsyncCommand)
-            if config().debug:
-                logger().debug("DEBUG: Executing rsync command (%s)" % rsyncCommand)
+            logger().info("INFO: Executing rsync command (%s)" % rsyncCommand)
             errcode, stdout = self.executeCommand(command)
         else:
             stdout = "Fileset is missing, Rsync is never invoked"

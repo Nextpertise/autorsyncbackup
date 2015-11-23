@@ -13,6 +13,8 @@ def setupCliArguments():
         default="/etc/autorsyncbackup/main.yaml")
     parser.add_option("-d", "--dry-run", action="store_true", dest="dryrun", default=False,
         help="do not invoke rsync, only perform a login attempt on remote host")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
+        help="Write logoutput also to stdout")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job", 
         help="run only the given job file")
 
@@ -24,10 +26,13 @@ if __name__ == "__main__":
     config(options.mainconfig)
     
     # Welcome message
-    print "Starting AutoRsyncBackup"
+    if options.verbose:
+        print "Starting AutoRsyncBackup"
     
     # Set logpath
     logger(config().logfile)
+    logger().setDebuglevel(config().debuglevel)
+    logger().setVerbose(options.verbose)
     for msg in config().debugmessages:
         logger().debug(msg)
     

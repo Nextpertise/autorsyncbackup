@@ -6,22 +6,48 @@ class logger():
         
         # Default config values
         logger = None
+        verbose = False
+        debuglevel = 0
 
         def spam(self):
             """ Test method, return singleton id """
             return id(self)
         
         def debug(self, msg):
-            logging.debug(msg)
+            if self.debuglevel >= 3:
+                logging.debug(msg)
+                if self.verbose:
+                    print msg
             
         def info(self, msg):
-            logging.info(msg)
+            if self.debuglevel >= 2:
+                logging.info(msg)
+                if self.verbose:
+                    print msg
             
         def warning(self, msg):
-            logging.warning(msg)
+            if self.debuglevel >= 1:
+                logging.warning(msg)
+                if self.verbose:
+                    print msg
             
         def error(self, msg):
-            logging.error(msg)
+            if self.debuglevel >= 0:
+                logging.error(msg)
+                if self.verbose:
+                    print msg
+                    
+        def setVerbose(self, verbose):
+            self.verbose = verbose
+            
+        def getVerbose(self):
+            return self.verbose
+            
+        def setDebuglevel(self, debuglevel):
+            self.debuglevel = debuglevel
+            
+        def getDebuglevel(self):
+            return self.debuglevel
 
     # storage for the instance reference
     __instance = None

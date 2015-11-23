@@ -45,16 +45,14 @@ class jobrunhistory():
         path = "%s/autorsyncbackup.db" % self.dbdirectory
         try:
             self.conn = sqlite3.connect(path)
-            if config().debug:
-                logger().debug("DEBUG: open %s" % path)
+            logger().debug("DEBUG: open %s" % path)
         except:
             exitcode = 1
             logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
             exit(exitcode)
             
     def checkTables(self):
-        if config().debug:
-            logger().debug("DEBUG: Check for table `jobrunhistory`")
+        logger().debug("DEBUG: Check for table `jobrunhistory`")
         c = self.conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
         if c.fetchone() is None:
@@ -91,9 +89,8 @@ class jobrunhistory():
                                     rsync_total_bytes_sent INTEGER, \
                                     rsync_total_bytes_received INTEGER \
                                 );'
-        if config().debug:
-            logger().debug("DEBUG: create table `jobrunhistory`")
-            logger().debug("DEBUG: %s" % jobrunhistoryTable.replace("\n",""))
+        logger().debug("DEBUG: create table `jobrunhistory`")
+        logger().debug("DEBUG: %s" % jobrunhistoryTable.replace("\n",""))
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
         
