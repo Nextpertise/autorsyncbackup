@@ -82,11 +82,25 @@ class rsync():
         return errcode, stdout
     
     def executeRsyncViaSshProtocol(self, job, latest):
-        """TODO: Needs to be implemented"""
-        # rsync -aR --delete --stats -e ssh root@stage1.netwerven.nl:/etc root@stage1.netwerven.nl:/var/spool/cron/crontabs /var/data/backups/autorsyncbackup/stage1.netwerven.nl/current/
-        logger().error("ERROR: executeRsyncViaSshProtocol - Needs to be implemented")
-        stdout = "ExecuteRsyncViaSshProtocol - Needs to be implemented"
-        errcode = 1
+        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
+        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshpublickey)
+        options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
+        fileset = self.generateFileset(job)        
+        
+        # Link files to the same inodes as last backup to save disk space and boost backup performance
+        if(latest):
+            latest = "--link-dest=%s" % latest
+        else:
+            latest = ""
+        
+        # Generate rsync CLI command and execute it  
+        if(fileset):  
+            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
+            logger().info("INFO: Executing rsync command (%s)" % command)
+            errcode, stdout = self.executeCommand(command)
+        else:
+            stdout = "Fileset is missing, Rsync is never invoked"
+            errcode = 9
         
         job.backupstatus['rsync_stdout'] = stdout
         job.backupstatus['rsync_return_code'] = errcode
