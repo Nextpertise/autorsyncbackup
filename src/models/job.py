@@ -9,6 +9,7 @@ class job():
     username = None
     password = None
     ssh = None
+    port = None
     share = None
     backupdir = None
     speedlimitkb = None
@@ -68,6 +69,16 @@ class job():
             logger().info("INFO: %s: No password is set while not using SSH, skipping job." % self.filepath)
             self.enabled = False
             return False
+            
+        try:
+            self.port = jobconfig['port']
+        except:
+            if self.ssh:
+                self.port = 22
+                logger().info("DEBUG: %s: No rsync+ssh port is set, using default." % self.filepath)
+            else:
+                self.port = 873
+                logger().info("DEBUG: %s: No rsync port is set, using default." % self.filepath)
             
         try:
             self.share = jobconfig['share']

@@ -14,7 +14,10 @@ class rsync():
     
     def checkRemoteHostViaRsyncProtocol(self, job):
         """Check if remote host is up and able to accept connections with our credentials"""
-        command = "export RSYNC_PASSWORD=\"%s\"; rsync --contimeout=5 rsync://%s@%s/%s" % (job.password, job.username, job.hostname, job.share)
+        password = "export RSYNC_PASSWORD=\"%s\"" % job.password
+        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (job.username, job.hostname, job.port, job.share)
+        command = "%s; %s" % (password, rsyncCommand)
+        logger().info("INFO: Executing rsync check (%s)" % rsyncCommand)
         errcode, stdout = self.executeCommand(command)
         
         if errcode != 0:
@@ -84,7 +87,7 @@ class rsync():
             if job.ssh:
                 fileset = fileset + " %s@%s:%s" % (job.username, job.hostname, fs)
             else:
-                fileset = fileset + " rsync://%s@%s:/%s%s" % (job.username, job.hostname, job.share, fs)
+                fileset = fileset + " rsync://%s@%s:%s/%s%s" % (job.username, job.hostname, job.port, job.share, fs)
         return fileset
     
     def executeCommand(self, command):
