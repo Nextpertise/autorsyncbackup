@@ -50,10 +50,11 @@ if __name__ == "__main__":
             
             # Start threads
             threads = []
-            for i in range(0, config().jobworkers):
-              thread = jobThread(i, exitFlag, queueLock, director, workQueue)
-              thread.start()
-              threads.append(thread)
+            if not options.dryrun:
+                for i in range(0, config().jobworkers):
+                  thread = jobThread(i, exitFlag, queueLock, director, workQueue)
+                  thread.start()
+                  threads.append(thread)
             
             # Execute jobs
             queueLock.acquire()
