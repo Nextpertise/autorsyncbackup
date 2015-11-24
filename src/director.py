@@ -254,4 +254,6 @@ class director():
         else:
             if job.backupstatus['rsync_backup_status'] == 1:
                 logger().error("Error unhandled output in rsync command (%s)" % job.backupstatus['rsync_stdout'])
-        jobrunhistory().insertJob(job.backupstatus)
+        jrh = jobrunhistory()
+        jrh.insertJob(job.backupstatus)
+        jrh.closeDbHandler()

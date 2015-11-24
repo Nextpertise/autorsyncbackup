@@ -7,12 +7,20 @@ from mailer import Mailer, Message
 from jinja2 import Environment, PackageLoader
 
 class statusemail():
+    jobrunhistory = None
+    
+    def __init__(self):
+        self.jobrunhistory = jobrunhistory()
+        
+    def __del__(self):
+        self.jobrunhistory.closeDbHandler()
+    
     def sendStatusEmail(self, jobs, durationstats):
         state = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
-        jrh = jobrunhistory().getJobHistory(self.getBackupHosts(jobs))
+        jrh = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         
         subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
         body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, jrh, jobs)
@@ -30,7 +38,7 @@ class statusemail():
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup"""
         ret = "ok"
-        for j in jobrunhistory().getJobHistory(self.getBackupHosts(jobs)):
+        for j in self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs)):
             if j['rsync_backup_status'] != 1:
                 ret = "error"        
         return ret
@@ -49,13 +57,13 @@ class statusemail():
         for i in jobs:
             if i.enabled:
                 hosts.append(i.hostname)
-        for j in jobrunhistory().getJobHistory(self.getBackupHosts(jobs)):
+        for j in self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs)):
             hosts.remove(j['hostname'])
         return hosts
         
     def getStats(self, jobs):
         """Produce total/average stats out database/jobs data"""
-        result = jobrunhistory().getJobHistory(self.getBackupHosts(jobs))
+        result = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         ret = {}
         ret['total_host_count'] = len(result)
         ret['total_backups_failed'] = 0

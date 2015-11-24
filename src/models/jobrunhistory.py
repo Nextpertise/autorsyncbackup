@@ -3,53 +3,34 @@ from config import config
 from lib.logger import logger
 
 class jobrunhistory():
-    class __impl:
-        """ Implementation of the singleton interface """
-        
-        # Default config values
-        dbdirectory = "/var/lib/autorsyncbackup"
-        conn = None
-
-        def spam(self):
-            """ Test method, return singleton id """
-            return id(self)
-
-    # storage for the instance reference
-    __instance = None
+    # Default config values
+    dbdirectory = "/var/lib/autorsyncbackup"
+    conn = None
     
-    def __init__(self, dbdirectory=None):
-        """ Create singleton instance """
-        # Check whether we already have an instance
-        if jobrunhistory.__instance is None:
-            # Create and remember instance
-            jobrunhistory.__instance = jobrunhistory.__impl()
-            
-            if(dbdirectory):
-                self.dbdirectory = dbdirectory
-            self.openDbHandler()
+    def __init__(self, dbdirectory=None, check=False):
+        if dbdirectory:
+            self.dbdirectory = dbdirectory
+        self.openDbHandler()
+        if check:
             self.checkTables()
-            self.init = False
 
-        # Store instance reference as the only member in the handle
-        self.__dict__['_jobrunhistory__instance'] = jobrunhistory.__instance
-
-    def __getattr__(self, attr):
-        """ Delegate access to implementation """
-        return getattr(self.__instance, attr)
-
-    def __setattr__(self, attr, value):
-        """ Delegate access to implementation """
-        return setattr(self.__instance, attr, value)
-            
     def openDbHandler(self):
         path = "%s/autorsyncbackup.db" % self.dbdirectory
         try:
             self.conn = sqlite3.connect(path)
-            logger().debug("DEBUG: open %s" % path)
+            logger().debug("DEBUG: open db [%s]" % path)
         except:
             exitcode = 1
             logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
             exit(exitcode)
+            
+    def closeDbHandler(self):
+        path = "%s/autorsyncbackup.db" % self.dbdirectory
+        try:
+            self.conn.close()
+            logger().debug("DEBUG: close db [%s]" % path)
+        except:
+            pass
             
     def checkTables(self):
         logger().debug("DEBUG: Check for table `jobrunhistory`")
@@ -117,8 +98,8 @@ class jobrunhistory():
                 query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
-            except:
-                pass
+            except Exception as e:
+                logger().error(e)
         return ret
         
     def dict_factory(self, cursor, row):

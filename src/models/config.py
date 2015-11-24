@@ -21,6 +21,7 @@ class config():
         monthlybackup = 1
         backupmailfrom = ""
         backupmailrecipients = []
+        jobworkers = 3
         debuglevel = 0
         debugmessages = []
 
@@ -149,3 +150,8 @@ class config():
                 self.backupmailrecipients = config['backupmailrecipients']
         except:
             self.debugmessages.append("DEBUG: %s: No backupmailrecipient(s) are set, there will no backup report be sent" % self.mainconfigpath)
+            
+        try:
+            self.jobworkers = config['jobworkers']
+        except:
+            self.debugmessages.append("DEBUG: %s: No jobworkers is set, using default value: %d" % (self.mainconfigpath, self.jobworkers))
