@@ -20,12 +20,14 @@ class jobThread (threading.Thread):
             self.queueLock.acquire()
             if not q.empty():
                 job = q.get()
-                self.queueLock.release()
                 
+                self.queueLock.release()
+                logger().info("Start job for hostname: [%s] in queue: [%d]" % (job.hostname, self.id))
                 self.director.checkBackupEnvironment(job)
                 latest = self.director.checkForPreviousBackup(job)
                 self.director.executeRsync(job, latest)
                 self.director.processBackupStatus(job)
+                logger().info("Stop job for hostname: %s: [%d]" % (job.hostname, self.id))
             else:
                 self.queueLock.release()
             time.sleep(1)
