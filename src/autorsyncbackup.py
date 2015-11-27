@@ -94,14 +94,19 @@ def checkRemoteHost(jobpath):
     return not directorInstance.checkRemoteHost(jobs[0])
         
 if __name__ == "__main__":
+    """ Start application """
+    # Initialise variables
+    checkSingleHost = False
+    
+    # Get CLI options and Config
     options = setupCliArguments()
     config(options.mainconfig)
-    checkSingleHost = False
     
     # Welcome message
     if options.verbose:
         print "Starting AutoRsyncBackup"
     
+    # Only check if host is reachable, set appropriate settings
     if options.job and options.dryrun:
         checkSingleHost = True
         options.verbose = True
@@ -114,6 +119,7 @@ if __name__ == "__main__":
     for msg in config().debugmessages:
         logger().debug(msg)
 
+    # Determine next step based on CLI options
     if options.version:
         print getVersion()
         exit(0)
