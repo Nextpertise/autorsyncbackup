@@ -91,8 +91,7 @@ def checkRemoteHost(jobpath):
     """ Check remote host and exit with exitcode 0 (success) or 1 (error) """
     directorInstance = director()
     jobs = directorInstance.getJobArray(jobpath)
-    checkRemoteHost = directorInstance.checkRemoteHost(jobs[0])
-    exit(not checkRemoteHost)
+    return not directorInstance.checkRemoteHost(jobs[0])
         
 if __name__ == "__main__":
     options = setupCliArguments()
@@ -119,6 +118,6 @@ if __name__ == "__main__":
         print getVersion()
         exit(0)
     elif checkSingleHost:
-        checkRemoteHost(options.job)
+        exit(checkRemoteHost(options.job))
     else:
         runBackup(options.job, options.dryrun)
