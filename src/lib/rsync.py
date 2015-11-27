@@ -22,7 +22,7 @@ class rsync():
         errcode, stdout = self.executeCommand(command)
         
         if errcode != 0:
-            logger().error("Error while connecting to host (%s) - %s" % (errcode, stdout))
+            logger().error("Error while connecting to host (%s) - %s" % (job.hostname, stdout))
             ret = False
         else:
             ret = True
