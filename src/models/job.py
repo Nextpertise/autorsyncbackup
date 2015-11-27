@@ -84,10 +84,10 @@ class job():
         except:
             if self.ssh:
                 self.port = 22
-                logger().info("DEBUG: %s: No rsync+ssh port is set, using default." % self.filepath)
+                logger().debug("DEBUG: %s: No rsync+ssh port is set, using default." % self.filepath)
             else:
                 self.port = 873
-                logger().info("DEBUG: %s: No rsync port is set, using default." % self.filepath)
+                logger().debug("DEBUG: %s: No rsync port is set, using default." % self.filepath)
             
         try:
             self.share = jobconfig['share']
