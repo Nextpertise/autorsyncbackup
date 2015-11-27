@@ -1,12 +1,13 @@
 #!/usr/bin/python
 import time, threading, Queue
 from optparse import OptionParser
-from director import director
+from _version import __version__
 from models.config import config
+from lib.director import director
 from lib.pidfile import *
 from lib.statusemail import statusemail
 from lib.logger import logger
-from jobthread import jobThread
+from lib.jobthread import jobThread
 
 def setupCliArguments():
     parser = OptionParser()
@@ -17,27 +18,18 @@ def setupCliArguments():
         help="do not invoke rsync, only perform a login attempt on remote host")
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
         help="Write logoutput also to stdout")
+    parser.add_option("--version", action="store_true", dest="version", default=False,
+        help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job", 
         help="run only the given job file")
 
     (options, args) = parser.parse_args()    
     return options
+        
+def getVersion():
+    return __version__
 
-if __name__ == "__main__":
-    options = setupCliArguments()
-    config(options.mainconfig)
-    
-    # Welcome message
-    if options.verbose:
-        print "Starting AutoRsyncBackup"
-    
-    # Set logpath
-    logger(config().logfile)
-    logger().setDebuglevel(config().debuglevel)
-    logger().setVerbose(options.verbose)
-    for msg in config().debugmessages:
-        logger().debug(msg)
-
+def runBackup(options):
     exitFlag = threading.Event()
     queueLock = threading.Lock()
     workQueue = Queue.Queue(0)
@@ -45,14 +37,14 @@ if __name__ == "__main__":
     try:
         with Pidfile(config().lockfile, logger().debug, logger().error):
             # Run director
-            director = director()
-            jobs = director.getJobArray(options.job)
+            directorInstance = director()
+            jobs = directorInstance.getJobArray(options.job)
             
             # Start threads
             threads = []
             if not options.dryrun:
                 for i in range(0, config().jobworkers):
-                  thread = jobThread(i, exitFlag, queueLock, director, workQueue)
+                  thread = jobThread(i, exitFlag, queueLock, directorInstance, workQueue)
                   thread.start()
                   threads.append(thread)
             
@@ -62,7 +54,7 @@ if __name__ == "__main__":
             durationstats['backupstartdatetime'] = int(time.time())
             for job in jobs:
                 if(job.enabled):
-                    if director.checkRemoteHost(job):
+                    if directorInstance.checkRemoteHost(job):
                         if not options.dryrun:
                             # Add to queue
                             workQueue.put(job)
@@ -85,10 +77,31 @@ if __name__ == "__main__":
                 for job in jobs:
                     if(job.enabled):
                         if job.backupstatus['rsync_backup_status'] == 1:
-                            director.backupRotate(job)
+                            directorInstance.backupRotate(job)
                 durationstats['housekeepingenddatetime'] = int(time.time())
                 
                 # Sent status report
                 statusemail().sendStatusEmail(jobs, durationstats)
     except ProcessRunningException as m:
         logger().error(m)
+        
+if __name__ == "__main__":
+    options = setupCliArguments()
+    config(options.mainconfig)
+    
+    # Welcome message
+    if options.verbose:
+        print "Starting AutoRsyncBackup"
+    
+    # Set logpath
+    logger(config().logfile)
+    logger().setDebuglevel(config().debuglevel)
+    logger().setVerbose(options.verbose)
+    for msg in config().debugmessages:
+        logger().debug(msg)
+        
+    if options.version:
+        print getVersion()
+        exit(0)
+    else:
+        runBackup(options)
