@@ -8,6 +8,7 @@ from lib.pidfile import *
 from lib.statusemail import statusemail
 from lib.logger import logger
 from lib.jobthread import jobThread
+from lib.statuscli import statuscli
 
 def setupCliArguments():
     """ Parse CLI options """
@@ -23,6 +24,8 @@ def setupCliArguments():
         help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job", 
         help="run only the given job file")
+    parser.add_option("-s", "--status", metavar="hostname", dest="hostname", 
+        help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
 
     (options, args) = parser.parse_args()    
     return options
@@ -92,6 +95,10 @@ def checkRemoteHost(jobpath):
     directorInstance = director()
     jobs = directorInstance.getJobArray(jobpath)
     return not directorInstance.checkRemoteHost(jobs[0])
+    
+def getLastBackupStatus(hostname):
+    """ Get status of last backup run of given hostname and exit with exitcode 0 (success) or 1 (error) """
+    return statuscli().printOutput(hostname)
         
 if __name__ == "__main__":
     """ Start application """
@@ -123,6 +130,8 @@ if __name__ == "__main__":
     if options.version:
         print getVersion()
         exit(0)
+    elif options.hostname:
+        exit(getLastBackupStatus(options.hostname))
     elif checkSingleHost:
         exit(checkRemoteHost(options.job))
     else:

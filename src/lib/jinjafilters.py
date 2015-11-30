@@ -19,7 +19,7 @@ class jinjafilters():
             bytesStr = "%.1f" % bytes
         return bytesStr + byteUnits[i]
         
-    def _secondsToReadableStr(self, seconds):
+    def _secondsToReadableStr(self, seconds, short=False):
         try:
           seconds = int(seconds)
         except:
@@ -27,14 +27,20 @@ class jinjafilters():
         if seconds == 0:
             return "0 seconds"
         ret = ""
-        units = OrderedDict([('week', 7*24*3600), ('day', 24*3600), ('hour', 3600), ('minute', 60), ('second', 1)])
+        if short:
+            units = OrderedDict([('w', 7*24*3600), ('d', 24*3600), ('h', 3600), ('m', 60), ('s', 1)])
+            space = ""
+        else:
+            units = OrderedDict([('week', 7*24*3600), ('day', 24*3600), ('hour', 3600), ('minute', 60), ('second', 1)])
+            space = " "
         for unit in units:
             quot = seconds / units[unit]
             if quot:
-               ret = ret + str(quot) + " " + unit
+               ret = ret + str(quot) + space + unit
                seconds = seconds - (quot * units[unit])
                if abs(quot) > 1:
-                   ret = ret + "s"
+                    if not short:
+                        ret = ret + "s"
                ret = ret + ", "
         return ret[:-2]
         
