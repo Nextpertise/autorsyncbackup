@@ -34,6 +34,7 @@ class director():
         return ret
         
     def checkBackupEnvironment(self, job):
+        self._moveLastBackupToCurrentBackup(job)
         backupdir = job.backupdir.rstrip('/')
         if not os.path.exists(backupdir):
             logger().error("Backup path (%s) doesn't exists" % backupdir)
@@ -204,6 +205,35 @@ class director():
         except:
             ret = false
         return ret
+        
+    def _moveLastBackupToCurrentBackup(self, job):
+        """Move last backup (expired) backup instance to current directory"""
+        workingDirectory = self.getWorkingDirectory()        
+        rotation = 0
+        try:
+            rotation = getattr(job, workingDirectory + 'rotation')
+        except:
+            pass
+            
+        oldestId = self.getOldestBackupId(job, workingDirectory)
+        if rotation > 0 and oldestId >= rotation:
+            src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory + "/*." + str(oldestId)
+            dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
+            g = glob.glob(src)
+            if not len(g) == 1:
+                errorMsg = "More than one directory matching on glob(%s)" % src
+                logger().error(errorMsg)
+                raise globException(errorMsg)
+            if os.path.exists(dest):
+                logger().info("Do not move oldest backup (%s) because current directory already exists")
+                return true
+            ret = True
+            try:
+                os.rename(g[0], dest)
+                logger().info("mv %s %s" % (g[0], dest))
+            except:
+                ret = False
+            return ret
 
     def getWorkingDirectory(self):
         """Check in which folder we place the backup today"""
