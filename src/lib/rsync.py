@@ -18,7 +18,7 @@ class rsync():
         password = "export RSYNC_PASSWORD=\"%s\"" % job.password
         rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (job.username, job.hostname, job.port, job.share)
         command = "%s; %s" % (password, rsyncCommand)
-        logger().info("INFO: Executing rsync check (%s)" % rsyncCommand)
+        logger().info("Executing rsync check (%s)" % rsyncCommand)
         errcode, stdout = self.executeCommand(command)
         
         if errcode != 0:
@@ -26,7 +26,7 @@ class rsync():
             ret = False
         else:
             ret = True
-            logger().info("INFO: Succesfully connected to host via rsync protocol (%s)" % job.hostname)
+            logger().info("Succesfully connected to host via rsync protocol (%s)" % job.hostname)
         
         return ret
           
@@ -37,10 +37,10 @@ class rsync():
         for x in range(retries):
             try:
                 ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
-                logger().info("INFO: Succesfully connected to host via ssh protocol (%s)" % job.hostname)
+                logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
                 return True
             except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
-                logger().error("ERROR: while connecting to host (%s) - %s" % (job.hostname, e))
+                logger().error("Error while connecting to host (%s) - %s" % (job.hostname, e))
                 time.sleep(interval)
         return False
         
@@ -71,7 +71,7 @@ class rsync():
             password = "export RSYNC_PASSWORD=\"%s\"" % job.password
             rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
             command = "%s; %s" % (password, rsyncCommand)
-            logger().info("INFO: Executing rsync command (%s)" % rsyncCommand)
+            logger().info("Executing rsync command (%s)" % rsyncCommand)
             errcode, stdout = self.executeCommand(command)
         else:
             stdout = "Fileset is missing, Rsync is never invoked"
@@ -96,7 +96,7 @@ class rsync():
         # Generate rsync CLI command and execute it  
         if(fileset):  
             command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
-            logger().info("INFO: Executing rsync command (%s)" % command)
+            logger().info("Executing rsync command (%s)" % command)
             errcode, stdout = self.executeCommand(command)
         else:
             stdout = "Fileset is missing, Rsync is never invoked"
@@ -109,7 +109,7 @@ class rsync():
     def generateFileset(self, job):
         """Create fileset string"""
         if not job.fileset:
-            logger().error("ERROR: No fileset specified")
+            logger().error("No fileset specified")
             return False
         fileset = ""
         for fs in job.fileset:

@@ -139,7 +139,7 @@ class director():
         
     def _unlinkExpiredBackup(self, job, backupdirectory):
         ret = True
-        logger().debug("DEBUG: Unlink expired backup (rm -rf %s)" % backupdirectory)
+        logger().debug("Unlink expired backup (rm -rf %s)" % backupdirectory)
         try:
             shutil.rmtree(backupdirectory)
         except:
@@ -167,7 +167,7 @@ class director():
                     except:
                         ret = False
                     
-                    logger().debug("DEBUG: mv %s %s" % (src, dest))
+                    logger().debug("mv %s %s" % (src, dest))
                     id = id - 1
                 else:
                     ret = False
@@ -189,13 +189,13 @@ class director():
         except:
             ret = False
         
-        logger().debug("DEBUG: mv %s %s " % (src, dest))
+        logger().debug("mv %s %s " % (src, dest))
         return ret
     
     def _updateLatestSymlink(self, job, latest):
         ret = True
         symlinkfile = job.backupdir.rstrip('/') + "/" + job.hostname + "/latest"
-        logger().debug("DEBUG: Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile))
+        logger().debug("Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile))
         try:
             os.unlink(symlinkfile)
         except:

@@ -110,7 +110,7 @@ class statusemail():
         
     def _send(self, subject, htmlbody):
         for to in config().backupmailrecipients:
-            logger().info("INFO: Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))
+            logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))
             message = Message(From=config().backupmailfrom, To=to, charset="utf-8")
             message.Subject = subject
             message.Html = htmlbody

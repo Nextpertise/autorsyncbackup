@@ -18,7 +18,7 @@ class jobrunhistory():
         path = "%s/autorsyncbackup.db" % self.dbdirectory
         try:
             self.conn = sqlite3.connect(path)
-            logger().debug("DEBUG: open db [%s]" % path)
+            logger().debug("open db [%s]" % path)
         except:
             exitcode = 1
             logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
@@ -28,12 +28,12 @@ class jobrunhistory():
         path = "%s/autorsyncbackup.db" % self.dbdirectory
         try:
             self.conn.close()
-            logger().debug("DEBUG: close db [%s]" % path)
+            logger().debug("close db [%s]" % path)
         except:
             pass
             
     def checkTables(self):
-        logger().debug("DEBUG: Check for table `jobrunhistory`")
+        logger().debug("Check for table `jobrunhistory`")
         c = self.conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
         if c.fetchone() is None:
@@ -70,8 +70,8 @@ class jobrunhistory():
                                     rsync_total_bytes_sent INTEGER, \
                                     rsync_total_bytes_received INTEGER \
                                 );'
-        logger().debug("DEBUG: create table `jobrunhistory`")
-        logger().debug("DEBUG: %s" % jobrunhistoryTable.replace("\n",""))
+        logger().debug("create table `jobrunhistory`")
+        logger().debug("%s" % jobrunhistoryTable.replace("\n",""))
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
         
@@ -85,7 +85,7 @@ class jobrunhistory():
             c.execute(query, backupstatus.values())
             self.conn.commit()
         except:
-            logger().error("ERROR: Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
+            logger().error("Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
             
     def getJobHistory(self, hosts):
         ret = None

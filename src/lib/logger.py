@@ -14,24 +14,28 @@ class logger():
             return id(self)
         
         def debug(self, msg):
+            msg = 'DEBUG: %s' % msg
             if self.debuglevel >= 3:
                 logging.debug(msg)
                 if self.verbose:
                     print msg
             
         def info(self, msg):
+            msg = 'INFO: %s' % msg
             if self.debuglevel >= 2:
                 logging.info(msg)
                 if self.verbose:
                     print msg
             
         def warning(self, msg):
+            msg = 'WARNING: %s' % msg
             if self.debuglevel >= 1:
                 logging.warning(msg)
                 if self.verbose:
                     print msg
             
         def error(self, msg):
+            msg = 'ERROR: %s' % msg
             if self.debuglevel >= 0:
                 logging.error(msg)
                 if self.verbose:
