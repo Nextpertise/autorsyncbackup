@@ -64,14 +64,13 @@ class director():
             return False
             
     def getBackups(self, job, workingDirectory):
+        retlist = []
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
         try:
             list = os.listdir(dir)
         except:
             logger().error("Error while listing working directory (%s) for host (%s)" % (dir, job.hostname))
-            retlist = False
-        retlist = []
-        if(list):
+        if retlist:
             for l in list:
                 if re.match(self.regexp_backupdirectory, l):
                     retlist.append(l)
