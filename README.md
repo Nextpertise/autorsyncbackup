@@ -16,7 +16,7 @@ Export by example to: `/usr/local/share/autorsyncbackup`
     
 Install dependencies:
 
-    $ apt-get install python python-yaml python-jinja2 python-mailer python-paramiko, python-prettytable
+    $ apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable
     
 Create symlink:
 
