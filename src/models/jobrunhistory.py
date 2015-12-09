@@ -88,7 +88,7 @@ class jobrunhistory():
             logger().error("Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
             
     def getJobHistory(self, hosts):
-        ret = None
+        ret = []
         if hosts:
             try:
                 c = self.conn.cursor()

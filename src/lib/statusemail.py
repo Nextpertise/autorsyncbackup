@@ -38,9 +38,12 @@ class statusemail():
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup"""
         ret = "ok"
-        for j in self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs)):
+        history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
+        for j in history:
             if j['rsync_backup_status'] != 1:
-                ret = "error"        
+                ret = "error"
+        if not history:
+            ret = "error"
         return ret
     
     def getBackupHosts(self, jobs):
