@@ -40,7 +40,7 @@ class statusemail():
         ret = "ok"
         history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         for j in history:
-            if j['rsync_backup_status'] != 1:
+            if (j['rsync_backup_status'] != 1) or (j['sanity_check'] != 1):
                 ret = "error"
         if not history:
             ret = "error"
@@ -102,6 +102,8 @@ class statusemail():
                 ret['total_bytes_received'] = ret['total_bytes_received'] + i['rsync_total_bytes_received']
                 if i['speedlimitkb']:
                     ret['total_speed_limit_kb'] = ret['total_speed_limit_kb'] + i['speedlimitkb']
+                if i['sanity_check'] == 0:
+                    ret['total_backups_failed'] = ret['total_backups_failed'] + 1
             else:
                 ret['total_backups_failed'] = ret['total_backups_failed'] + 1
         

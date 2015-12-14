@@ -68,7 +68,8 @@ class jobrunhistory():
                                     rsync_file_list_generation_time NUMERIC, \
                                     rsync_file_list_transfer_time NUMERIC, \
                                     rsync_total_bytes_sent INTEGER, \
-                                    rsync_total_bytes_received INTEGER \
+                                    rsync_total_bytes_received INTEGER, \
+                                    sanity_check INTEGER \
                                 );'
         logger().debug("create table `jobrunhistory`")
         logger().debug("%s" % jobrunhistoryTable.replace("\n",""))

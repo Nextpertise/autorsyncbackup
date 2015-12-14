@@ -7,7 +7,7 @@ from lib.logger import logger
 
 class director():
     
-    regexp_backupdirectory = r"^(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"
+    regexp_backupdirectory = r".*?(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"
 
     def getJobArray(self, jobpath):
         jobArray = []
@@ -63,17 +63,16 @@ class director():
         else:
             return False
             
-    def getBackups(self, job, workingDirectory):
+    def getBackups(self, job):
         retlist = []
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
+        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
         try:
             list = os.listdir(dir)
         except:
             logger().error("Error while listing working directory (%s) for host (%s)" % (dir, job.hostname))
-        if retlist:
-            for l in list:
-                if re.match(self.regexp_backupdirectory, l):
-                    retlist.append(l)
+        for l in list:
+            if re.match(self.regexp_backupdirectory, l):
+                retlist.append(l)
         return retlist
         
     def getIdfromBackupInstance(self, backupDirectoryInstance):
@@ -92,8 +91,8 @@ class director():
             ret = m.group(1)
         return ret  
         
-    def getOldestBackupId(self, job, workingDirectory):
-        list = self.getBackups(job, workingDirectory)
+    def getOldestBackupId(self, job):
+        list = self.getBackups(job)
         ret = False
         id = 0
         for l in list:
@@ -102,14 +101,12 @@ class director():
         return ret            
             
     def backupRotate(self, job, moveCurrent = True):
-        workingDirectory = self.getWorkingDirectory()
-        
         # Check if we need to remove the oldest backup(s)
-        self._unlinkExpiredBackups(job, workingDirectory)
+        self._unlinkExpiredBackups(job)
         
         # Rotate backups
-        if(self._rotateBackups(job, workingDirectory)):
-            latest = self._moveCurrentBackup(job, workingDirectory)
+        if(self._rotateBackups(job)):
+            latest = self._moveCurrentBackup(job)
             if latest:
                 if(self._updateLatestSymlink(job, latest)):
                     pass
@@ -120,7 +117,9 @@ class director():
         else:
             logger().error("Error rotating backups for host: %s" % job.hostname)
         
-    def _unlinkExpiredBackups(self, job, workingDirectory):
+    def _unlinkExpiredBackups(self, job):
+        workingDirectory = self.getWorkingDirectory()
+        
         """Unlink oldest backup(s) if applicable"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
         
@@ -130,7 +129,7 @@ class director():
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
         
-        for l in self.getBackups(job, workingDirectory):
+        for l in self.getBackups(job):
             if self.getIdfromBackupInstance(l):
                 if self.getIdfromBackupInstance(l) > (backupRetention - 1):
                     self._unlinkExpiredBackup(job, dir + "/" + l)
@@ -146,11 +145,11 @@ class director():
             ret = False
         return ret
         
-    def _rotateBackups(self, job, workingDirectory):
+    def _rotateBackups(self, job):
         """Rotate backups"""
         ret = True
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
-        id = self.getOldestBackupId(job, workingDirectory)
+        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
+        id = self.getOldestBackupId(job)
         while id >= 0:
             cur = "%s/*.%s" % (dir, id)
             cur = glob.glob(cur)
@@ -174,13 +173,13 @@ class director():
                 return ret
         return ret
         
-    def _moveCurrentBackup(self, job, workingDirectory):
+    def _moveCurrentBackup(self, job):
         """Move current backup"""
         src = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         
         # BackupDirectoryInstance format: 2015-10-27_04-56-59_backup.0
         folder = datetime.datetime.today().strftime("%Y-%m-%d_%H-%M-%S_backup.0")
-        ret = workingDirectory + "/" + folder
+        ret = self.getWorkingDirectory() + "/" + folder
         dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + ret
         
         try:
@@ -214,7 +213,7 @@ class director():
         except:
             pass
             
-        oldestId = self.getOldestBackupId(job, workingDirectory)
+        oldestId = self.getOldestBackupId(job)
         if rotation > 0 and oldestId >= rotation:
             src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory + "/*." + str(oldestId)
             dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
@@ -241,6 +240,32 @@ class director():
             ret = "weekly"
         if(int(datetime.datetime.today().strftime("%d")) == config().monthlybackup):
             ret = "monthly"
+        return ret
+        
+    def sanityCheckWorkingDirectory(self, job):
+        src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory() + "/*.*"
+        list = glob.glob(src)
+        found_ids = []
+        ret = True
+        
+        # Check for duplicate id's
+        for l in list:
+            id = self.getIdfromBackupInstance(l)
+            if id in found_ids:
+                ret = False
+            found_ids.append(id)
+            
+        # Check sequence
+        for id in range(0, self.getOldestBackupId(job)):
+            print id
+            if id not in found_ids:
+                ret = False
+        
+        if ret:
+            logger().debug("Sanity check passed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
+        else:
+            logger().error("Sanity check failed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
+        job.backupstatus['sanity_check'] = int(ret)
         return ret
     
     # Checks

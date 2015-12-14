@@ -24,6 +24,7 @@ class jobThread (threading.Thread):
                 self.queueLock.release()
                 logger().info("Start job for hostname: [%s] in queue: [%d]" % (job.hostname, self.id))
                 self.director.checkBackupEnvironment(job)
+                self.director.sanityCheckWorkingDirectory(job)
                 latest = self.director.checkForPreviousBackup(job)
                 self.director.executeRsync(job, latest)
                 self.director.processBackupStatus(job)
