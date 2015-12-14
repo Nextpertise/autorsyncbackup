@@ -257,7 +257,6 @@ class director():
             
         # Check sequence
         for id in range(0, self.getOldestBackupId(job)):
-            print id
             if id not in found_ids:
                 ret = False
         
