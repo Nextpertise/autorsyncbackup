@@ -17,7 +17,7 @@ class config():
         dailyrotation = 8
         weeklyrotation = 5
         monthlyrotation = 13
-        weeklybackup = 7
+        weeklybackup = 6
         monthlybackup = 1
         backupmailfrom = ""
         backupmailrecipients = []
