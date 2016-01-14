@@ -4,10 +4,11 @@ from lib.logger import logger
 
 class jobrunhistory():
     # Default config values
-    dbdirectory = "/var/lib/autorsyncbackup"
+    dbdirectory = None
     conn = None
     
     def __init__(self, dbdirectory=None, check=False):
+        self.dbdirectory = config().jobspooldirectory
         if dbdirectory:
             self.dbdirectory = dbdirectory
         self.openDbHandler()
@@ -108,3 +109,4 @@ class jobrunhistory():
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
+
