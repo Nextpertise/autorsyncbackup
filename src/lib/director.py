@@ -34,7 +34,6 @@ class director():
         return ret
         
     def checkBackupEnvironment(self, job):
-        self._moveLastBackupToCurrentBackup(job)
         backupdir = job.backupdir.rstrip('/')
         if not os.path.exists(backupdir):
             logger().error("Backup path (%s) doesn't exists" % backupdir)
@@ -52,6 +51,7 @@ class director():
             dir = backupdir + "/" + job.hostname + "/monthly"
             if not os.path.exists(dir):
                 os.makedirs(dir)
+            self._moveLastBackupToCurrentBackup(job)
         except:
             logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
             return False
