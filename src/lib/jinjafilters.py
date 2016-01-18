@@ -50,7 +50,7 @@ class jinjafilters():
         except:
             x = 0
         if x < 0:
-            return '-' + _intToReadableStr(-x)
+            return '-' + self._intToReadableStr(-x)
         result = ''
         while x >= 1000:
             x, r = divmod(x, 1000)
