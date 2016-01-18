@@ -146,7 +146,18 @@ class jobrunhistory():
             except Exception as e:
                 logger().error(e)
         return ret
-        
+
+    def deleteHistory(self):
+        try:
+            c = self.conn.cursor()
+            c.execute("select id from jobrunhistory where startdatetime < strftime('%s','now','-%d days')" % ('%s', config().databaseretention))
+            result = c.fetchall()
+            for row in result:
+                c.execute("delete from jobcommandhistory where jobrunid = %d" % row['id'])
+                c.execute("delete from jobrunhistory where id = %d" % row['id'])
+        except Exception as e:
+            logger().error(e)
+
     def dict_factory(self, cursor, row):
         d = {}
         for idx, col in enumerate(cursor.description):
