@@ -1,6 +1,5 @@
 import subprocess, paramiko, time, socket;
 from logger import logger
-#from models.job import job
 
 class command():
 
@@ -44,11 +43,3 @@ class command():
 
 class CommandException(Exception):
     pass
-
-#
-#if __name__ == '__main__':
-#    c = command()
-#    job = job('/hone/leo/src/autorsyncbackup/etc/wp.nextpertise.nl.job')
-#    if c.checkRemoteHostViaSshProtocol(job):
-#        print c.executeRemoteCommand(job, '/bin/bash -c /usr/bin/yes | /usr/bin/head')
-#        print c.executeLocalCommand(job,  '/bin/bash -c /usr/bin/yes | /usr/bin/head')
