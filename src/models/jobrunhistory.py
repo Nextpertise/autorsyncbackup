@@ -138,6 +138,11 @@ class jobrunhistory():
                 query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
+                
+                for row in ret:
+                    query = "select * from jobcommandhistory where jobrunid = %d" % row['id']
+                    c.execute(query)
+                    row['commands'] = c.fetchall()
             except Exception as e:
                 logger().error(e)
         return ret
