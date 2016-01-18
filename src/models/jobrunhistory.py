@@ -38,7 +38,13 @@ class jobrunhistory():
         c = self.conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
         if c.fetchone() is None:
-          self.createTableJobrunhistoryTable()
+            self.createTableJobrunhistoryTable()
+        
+        logger().debug("Check for table jobcommandhistory")
+        c.execute("select name from sqlite_master where type='table' and name='jobcommandhistory'")
+        if c.fetchone() is None:
+            self.createTableJobcommandhistoryTable()
+      
         
     def createTableJobrunhistoryTable(self):
         jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
@@ -77,7 +83,24 @@ class jobrunhistory():
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
         
-    def insertJob(self, backupstatus):
+    def createTableJobcommandhistoryTable(self):
+        sql = '''
+            create table if not exists jobcommandhistory(
+                id integer primary key autoincrement,
+                jobrunid integer not null,
+                local integer,
+                before integer,
+                returncode integer,
+                script text,
+                stdout text,
+                stderr text);
+        '''
+        logger().debug('create table jobcommandhistory')
+        logger().debug("%s" % sql.replace("\n",  ""))
+        c = self.conn.cursor()
+        c.execute(sql)
+        
+    def insertJob(self, backupstatus,  hooks):
         """Insert job run details into the database"""
         try:
             columns = ', '.join(backupstatus.keys())
@@ -85,7 +108,22 @@ class jobrunhistory():
             query = "INSERT INTO jobrunhistory ( %s ) VALUES ( %s )" % (columns, placeholders)
             c = self.conn.cursor()
             c.execute(query, backupstatus.values())
+
+            jobid = c.lastrowid
+            for hook in hooks:
+                sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, script, stdout, stderr) values (%d, %d, %d, %d, '%s', '%s', '%s')" % (
+                    jobid,
+                    hook['local'],
+                    hook['runtime'] == 'before',
+                    hook['returncode'],
+                    hook['script'], 
+                    hook['stdout'],
+                    hook['stderr'])
+                logger().debug(sql)
+                c.execute(sql)
+
             self.conn.commit()
+            logger().debug("Commited job history to database")
         except:
             logger().error("Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
             

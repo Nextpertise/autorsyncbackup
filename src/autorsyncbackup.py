@@ -10,6 +10,7 @@ from lib.logger import logger
 from lib.jobthread import jobThread
 from lib.statuscli import statuscli
 
+
 def setupCliArguments():
     """ Parse CLI options """
     parser = OptionParser()
@@ -109,6 +110,16 @@ if __name__ == "__main__":
     options = setupCliArguments()
     config(options.mainconfig)
     
+#    from models.job import job
+#    c = command()
+#    job = job('/home/leo/src/autorsyncbackup/etc/wp1.nextpertise.nl.job')
+#    if c.checkRemoteHostViaSshProtocol(job):
+#        print c.executeRemoteCommand(job, '/bin/ls -l')
+#        print "That's one"
+#        print c.executeLocalCommand(job,  '/bin/ls -l')
+#        print "That's two"
+#    exit(0)
+
     # Welcome message
     if options.verbose:
         print "Starting AutoRsyncBackup"
