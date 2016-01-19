@@ -24,6 +24,7 @@ class config():
         jobworkers = 3
         debuglevel = 0
         debugmessages = []
+        databaseretention = 540 # approx 1.5 year
 
         def spam(self):
             """ Test method, return singleton id """
@@ -155,3 +156,8 @@ class config():
             self.jobworkers = config['jobworkers']
         except:
             self.debugmessages.append("%s: No jobworkers is set, using default value: %d" % (self.mainconfigpath, self.jobworkers))
+
+        try:
+            self.databaseretention = config['databaseretention']
+        except:
+            self.debugmessages.append("%s: No database retention set, using default value: %d" % (self.mainconfigpath,  self.jobworkers))

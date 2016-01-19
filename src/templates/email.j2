@@ -446,6 +446,26 @@
                                                     <td class="data-heading" width="50%">Total received</td>
                                                     <td class="data-value">{{ jrh.rsync_total_bytes_received|bytesformat }}</td>
                                                   </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Commands executed</td>
+                                                    <td class="data-value">{{ jrh['commands']|length }}</td>
+                                                  </tr>
+                                                  {% for c in jrh['commands'] %}
+                                                  <tr>
+                                                    <td class="data-heading" width="50%"><li>{{ c.script }} ({% if c.local == true %}Local{% else %} Remote{% endif %}, {% if c.before == true %}Before{% else %}After{% endif %})</li></td>
+                                                    <td class="data-value">{% if c.returncode == 0 %}Success{% else %}Error{% endif %}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%"><li>stdout:</li></td>
+                                                    <td class="data-value">{{ c.stdout }}</td>
+                                                  </tr>
+                                                  {% if c.returncode != 0 %}
+                                                  <tr>
+                                                    <td class="data-heading" width="50%"><li>stderr:</li></td>
+                                                    <td class="data-value">{{ c.stderr }}</td>
+                                                  </tr>
+                                                  {% endif %}
+                                                  {% endfor %}
                                                 </table>
                                               </td>
                                             </tr>

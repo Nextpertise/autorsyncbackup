@@ -21,6 +21,11 @@ class job():
     monthlybackup = None
     fileset = None
     backupstatus = None
+    hooks = None
+    beforeLocalHooks = []
+    afterLocalHooks = []
+    beforeRemoteHooks =[]
+    afterRemoteHooks = []
     
     def __init__(self, filepath=None):
         self.filepath = filepath
@@ -139,8 +144,46 @@ class job():
             logger().debug("%s: No monthlybackup is set, using default" % self.filepath)
             
         try:
+            self.hooks = jobconfig['hooks']
+            for hook in self.hooks:
+                try:
+                    self.addhook(hook)
+                except KeyError as e:
+                    logger.debug("%s: Error in hook definition: %s" % (self.filepath,  e))
+                    return False
+        except:
+            logger().info("%s: No hooks defined, skipping hooks." % self.filepath)
+            
+        try:
             self.fileset = jobconfig['fileset']
         except:
             logger().info("%s: No fileset is set, skipping job." % self.filepath)
             self.enabled = False
             return False
+
+    def addhook(self,  hook):
+        if not 'script' in hook:
+            raise KeyError("script not defined in hook")
+        
+        hook['local'] = hook.get('local',  False)
+        if not hook['local'] in (False,  True):
+            raise KeyError("local not one of True or False in hook")
+
+        hook['runtime'] = hook.get('runtime',  'before')
+        if not hook['runtime'] in ('before',  'after'):
+            raise KeyError("runtime must be before or after in hook")
+        
+        hook['continueonerror'] = hook.get('continueOnError',  False)
+        if not hook['continueonerror'] in (False,  True):
+            raise KeyError("continueonerror must be True of False in hook")
+        
+        if hook['local']:
+            if hook['runtime'] == 'before':
+                self.beforeLocalHooks.append(hook)
+            else:
+                self.afterLocalHooks.append(hook)
+        else:
+            if hook['runtime'] == 'before':
+                self.beforeRemoteHooks.append(hook)
+            else:
+                self.afterRemoteHooks.append(hook)

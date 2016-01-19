@@ -4,6 +4,7 @@ from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.rsync import rsync
 from lib.logger import logger
+from lib.command import command,  CommandException
 
 class director():
     
@@ -26,15 +27,28 @@ class director():
         
     def checkRemoteHost(self, job):
         return rsync().checkRemoteHost(job)
-        
+
+    def executeJobs(self,  job,  commands):
+        comm = command()
+        for c in commands:
+            if c['local']:
+                c['returncode'],  c['stdout'],  c['stderr'] = comm.executeLocalCommand(job,  c['script'])
+            else:
+                c['returncode'],  c['stdout'],  c['stderr'] =  comm.executeRemoteCommand(job,  c['script'])
+            if c['returncode'] != 0 and c['continueonerror'] == False:
+                raise CommandException('Hook %s failed to execute' % c['script'])
+            
     def executeRsync(self, job, latest):
+        self.executeJobs(job, job.beforeLocalHooks)
+        self.executeJobs(job, job.beforeRemoteHooks)
         job.backupstatus['startdatetime'] = int(time.time())
         ret = rsync().executeRsync(job, latest)
         job.backupstatus['enddatetime'] = int(time.time())
+        self.executeJobs(job, job.afterRemoteHooks)
+        self.executeJobs(job, job.afterLocalHooks)
         return ret
         
     def checkBackupEnvironment(self, job):
-        self._moveLastBackupToCurrentBackup(job)
         backupdir = job.backupdir.rstrip('/')
         if not os.path.exists(backupdir):
             logger().error("Backup path (%s) doesn't exists" % backupdir)
@@ -52,6 +66,7 @@ class director():
             dir = backupdir + "/" + job.hostname + "/monthly"
             if not os.path.exists(dir):
                 os.makedirs(dir)
+            self._moveLastBackupToCurrentBackup(job)
         except:
             logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
             return False
@@ -201,7 +216,7 @@ class director():
         try:
             os.symlink(latest, symlinkfile)
         except:
-            ret = false
+            ret = False
         return ret
         
     def _moveLastBackupToCurrentBackup(self, job):
@@ -221,10 +236,10 @@ class director():
             if not len(g) == 1:
                 errorMsg = "More than one directory matching on glob(%s)" % src
                 logger().error(errorMsg)
-                raise globException(errorMsg)
+                raise Exception(errorMsg)
             if os.path.exists(dest):
                 logger().info("Do not move oldest backup (%s) because current directory already exists")
-                return true
+                return True
             ret = True
             try:
                 os.rename(g[0], dest)
@@ -286,27 +301,34 @@ class director():
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb
         job.backupstatus['type'] = self.getWorkingDirectory()
-        p = re.compile(r"^(.*)\s*?Number of files: (\d+)\s*Number of files transferred: (\d+)\s*Total file size: (\d+) bytes\s*Total transferred file size: (\d+)\s* bytes\s*Literal data: (\d+) bytes\s*Matched data: (\d+) bytes\s*File list size: (\d+)\s*File list generation time: (\S+)\s* seconds?\s*File list transfer time: (\S+)\s*seconds?\s*Total bytes sent: (\d+)\s*Total bytes received: (\d+)(\s|\S)*$", re.MULTILINE|re.DOTALL)
-        m = p.match(job.backupstatus['rsync_stdout'])
-        if m:
-            # Limit output on max 10.000 characters incase of thousends of vanished files will fill up the SQLite db / e-mail output
-            job.backupstatus['rsync_stdout'] = job.backupstatus['rsync_stdout'][:10000]
-            job.backupstatus['rsync_pre_stdout'] = m.group(1)[:10000]
-            # Set backupstatus vars via regexp group capture
-            job.backupstatus['rsync_number_of_files'] = m.group(2)
-            job.backupstatus['rsync_number_of_files_transferred'] =  m.group(3)
-            job.backupstatus['rsync_total_file_size'] = m.group(4)
-            job.backupstatus['rsync_total_transferred_file_size'] =  m.group(5)
-            job.backupstatus['rsync_literal_data'] = m.group(6)
-            job.backupstatus['rsync_matched_data'] = m.group(7)
-            job.backupstatus['rsync_file_list_size'] = m.group(8)
-            job.backupstatus['rsync_file_list_generation_time'] = float(m.group(9))
-            job.backupstatus['rsync_file_list_transfer_time'] = float(m.group(10))
-            job.backupstatus['rsync_total_bytes_sent'] = m.group(11)
-            job.backupstatus['rsync_total_bytes_received'] = m.group(12)
-        else:
-            if job.backupstatus['rsync_backup_status'] == 1:
-                logger().error("Error unhandled output in rsync command (%s)" % job.backupstatus['rsync_stdout'])
-        jrh = jobrunhistory()
-        jrh.insertJob(job.backupstatus)
+        self.parseRsyncOutput(job)
+        jrh = jobrunhistory(check = True)
+        jrh.insertJob(job.backupstatus,  job.hooks)
         jrh.closeDbHandler()
+
+    def parseRsyncOutput(self, job):
+        regexps = {
+            'rsync_number_of_files'             : r"^.*Number of files: (\d[\d,]*).*$",
+            'rsync_number_of_files_transferred' : r"^.*Number of .*files transferred: (\d[\d,]*).*$",
+            'rsync_total_file_size'             : r"^.*Total file size: (\d[\d,]*).*$",
+            'rsync_total_transferred_file_size' : r"^.*Total transferred file size: (\d[\d,]*).*$", 
+            'rsync_literal_data'                : r"^.*Literal data: (\d[\d,]*).*$", 
+            'rsync_matched_data'                : r"^.*Matched data: (\d[\d,]*).*$", 
+            'rsync_file_list_size'              : r"^.*File list size: (\d[\d,]*).*$", 
+            'rsync_file_list_generation_time'   : r"^.*File list generation time: (\d+\.\d*).*$",
+            'rsync_file_list_transfer_time'     : r"^.*File list transfer time: (\d+\.\d*).*$", 
+            'rsync_total_bytes_sent'            : r"^.*Total bytes sent: (\d[\d,]*).*$", 
+            'rsync_total_bytes_received'        : r"^.*Total bytes received: (\d[\d,]*).*$"
+        }
+        strings = job.backupstatus['rsync_stdout']
+        job.backupstatus['rsync_stdout'] = strings[:10000]
+        for key in regexps.keys():
+            try:
+                logger().debug("matching %s for %s" % (regexps[key], key))
+                m = re.match(regexps[key],  strings,  re.MULTILINE | re.DOTALL)
+                if m:
+                    job.backupstatus[key] = m.group(1).replace(',',  '')
+                else:
+                    logger().debug("no match!")
+            except:
+                logger().error("FAILING regexp[%s] %s" % (key, regexps[key]))

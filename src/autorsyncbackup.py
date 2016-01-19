@@ -9,6 +9,8 @@ from lib.statusemail import statusemail
 from lib.logger import logger
 from lib.jobthread import jobThread
 from lib.statuscli import statuscli
+from models.jobrunhistory import jobrunhistory
+
 
 def setupCliArguments():
     """ Parse CLI options """
@@ -83,6 +85,7 @@ def runBackup(jobpath, dryrun):
                     if(job.enabled):
                         if job.backupstatus['rsync_backup_status'] == 1:
                             directorInstance.backupRotate(job)
+                jobrunhistory.deleteHistory()
                 durationstats['housekeepingenddatetime'] = int(time.time())
                 
                 # Sent status report

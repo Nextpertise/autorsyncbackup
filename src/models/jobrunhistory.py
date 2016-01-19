@@ -4,10 +4,11 @@ from lib.logger import logger
 
 class jobrunhistory():
     # Default config values
-    dbdirectory = "/var/lib/autorsyncbackup"
+    dbdirectory = None
     conn = None
     
     def __init__(self, dbdirectory=None, check=False):
+        self.dbdirectory = config().jobspooldirectory
         if dbdirectory:
             self.dbdirectory = dbdirectory
         self.openDbHandler()
@@ -37,7 +38,13 @@ class jobrunhistory():
         c = self.conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
         if c.fetchone() is None:
-          self.createTableJobrunhistoryTable()
+            self.createTableJobrunhistoryTable()
+        
+        logger().debug("Check for table jobcommandhistory")
+        c.execute("select name from sqlite_master where type='table' and name='jobcommandhistory'")
+        if c.fetchone() is None:
+            self.createTableJobcommandhistoryTable()
+      
         
     def createTableJobrunhistoryTable(self):
         jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
@@ -76,7 +83,24 @@ class jobrunhistory():
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
         
-    def insertJob(self, backupstatus):
+    def createTableJobcommandhistoryTable(self):
+        sql = '''
+            create table if not exists jobcommandhistory(
+                id integer primary key autoincrement,
+                jobrunid integer not null,
+                local integer,
+                before integer,
+                returncode integer,
+                script text,
+                stdout text,
+                stderr text);
+        '''
+        logger().debug('create table jobcommandhistory')
+        logger().debug("%s" % sql.replace("\n",  ""))
+        c = self.conn.cursor()
+        c.execute(sql)
+        
+    def insertJob(self, backupstatus,  hooks):
         """Insert job run details into the database"""
         try:
             columns = ', '.join(backupstatus.keys())
@@ -84,7 +108,22 @@ class jobrunhistory():
             query = "INSERT INTO jobrunhistory ( %s ) VALUES ( %s )" % (columns, placeholders)
             c = self.conn.cursor()
             c.execute(query, backupstatus.values())
+
+            jobid = c.lastrowid
+            for hook in hooks:
+                sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, script, stdout, stderr) values (%d, %d, %d, %d, '%s', '%s', '%s')" % (
+                    jobid,
+                    hook['local'],
+                    hook['runtime'] == 'before',
+                    hook['returncode'],
+                    hook['script'], 
+                    hook['stdout'],
+                    hook['stderr'])
+                logger().debug(sql)
+                c.execute(sql)
+
             self.conn.commit()
+            logger().debug("Commited job history to database")
         except:
             logger().error("Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
             
@@ -99,12 +138,29 @@ class jobrunhistory():
                 query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
+                
+                for row in ret:
+                    query = "select * from jobcommandhistory where jobrunid = %d" % row['id']
+                    c.execute(query)
+                    row['commands'] = c.fetchall()
             except Exception as e:
                 logger().error(e)
         return ret
-        
+
+    def deleteHistory(self):
+        try:
+            c = self.conn.cursor()
+            c.execute("select id from jobrunhistory where startdatetime < strftime('%s','now','-%d days')" % ('%s', config().databaseretention))
+            result = c.fetchall()
+            for row in result:
+                c.execute("delete from jobcommandhistory where jobrunid = %d" % row['id'])
+                c.execute("delete from jobrunhistory where id = %d" % row['id'])
+        except Exception as e:
+            logger().error(e)
+
     def dict_factory(self, cursor, row):
         d = {}
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
+
