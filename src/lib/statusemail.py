@@ -8,6 +8,7 @@ from jinja2 import Environment, PackageLoader
 
 class statusemail():
     jobrunhistory = None
+    history = None
     
     def __init__(self):
         self.jobrunhistory = jobrunhistory()
@@ -16,14 +17,14 @@ class statusemail():
         self.jobrunhistory.closeDbHandler()
     
     def sendStatusEmail(self, jobs, durationstats):
+        self.history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         state = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
-        jrh = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         
         subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, jrh, jobs)
+        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs)
         self._send(subject=subject, htmlbody=body)
         
     def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs):
@@ -38,11 +39,15 @@ class statusemail():
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup"""
         ret = "ok"
-        history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
-        for j in history:
+        for j in self.history:
             if (j['rsync_backup_status'] != 1) or (j['sanity_check'] != 1):
                 ret = "error"
-        if not history:
+            j['commanderror'] = 'ok'
+            for c in j['commands']:
+                if c['returncode'] != 0:
+                    j['commanderror'] = "error"
+                    ret = "error"
+        if not self.history:
             ret = "error"
         return ret
     
@@ -60,13 +65,13 @@ class statusemail():
         for i in jobs:
             if i.enabled:
                 hosts.append(i.hostname)
-        for j in self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs)):
+        for j in self.history:
             hosts.remove(j['hostname'])
         return hosts
         
     def getStats(self, jobs):
         """Produce total/average stats out database/jobs data"""
-        result = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
+        result = self.history
         ret = {}
         ret['total_host_count'] = len(result)
         ret['total_backups_failed'] = 0
@@ -87,7 +92,7 @@ class statusemail():
         ret['average_speed_limit_kb'] = 0
         
         for i in result:
-            if i['rsync_backup_status'] == 1:
+            if i['rsync_backup_status'] == 1 and i['commanderror'] == 'ok':
                 ret['total_rsync_duration'] = ret['total_rsync_duration'] + (i['enddatetime'] - i['startdatetime'])
                 ret['total_number_of_files'] = ret['total_number_of_files'] + i['rsync_number_of_files']
                 ret['total_number_of_files_transferred'] = ret['total_number_of_files_transferred'] + i['rsync_number_of_files_transferred']
@@ -106,7 +111,7 @@ class statusemail():
                     ret['total_backups_failed'] = ret['total_backups_failed'] + 1
             else:
                 ret['total_backups_failed'] = ret['total_backups_failed'] + 1
-        
+
         ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
         if ret['total_backups_success'] > 0:
             ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']

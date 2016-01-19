@@ -158,7 +158,7 @@ class job():
             
         try:
             self.hooks = jobconfig['hooks']
-            if self.sshusername is None or self.sshkeyfile is None:
+            if self.sshusername == None or self.sshpublickey == None:
                 logger().error('%s: Missing ssh username or keyfile, hooks disabled' % self.filepath)
             else:
                 for hook in self.hooks:
@@ -167,8 +167,8 @@ class job():
                     except KeyError as e:
                         logger().error("%s: Error in hook definition: %s" % (self.filepath,  e))
                         return False
-        except:
-            logger().info("%s: No hooks defined, skipping hooks." % self.filepath)
+        except Exception as e:
+            logger().info("%s: No hooks defined, skipping hooks (exception: %s)." % (self.filepath,  e))
             
         try:
             self.fileset = jobconfig['fileset']
@@ -189,7 +189,7 @@ class job():
         if not hook['runtime'] in ('before',  'after'):
             raise KeyError("runtime must be before or after in hook")
         
-        hook['continueonerror'] = hook.get('continueOnError',  False)
+        hook['continueonerror'] = hook.get('continueonerror',  False)
         if not hook['continueonerror'] in (False,  True):
             raise KeyError("continueonerror must be True of False in hook")
         
