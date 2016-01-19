@@ -9,7 +9,7 @@ class command():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
-                ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
                 logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
                 return True
             except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
@@ -21,7 +21,7 @@ class command():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+            ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
             logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
 
             stdin, stdout, stderr = ssh.exec_command("%s; echo $?" % command)

@@ -15,8 +15,8 @@ class rsync():
     
     def checkRemoteHostViaRsyncProtocol(self, job):
         """Check if remote host is up and able to accept connections with our credentials"""
-        password = "export RSYNC_PASSWORD=\"%s\"" % job.password
-        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (job.username, job.hostname, job.port, job.share)
+        password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
+        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare)
         command = "%s; %s" % (password, rsyncCommand)
         logger().info("Executing rsync check (%s)" % rsyncCommand)
         errcode, stdout = self.executeCommand(command)
@@ -36,7 +36,7 @@ class rsync():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
-                ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
                 logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
                 return True
             except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
@@ -68,7 +68,7 @@ class rsync():
         
         # Generate rsync CLI command and execute it  
         if(fileset):  
-            password = "export RSYNC_PASSWORD=\"%s\"" % job.password
+            password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
             rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
             command = "%s; %s" % (password, rsyncCommand)
             logger().info("Executing rsync command (%s)" % rsyncCommand)
@@ -114,9 +114,9 @@ class rsync():
         fileset = ""
         for fs in job.fileset:
             if job.ssh:
-                fileset = fileset + " %s@%s:%s" % (job.username, job.hostname, fs)
+                fileset = fileset + " %s@%s:%s" % (job.sshusername, job.hostname, fs)
             else:
-                fileset = fileset + " rsync://%s@%s:%s/%s%s" % (job.username, job.hostname, job.port, job.share, fs)
+                fileset = fileset + " rsync://%s@%s:%s/%s%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare, fs)
         return fileset
     
     def executeCommand(self, command):

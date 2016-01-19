@@ -290,13 +290,14 @@ class director():
         
     def processBackupStatus(self, job):
         job.backupstatus['hostname'] = job.hostname
-        job.backupstatus['username'] = job.username
         if(job.ssh):
             ssh = 'True'
+            job.backupstatus['username'] = job.sshusername
         else:
             ssh = 'False'
+            job.backupstatus['username'] = job.rsyncusername
         job.backupstatus['ssh'] = ssh
-        job.backupstatus['share'] = job.share
+        job.backupstatus['share'] = job.rsyncshare
         job.backupstatus['fileset'] = ':'.join(job.fileset)
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb

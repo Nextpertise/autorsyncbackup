@@ -6,9 +6,10 @@ class job():
     enabled = None
     filepath = None
     hostname = None
-    username = None
-    password = None
     ssh = None
+    rsyncusername = None
+    rsyncpassword = None
+    sshusername = None
     sshpublickey = None
     port = None
     share = None
@@ -62,25 +63,34 @@ class job():
             logger().debug("%s: No SSH jobconfig variable set." % self.filepath)
         
         try:
-            self.username = jobconfig['username']
+            self.sshusername = jobconfig['ssh_username']
         except:
-            logger().info("%s: No username is set, skipping job." % self.filepath)
+            if self.ssh:
+                logger().info("%s: No ssh_username is set, skipping job." % self.filepath)
+                self.enabled = False
+                return False
+
+        try:
+            if not self.ssh:
+                self.rsyncusername = jobconfig['rsync_username']
+        except:
+            logger().info("%s: No rsync_username is set, skipping job." % self.filepath)
             self.enabled = False
             return False
 
         try:
             if not self.ssh:
-                self.password = jobconfig['password']
+                self.rysncpassword = jobconfig['rsync_password']
         except:
             logger().info("%s: No password is set while not using SSH, skipping job." % self.filepath)
             self.enabled = False
             return False
             
         try:
-            self.sshpublickey = jobconfig['sshpublickey']
+            self.sshpublickey = jobconfig['ssh_publickey']
         except:
             if self.ssh:
-                logger().error("%s: SSH is set, but no sshpublickey is configured, disabling backup" % self.filepath)
+                logger().error("%s: SSH is set, but no ssh_publickey is configured, disabling backup" % self.filepath)
                 self.enabled = False
                 return False
             
@@ -95,9 +105,12 @@ class job():
                 logger().debug("%s: No rsync port is set, using default." % self.filepath)
             
         try:
-            self.share = jobconfig['share']
+            if not self.ssh:
+                self.rsyncshare = jobconfig['rsync_share']
+            else:
+                self.rsyncshare = ''
         except:
-            logger().info("%s: No share is set, skipping job." % self.filepath)
+            logger().info("%s: No rsync_share is set, skipping job." % self.filepath)
             self.enabled = False
             return False
             
@@ -145,12 +158,15 @@ class job():
             
         try:
             self.hooks = jobconfig['hooks']
-            for hook in self.hooks:
-                try:
-                    self.addhook(hook)
-                except KeyError as e:
-                    logger.debug("%s: Error in hook definition: %s" % (self.filepath,  e))
-                    return False
+            if self.sshusername is None or self.sshkeyfile is None:
+                logger().error('%s: Missing ssh username or keyfile, hooks disabled' % self.filepath)
+            else:
+                for hook in self.hooks:
+                    try:
+                        self.addhook(hook)
+                    except KeyError as e:
+                        logger().error("%s: Error in hook definition: %s" % (self.filepath,  e))
+                        return False
         except:
             logger().info("%s: No hooks defined, skipping hooks." % self.filepath)
             
