@@ -154,3 +154,32 @@ recipients:                                                         # list of st
 
 Job file options
 ----------------
+(showing default values)
+
+```yaml
+enabled:          True                                     # (en/dis)able this entry
+hostname:         _no_default_value_                       # fully qualified domain name of the host being backedup
+ssh:              False                                    # whether to use rsync over ssh (True) or plain rsync (False)
+rsync_username:   _no_default_value_                       # rsync user account
+rsync_password:   _no_default_value_                       # rsync password
+rsync_share:      ''                                       #
+ssh_username:     _no_default_value_                       # ssh username
+ssh_publickey:    _no_default_value_                       # ssh private key file (public key on client)
+port:             22 or 873                                # defaults to either ssh or rsync port depending on the value of the ssh entry
+backupdir:        _taken_from_main_config_file_            # see Config file options
+speedlimitkb:     _taken_from_main_config_file_            # see Config file options
+dailyrotation:    _taken_from_main_config_file_            # see Config file options
+weeklyrotation:   _taken_from_main_config_file_            # see Config file options
+monthlyrotation:  _taken_from_main_config_file_            # see Config file options
+weeklybackup:     _taken_from_main_config_file_            # see Config file options
+monthlybackup:    _taken_from_main_config_file_            # see Config file options
+fileset:                                                   # list of dirs and files to backup (no defaults)
+  - list
+  - of files and
+  - directories/
+hooks:                                                     # list of pre/post backup scripts (no defaults)
+  - script:       name_and_full_path_of_executable         # full path to executable
+    local:        False                                    # whether the script runs locally on the server or remote on the client
+    runtime:      before                                   # whether the script runs "before" or "after" the backup
+    continueonerror: False                                 # abort backup run when script fails
+```
