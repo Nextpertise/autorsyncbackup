@@ -1,7 +1,9 @@
 AutoRsyncbackup
 ---------------
 
-AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync. Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution. Please create an issue if you find any problem.
+AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync.
+Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution.
+Please create an issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
     @company: Nextpertise B.V.
@@ -13,7 +15,7 @@ Export by example to: `/usr/local/share/autorsyncbackup`
 
     $ cd /usr/local/share/
     $ git clone git@github.com:Nextpertise/autorsyncbackup.git
-    
+
 Install dependencies:
 
     $ apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable
@@ -41,6 +43,16 @@ The job files are written in YAML syntax and will only apply with the `.job` fil
     fileset:
       - /etc/
       - /home/
+    hooks:
+      - script: /bin/false
+        local: true
+        runtime: before
+        continueonerror: true
+    
+      - script: /bin/ls -l
+        local: false
+        runtime: after
+        continueonerror: true
 
 Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
 
@@ -103,3 +115,18 @@ Adjust permissions on `/etc/rsyncd.secrets`:
 Start the rsync daemon with the init script:
 
     $ /etc/init.d/rsync start
+
+Command line options
+--------------------
+* -c, --main-config <configfile>    Defines the main config file, default is `/etc/autorsyncbackup/main.yaml`.
+* -d, --dry-run                     Dry run, do try to login on host but do not invoke rsync or hook scripts.
+* -v, --verbose                     Write logoutput also to stdout
+* --version                         Show version number
+* -j, --single-job <jobfile>        Run only the given job file
+* -s, --status <hostname>           Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
+
+Config file options
+-------------------
+
+Job file options
+----------------
