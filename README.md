@@ -2,7 +2,7 @@ AutoRsyncbackup
 ---------------
 
 AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync.
-Currently it's only tested for Debian Wheezy, but it should work on any other Linux distribution.
+Currently it's only tested for **Debian Wheezy**, but it should work on any other Linux distribution.
 Please create an issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
@@ -118,15 +118,39 @@ Start the rsync daemon with the init script:
 
 Command line options
 --------------------
-* -c, --main-config <configfile>    Defines the main config file, default is `/etc/autorsyncbackup/main.yaml`.
-* -d, --dry-run                     Dry run, do try to login on host but do not invoke rsync or hook scripts.
-* -v, --verbose                     Write logoutput also to stdout
-* --version                         Show version number
-* -j, --single-job <jobfile>        Run only the given job file
-* -s, --status <hostname>           Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
+* `-c, --main-config <configfile>   'Defines the main config file, default is `/etc/autorsyncbackup/main.yaml`.
+* `-d, --dry-run                    'Dry run, do try to login on host but do not invoke rsync or hook scripts.
+* `-v, --verbose                    'Write logoutput also to stdout
+* `--version                        'Show version number
+* `-j, --single-job <jobfile>       'Run only the given job file
+* `-s, --status <hostname>          'Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
 
 Config file options
 -------------------
+(showing default values)
+
+'''yaml
+rsyncpath:          "/usr/bin/rsync"                                # path to the rsync executable file
+lockfile:           "/var/run/autorsyncbackup.pid"                  # path to the run/pid file on your system
+jobconfigdirectory: "/etc/autorsyncbackup/"                         # location where .job files are kept
+jobspooldirectory:  "/var/spool/autorsyncbackup"                    # location of the spool directory
+backupdir:          "/var/data/backups/autorsyncbackup/"            # where the backups are stored
+logfile:            "/var/log/autorsyncbackup/autorsyncbackup.log"  # records the actions taken by autorsyncbackup
+speedlimitkb:       0                                               # maximize datatransfer speed in KB
+dailyrotation:      8                                               # how many 'daily' backups to keep
+weeklyrotation:     5                                               # how many 'weekly' backups to keep
+monthlyrotation:    13                                              # how many 'monthly' backups to keep
+weeklybackup:       6                                               # the day of the week (0 = sunday) on which to make a weekly backup
+monthlybackup:      1                                               # the day of the month on which to make a monthly backup
+backupmailfrom:     ""                                              # email from address
+jobworkers:         3                                               # number of concurrent jobs
+debuglevel:         0                                               # sets the verbosity of the logfile
+databaseretention:  540                                             # how many days the backup status records are kept
+smtphost:           _no default value_                              # where to send email to (port 25 is implied)
+recipients:                                                         # list of status email recipients
+  - maintainer@yourcompany.com
+  - another@nodefault.example.com
+'''
 
 Job file options
 ----------------
