@@ -9,7 +9,7 @@ class command():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
-                ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
                 logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
                 return True
             except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
@@ -21,7 +21,7 @@ class command():
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(job.hostname, username=job.username, key_filename=job.sshpublickey)
+            ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
             logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
 
             stdin, stdout, stderr = ssh.exec_command("%s; echo $?" % command)
@@ -29,7 +29,7 @@ class command():
             returncode = int(lines[-1].rstrip('\n'))
             stdout_value = lines[0:-1]
             stderr_value = stderr.readlines()
-            logger().debug("Remote execution of %s on %s gives (rc=%d, stdout=%s, stderr=%s" % (command,  job.hostname,  returncode,  stdout_value, stderr_value))
+            logger().debug("Remote execution of %s on %s gives (rc=%d, stdout=%s, stderr=%s)" % (command,  job.hostname,  returncode,  stdout_value, stderr_value))
             return returncode, "\n".join(stdout_value[:10000]).encode('ascii'), "\n".join(stderr_value[:10000]).encode('ascii')
         except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
             logger().error("Error while connecting to host (%s) - %s" % (job.hostname, e))
@@ -38,7 +38,7 @@ class command():
     def executeLocalCommand(self, job, command):
         p = subprocess.Popen(command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         stdout_value, stderr_value = p.communicate()
-        logger().debug("Local execution of %s gives (rc=%d, stdout=%s, stderr=%s" % (command,  p.returncode,  stdout_value,  stderr_value))
+        logger().debug("Local execution of %s gives (rc=%d, stdout=%s, stderr=%s)" % (command,  p.returncode,  stdout_value,  stderr_value))
         return p.returncode,  stdout_value, stderr_value
 
 class CommandException(Exception):

@@ -85,7 +85,7 @@ def runBackup(jobpath, dryrun):
                     if(job.enabled):
                         if job.backupstatus['rsync_backup_status'] == 1:
                             directorInstance.backupRotate(job)
-                jobrunhistory.deleteHistory()
+                jobrunhistory().deleteHistory()
                 durationstats['housekeepingenddatetime'] = int(time.time())
                 
                 # Sent status report

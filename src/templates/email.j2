@@ -358,17 +358,17 @@
                                     {% for jrh in jobrunhistory %}
                                     <table cellpadding="0" cellspacing="0" class="card" style="margin-top: 20px">
                                       <tr>
-                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 %}green{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
+                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
                                       </tr>
                                       <tr>
-                                        <td style="border:1px solid {% if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 %}green{% else %}red{% endif %}; padding: 20px 0 20px;">
+                                        <td style="border:1px solid {% if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% else %}red{% endif %}; padding: 20px 0 20px;">
                                           <table cellpadding="0" cellspacing="0" width="100%">
                                             <tr>
                                               <td>
                                                 <table bgcolor="#FFFFFF" cellpadding="0" cellspacing="0" width="100%">
                                                   <tr>
                                                     <td class="data-heading" width="50%">Rsync return message</td>
-                                                    <td class="data-value">{%- if jrh.rsync_backup_status == 1 %}Sucess{%- else %}Error{%- endif %}</td>
+                                                    <td class="data-value">{%- if jrh.rsync_backup_status == 1 %}Success{%- else %}Error{%- endif %}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Rsync errors</td>

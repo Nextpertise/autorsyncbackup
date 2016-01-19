@@ -32,20 +32,38 @@ class director():
         comm = command()
         for c in commands:
             if c['local']:
+                logger().debug('Running local command %s' % c['script'])
                 c['returncode'],  c['stdout'],  c['stderr'] = comm.executeLocalCommand(job,  c['script'])
+                logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
             else:
+                logger().debug('Running remote command %s' % c['script'])
                 c['returncode'],  c['stdout'],  c['stderr'] =  comm.executeRemoteCommand(job,  c['script'])
+                logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
             if c['returncode'] != 0 and c['continueonerror'] == False:
+                logger().debug('command failed and continueonerror = false: exception')
                 raise CommandException('Hook %s failed to execute' % c['script'])
+            if c['returncode'] != 0 and c['continueonerror'] == True:
+                # TODO: add continueonerror to sqlite table
+                c['returncode'] = 0
             
     def executeRsync(self, job, latest):
-        self.executeJobs(job, job.beforeLocalHooks)
-        self.executeJobs(job, job.beforeRemoteHooks)
+        try:
+            self.executeJobs(job, job.beforeLocalHooks)
+            self.executeJobs(job, job.beforeRemoteHooks)
+        except CommandException as e:
+            logger().error("Required command failed (%s), skipping remainder of job" % e)
+            job.backupstatus['rsync_backup_status'] = 0
+            job.backupstatus['rsync_stdout'] = "No output due to failed required 'Before' command"
+            return 0;
         job.backupstatus['startdatetime'] = int(time.time())
         ret = rsync().executeRsync(job, latest)
         job.backupstatus['enddatetime'] = int(time.time())
-        self.executeJobs(job, job.afterRemoteHooks)
-        self.executeJobs(job, job.afterLocalHooks)
+        try:
+            self.executeJobs(job, job.afterRemoteHooks)
+            self.executeJobs(job, job.afterLocalHooks)
+        except CommandException as e:
+            logger().error("Required command failed (%s), skipping remainder of job" % e)
+            return 0;
         return ret
         
     def checkBackupEnvironment(self, job):
@@ -290,13 +308,14 @@ class director():
         
     def processBackupStatus(self, job):
         job.backupstatus['hostname'] = job.hostname
-        job.backupstatus['username'] = job.username
         if(job.ssh):
             ssh = 'True'
+            job.backupstatus['username'] = job.sshusername
         else:
             ssh = 'False'
+            job.backupstatus['username'] = job.rsyncusername
         job.backupstatus['ssh'] = ssh
-        job.backupstatus['share'] = job.share
+        job.backupstatus['share'] = job.rsyncshare
         job.backupstatus['fileset'] = ':'.join(job.fileset)
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb
@@ -329,6 +348,7 @@ class director():
                 if m:
                     job.backupstatus[key] = m.group(1).replace(',',  '')
                 else:
+                    job.backupstatus[key] = ''
                     logger().debug("no match!")
             except:
                 logger().error("FAILING regexp[%s] %s" % (key, regexps[key]))
