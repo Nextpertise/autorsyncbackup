@@ -54,9 +54,6 @@ class director():
             logger().error("Backup path (%s) doesn't exists" % backupdir)
             return False
         try:
-            dir = backupdir + "/" + job.hostname + "/current"
-            if not os.path.exists(dir):
-                os.makedirs(dir)
             dir = backupdir + "/" + job.hostname + "/daily"
             if not os.path.exists(dir):
                 os.makedirs(dir)
@@ -67,6 +64,9 @@ class director():
             if not os.path.exists(dir):
                 os.makedirs(dir)
             self._moveLastBackupToCurrentBackup(job)
+            dir = backupdir + "/" + job.hostname + "/current"
+            if not os.path.exists(dir):
+                os.makedirs(dir)
         except:
             logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
             return False
