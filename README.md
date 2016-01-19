@@ -162,7 +162,7 @@ hostname:         _no_default_value_                       # fully qualified dom
 ssh:              False                                    # whether to use rsync over ssh (True) or plain rsync (False)
 rsync_username:   _no_default_value_                       # rsync user account
 rsync_password:   _no_default_value_                       # rsync password
-rsync_share:      ''                                       #
+rsync_share:      _no_default_value_                       # rsync share
 ssh_username:     _no_default_value_                       # ssh username
 ssh_publickey:    _no_default_value_                       # ssh private key file (public key on client)
 port:             22 or 873                                # defaults to either ssh or rsync port depending on the value of the ssh entry
