@@ -118,18 +118,18 @@ Start the rsync daemon with the init script:
 
 Command line options
 --------------------
-* `-c, --main-config <configfile>   'Defines the main config file, default is `/etc/autorsyncbackup/main.yaml`.
-* `-d, --dry-run                    'Dry run, do try to login on host but do not invoke rsync or hook scripts.
-* `-v, --verbose                    'Write logoutput also to stdout
-* `--version                        'Show version number
-* `-j, --single-job <jobfile>       'Run only the given job file
-* `-s, --status <hostname>          'Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
+* `-c, --main-config <configfile>   `Defines the main config file, default is `/etc/autorsyncbackup/main.yaml`.
+* `-d, --dry-run                    `Dry run, do try to login on host but do not invoke rsync or hook scripts.
+* `-v, --verbose                    `Write logoutput also to stdout
+* `--version                        `Show version number
+* `-j, --single-job <jobfile>       `Run only the given job file
+* `-s, --status <hostname>          `Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
 
 Config file options
 -------------------
 (showing default values)
 
-'''yaml
+```yaml
 rsyncpath:          "/usr/bin/rsync"                                # path to the rsync executable file
 lockfile:           "/var/run/autorsyncbackup.pid"                  # path to the run/pid file on your system
 jobconfigdirectory: "/etc/autorsyncbackup/"                         # location where .job files are kept
@@ -150,7 +150,7 @@ smtphost:           _no default value_                              # where to s
 recipients:                                                         # list of status email recipients
   - maintainer@yourcompany.com
   - another@nodefault.example.com
-'''
+```
 
 Job file options
 ----------------
