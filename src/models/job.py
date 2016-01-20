@@ -9,10 +9,10 @@ class job():
     ssh = None
     rsyncusername = None
     rsyncpassword = None
+    rsyncshare = None
     sshusername = None
     sshpublickey = None
     port = None
-    share = None
     backupdir = None
     speedlimitkb = None
     dailyrotation = None
@@ -80,7 +80,7 @@ class job():
 
         try:
             if not self.ssh:
-                self.rysncpassword = jobconfig['rsync_password']
+                self.rsyncpassword = jobconfig['rsync_password']
         except:
             logger().info("%s: No password is set while not using SSH, skipping job." % self.filepath)
             self.enabled = False
