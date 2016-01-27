@@ -36,7 +36,7 @@ class rsync():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
-                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshpublickey)
+                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshprivatekey)
                 logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
                 return True
             except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
@@ -83,7 +83,7 @@ class rsync():
     
     def executeRsyncViaSshProtocol(self, job, latest):
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
-        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshpublickey)
+        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshprivatekey)
         options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
         fileset = self.generateFileset(job)        
         

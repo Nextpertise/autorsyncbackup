@@ -11,7 +11,7 @@ class job():
     rsyncpassword = None
     rsyncshare = None
     sshusername = None
-    sshpublickey = None
+    sshprivatekey = None
     port = None
     backupdir = None
     speedlimitkb = None
@@ -87,10 +87,10 @@ class job():
             return False
             
         try:
-            self.sshpublickey = jobconfig['ssh_publickey']
+            self.sshprivatekey = jobconfig['ssh_privatekey']
         except:
             if self.ssh:
-                logger().error("%s: SSH is set, but no ssh_publickey is configured, disabling backup" % self.filepath)
+                logger().error("%s: SSH is set, but no ssh_privatekey is configured, disabling backup" % self.filepath)
                 self.enabled = False
                 return False
             
@@ -158,7 +158,7 @@ class job():
             
         try:
             self.hooks = jobconfig['hooks']
-            if self.sshusername == None or self.sshpublickey == None:
+            if self.sshusername == None or self.sshprivatekey == None:
                 logger().error('%s: Missing ssh username or keyfile, hooks disabled' % self.filepath)
             else:
                 for hook in self.hooks:
