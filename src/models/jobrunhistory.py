@@ -110,22 +110,23 @@ class jobrunhistory():
             c.execute(query, backupstatus.values())
 
             jobid = c.lastrowid
-            for hook in hooks:
-                sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, script, stdout, stderr) values (%d, %d, %d, %d, '%s', '%s', '%s')" % (
-                    jobid,
-                    hook['local'],
-                    hook['runtime'] == 'before',
-                    hook['returncode'],
-                    hook['script'], 
-                    hook['stdout'],
-                    hook['stderr'])
-                logger().debug(sql)
-                c.execute(sql)
+            if hooks != None:
+                for hook in hooks:
+                    sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, script, stdout, stderr) values (%d, %d, %d, %d, '%s', '%s', '%s')" % (
+                        jobid,
+                        hook['local'],
+                        hook['runtime'] == 'before',
+                        hook['returncode'],
+                        hook['script'], 
+                        hook['stdout'],
+                        hook['stderr'])
+                    logger().debug(sql)
+                    c.execute(sql)
 
             self.conn.commit()
             logger().debug("Commited job history to database")
-        except:
-            logger().error("Could not insert job details for host (%s) into the database (%s)" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db"))
+        except Exception as e:
+            logger().error("Could not insert job details for host (%s) into the database (%s): %s" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db", e))
             
     def getJobHistory(self, hosts):
         ret = []
