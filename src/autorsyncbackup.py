@@ -90,6 +90,9 @@ def runBackup(jobpath, dryrun):
                 
                 # Sent status report
                 statusemail().sendStatusEmail(jobs, durationstats)
+#            else:
+#                for job in jobs:
+#                    job.showjob()
     except ProcessRunningException as m:
         logger().error(m)
         

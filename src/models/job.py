@@ -3,32 +3,28 @@ from config import config
 from lib.logger import logger
 
 class job():
-    enabled = None
-    filepath = None
-    hostname = None
-    ssh = None
-    rsyncusername = None
-    rsyncpassword = None
-    rsyncshare = None
-    sshusername = None
-    sshprivatekey = None
-    port = None
-    backupdir = None
-    speedlimitkb = None
-    dailyrotation = None
-    weeklyrotation = None
-    monthlyrotation = None
-    weeklybackup = None
-    monthlybackup = None
-    fileset = None
-    backupstatus = None
-    hooks = None
-    beforeLocalHooks = []
-    afterLocalHooks = []
-    beforeRemoteHooks =[]
-    afterRemoteHooks = []
-    
     def __init__(self, filepath=None):
+        self.enabled = None
+        self.hostname = None
+        self.ssh = None
+        self.rsyncusername = None
+        self.rsyncpassword = None
+        self.rsyncshare = None
+        self.sshusername = None
+        self.sshprivatekey = None
+        self.port = None
+        self.backupdir = None
+        self.speedlimitkb = None
+        self.dailyrotation = None
+        self.weeklyrotation = None
+        self.monthlyrotation = None
+        self.weeklybackup = None
+        self.monthlybackup = None
+        self.hooks = None
+        self.beforeLocalHooks = []
+        self.afterLocalHooks = []
+        self.beforeRemoteHooks =[]
+        self.afterRemoteHooks = []
         self.filepath = filepath
         self.fileset = []
         self.backupstatus = {}
@@ -203,3 +199,29 @@ class job():
                 self.beforeRemoteHooks.append(hook)
             else:
                 self.afterRemoteHooks.append(hook)
+    
+    def showjob(self):
+        print "Show job:"
+        print "enabled: %s" % str(self.enabled)
+        print "filepath: %s" % str(self.filepath)
+        print "hostname: %s" % str(self.hostname)
+        print "rsyncusername: %s" % str(self.rsyncusername)
+        print "rsyncpassword: %s" % str(self.rsyncpassword)
+        print "rsyncshare: %s" % str(self.rsyncshare)
+        print "sshusername: %s" % str(self.sshusername)
+        print "sshprivatekey: %s" % str(self.sshprivatekey)
+        print "backupdir: %s" % str(self.backupdir)
+        print "speedlimitkb: %s" % str(self.speedlimitkb)
+        print "dailyrotation: %s" % str(self.dailyrotation)
+        print "weeklyrotation: %s" % str(self.weeklyrotation)
+        print "monthlyrotation: %s" % str(self.monthlyrotation)
+        print "weeklybackup: %s" % str(self.weeklybackup)
+        print "monthlybackup: %s" % str(self.monthlybackup)
+        print "fileset: %s" % str(self.fileset)
+        print "backupstatus: %s" % str(self.backupstatus)
+        print "hooks: %s" % str(self.hooks)
+        print "beforeLocalHooks: %s" % str(self.beforeLocalHooks)
+        print "afterLocalHooks: %s" % str(self.afterLocalHooks)
+        print "beforeRemoteHooks: %s" % str(self.beforeRemoteHooks)
+        print "beforeRemoteHooks: %s" % str(self.beforeRemoteHooks)
+        print "afterRemoteHooks: %s" % str(self.afterRemoteHooks)
