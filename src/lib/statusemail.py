@@ -9,24 +9,29 @@ from jinja2 import Environment, PackageLoader
 class statusemail():
     jobrunhistory = None
     history = None
-    
+
     def __init__(self):
         self.jobrunhistory = jobrunhistory()
-        
+
     def __del__(self):
         self.jobrunhistory.closeDbHandler()
-    
+
     def sendStatusEmail(self, jobs, durationstats):
         self.history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
         state = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
-        
+
         subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
         body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs)
         self._send(subject=subject, htmlbody=body)
-        
+
+    def sendSuddenDeath(self, exc):
+        subject = "AUTORSYNCBACKUP Sudden Death - %s" % datetime.datetime.today().strftime("%a, %d/%m/%Y")
+        body = self.getHtmlExceptionBody(exc)
+        self._send(subject=subject, htmlbody=body)
+
     def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
@@ -35,7 +40,16 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         template = env.get_template('email.j2')
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs)
-        
+
+    def getHtmlExceptionBody(self, exc):
+        env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
+        env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
+        env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
+        env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
+        env.filters['numberformat'] = jinjafilters()._intToReadableStr
+        template = env.get_template('email_exc.j2')
+        return template.render(exc=exc)
+
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup"""
         ret = "ok"
@@ -50,7 +64,7 @@ class statusemail():
         if not self.history:
             ret = "error"
         return ret
-    
+
     def getBackupHosts(self, jobs):
         """Get all configured hosts"""
         ret = []
@@ -58,7 +72,7 @@ class statusemail():
             if j.enabled:
                 ret.append(j.hostname)
         return ret
-        
+
     def getMissingHosts(self, jobs):
         """Add all configured hosts, remove all runned hosts, incase there are elements left we have 'missing' hosts"""
         hosts = []
@@ -68,7 +82,7 @@ class statusemail():
         for j in self.history:
             hosts.remove(j['hostname'])
         return hosts
-        
+
     def getStats(self, jobs):
         """Produce total/average stats out database/jobs data"""
         result = self.history
@@ -90,7 +104,7 @@ class statusemail():
         ret['total_speed_limit_kb'] = 0
         ret['average_backup_duration'] = 0
         ret['average_speed_limit_kb'] = 0
-        
+
         for i in result:
             if i['rsync_backup_status'] == 1 and i['commanderror'] == 'ok':
                 ret['total_rsync_duration'] = ret['total_rsync_duration'] + (i['enddatetime'] - i['startdatetime'])
@@ -117,7 +131,7 @@ class statusemail():
             ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']
             ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
-        
+
     def _send(self, subject, htmlbody):
         for to in config().backupmailrecipients:
             logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))

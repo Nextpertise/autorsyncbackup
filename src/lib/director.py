@@ -5,9 +5,10 @@ from models.jobrunhistory import jobrunhistory
 from lib.rsync import rsync
 from lib.logger import logger
 from lib.command import command,  CommandException
+from lib.statusemail import statusemail
 
 class director():
-    
+
     regexp_backupdirectory = r".*?(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"
 
     def getJobArray(self, jobpath):
@@ -22,9 +23,9 @@ class director():
                 logger().error("Job directory (%s) doesn't exists, exiting (1)" % dir)
         else:
             jobArray.append(job(jobpath))
-            
+
         return jobArray
-        
+
     def checkRemoteHost(self, job):
         return rsync().checkRemoteHost(job)
 
@@ -45,7 +46,7 @@ class director():
             if c['returncode'] != 0 and c['continueonerror'] == True:
                 # TODO: add continueonerror to sqlite table
                 c['returncode'] = 0
-            
+
     def executeRsync(self, job, latest):
         try:
             self.executeJobs(job, job.beforeLocalHooks)
@@ -65,37 +66,43 @@ class director():
             logger().error("Required command failed (%s), skipping remainder of job" % e)
             return 0;
         return ret
-        
+
     def checkBackupEnvironment(self, job):
         backupdir = job.backupdir.rstrip('/')
-        if not os.path.exists(backupdir):
-            logger().error("Backup path (%s) doesn't exists" % backupdir)
-            return False
         try:
+            if not os.path.exists(backupdir):
+                os.makedirs(backupdir)
+                logger().info("Backup path (%s) created" % backupdir)
+
             dir = backupdir + "/" + job.hostname + "/daily"
             if not os.path.exists(dir):
                 os.makedirs(dir)
+
             dir = backupdir + "/" + job.hostname + "/weekly"
             if not os.path.exists(dir):
                 os.makedirs(dir)
+
             dir = backupdir + "/" + job.hostname + "/monthly"
             if not os.path.exists(dir):
                 os.makedirs(dir)
+
             self._moveLastBackupToCurrentBackup(job)
+
             dir = backupdir + "/" + job.hostname + "/current"
             if not os.path.exists(dir):
                 os.makedirs(dir)
-        except:
+        except Exception as e:
             logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
+            statusemail().sendSuddenDeath(e)
             return False
-    
+
     def checkForPreviousBackup(self, job):
         latest = job.backupdir.rstrip('/') + "/" + job.hostname + "/latest"
         if os.path.exists(latest):
             return latest
         else:
             return False
-            
+
     def getBackups(self, job):
         retlist = []
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
@@ -107,7 +114,7 @@ class director():
             if re.match(self.regexp_backupdirectory, l):
                 retlist.append(l)
         return retlist
-        
+
     def getIdfromBackupInstance(self, backupDirectoryInstance):
         ret = False
         p = re.compile(self.regexp_backupdirectory)
@@ -115,15 +122,15 @@ class director():
         if m:
             ret = int(m.group(2))
         return ret
-        
+
     def getNamefromBackupInstance(self, backupDirectoryInstance):
         ret = False
         p = re.compile(self.regexp_backupdirectory)
         m = p.match(backupDirectoryInstance)
         if m:
             ret = m.group(1)
-        return ret  
-        
+        return ret
+
     def getOldestBackupId(self, job):
         list = self.getBackups(job)
         ret = False
@@ -131,12 +138,12 @@ class director():
         for l in list:
             if self.getIdfromBackupInstance(l) >= id:
                 ret = id = self.getIdfromBackupInstance(l)
-        return ret            
-            
+        return ret
+
     def backupRotate(self, job, moveCurrent = True):
         # Check if we need to remove the oldest backup(s)
         self._unlinkExpiredBackups(job)
-        
+
         # Rotate backups
         if(self._rotateBackups(job)):
             latest = self._moveCurrentBackup(job)
@@ -149,25 +156,25 @@ class director():
                 logger().error("Error moving current backup failed for host: %s" % job.hostname)
         else:
             logger().error("Error rotating backups for host: %s" % job.hostname)
-        
+
     def _unlinkExpiredBackups(self, job):
         workingDirectory = self.getWorkingDirectory()
-        
+
         """Unlink oldest backup(s) if applicable"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
-        
+
         if not self.checkWorkingDirectory(workingDirectory):
             logger().error("Error working directory not found (%s)" % dir)
             return False
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
-        
+
         for l in self.getBackups(job):
             if self.getIdfromBackupInstance(l):
                 if self.getIdfromBackupInstance(l) > (backupRetention - 1):
                     self._unlinkExpiredBackup(job, dir + "/" + l)
         return True
-        
+
     def _unlinkExpiredBackup(self, job, backupdirectory):
         ret = True
         logger().debug("Unlink expired backup (rm -rf %s)" % backupdirectory)
@@ -177,7 +184,7 @@ class director():
             logger().error("Error while removing (%s)" % backupdirectory)
             ret = False
         return ret
-        
+
     def _rotateBackups(self, job):
         """Rotate backups"""
         ret = True
@@ -192,12 +199,12 @@ class director():
                 if cur is not False:
                     src = "%s/%s.%s" % (dir, cur, id)
                     dest = "%s/%s.%s" % (dir, cur, (id + 1))
-                    
+
                     try:
                         os.rename(src, dest)
                     except:
                         ret = False
-                    
+
                     logger().debug("mv %s %s" % (src, dest))
                     id = id - 1
                 else:
@@ -205,24 +212,24 @@ class director():
             else:
                 return ret
         return ret
-        
+
     def _moveCurrentBackup(self, job):
         """Move current backup"""
         src = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
-        
+
         # BackupDirectoryInstance format: 2015-10-27_04-56-59_backup.0
         folder = datetime.datetime.today().strftime("%Y-%m-%d_%H-%M-%S_backup.0")
         ret = self.getWorkingDirectory() + "/" + folder
         dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + ret
-        
+
         try:
             os.rename(src, dest)
         except:
             ret = False
-        
+
         logger().debug("mv %s %s " % (src, dest))
         return ret
-    
+
     def _updateLatestSymlink(self, job, latest):
         ret = True
         symlinkfile = job.backupdir.rstrip('/') + "/" + job.hostname + "/latest"
@@ -236,16 +243,16 @@ class director():
         except:
             ret = False
         return ret
-        
+
     def _moveLastBackupToCurrentBackup(self, job):
         """Move last backup (expired) backup instance to current directory"""
-        workingDirectory = self.getWorkingDirectory()        
+        workingDirectory = self.getWorkingDirectory()
         rotation = 0
         try:
             rotation = getattr(job, workingDirectory + 'rotation')
         except:
             pass
-            
+
         oldestId = self.getOldestBackupId(job)
         if rotation > 0 and oldestId >= rotation:
             src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory + "/*." + str(oldestId)
@@ -274,38 +281,38 @@ class director():
         if(int(datetime.datetime.today().strftime("%d")) == config().monthlybackup):
             ret = "monthly"
         return ret
-        
+
     def sanityCheckWorkingDirectory(self, job):
         src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory() + "/*.*"
         list = glob.glob(src)
         found_ids = []
         ret = True
-        
+
         # Check for duplicate id's
         for l in list:
             id = self.getIdfromBackupInstance(l)
             if id in found_ids:
                 ret = False
             found_ids.append(id)
-            
+
         # Check sequence
         for id in range(0, self.getOldestBackupId(job)):
             if id not in found_ids:
                 ret = False
-        
+
         if ret:
             logger().debug("Sanity check passed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
         else:
             logger().error("Sanity check failed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
         job.backupstatus['sanity_check'] = int(ret)
         return ret
-    
+
     # Checks
     def checkWorkingDirectory(self, workingDirectory):
         """Check if workingDirectory is daily/weekly/monthly"""
         check = ["daily", "weekly", "monthly"]
         return workingDirectory in check
-        
+
     def processBackupStatus(self, job):
         job.backupstatus['hostname'] = job.hostname
         if(job.ssh):
@@ -330,13 +337,13 @@ class director():
             'rsync_number_of_files'             : r"^.*Number of files: (\d[\d,]*).*$",
             'rsync_number_of_files_transferred' : r"^.*Number of .*files transferred: (\d[\d,]*).*$",
             'rsync_total_file_size'             : r"^.*Total file size: (\d[\d,]*).*$",
-            'rsync_total_transferred_file_size' : r"^.*Total transferred file size: (\d[\d,]*).*$", 
-            'rsync_literal_data'                : r"^.*Literal data: (\d[\d,]*).*$", 
-            'rsync_matched_data'                : r"^.*Matched data: (\d[\d,]*).*$", 
-            'rsync_file_list_size'              : r"^.*File list size: (\d[\d,]*).*$", 
+            'rsync_total_transferred_file_size' : r"^.*Total transferred file size: (\d[\d,]*).*$",
+            'rsync_literal_data'                : r"^.*Literal data: (\d[\d,]*).*$",
+            'rsync_matched_data'                : r"^.*Matched data: (\d[\d,]*).*$",
+            'rsync_file_list_size'              : r"^.*File list size: (\d[\d,]*).*$",
             'rsync_file_list_generation_time'   : r"^.*File list generation time: (\d+\.\d*).*$",
-            'rsync_file_list_transfer_time'     : r"^.*File list transfer time: (\d+\.\d*).*$", 
-            'rsync_total_bytes_sent'            : r"^.*Total bytes sent: (\d[\d,]*).*$", 
+            'rsync_file_list_transfer_time'     : r"^.*File list transfer time: (\d+\.\d*).*$",
+            'rsync_total_bytes_sent'            : r"^.*Total bytes sent: (\d[\d,]*).*$",
             'rsync_total_bytes_received'        : r"^.*Total bytes received: (\d[\d,]*).*$"
         }
         strings = job.backupstatus['rsync_stdout']
