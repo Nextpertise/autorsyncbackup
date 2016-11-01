@@ -51,18 +51,27 @@ class statusemail():
         return template.render(exc=exc)
 
     def getOverallBackupState(self, jobs):
-        """Overall backup state = 'ok' unless there is at least one failed backup"""
+        """Overall backup state = 'ok' unless there is at least one failed backup.
+        At the same time reorder the list so errors appear first."""
         ret = "ok"
+        good = []
+        bad = []
         for j in self.history:
+            addto = good
             if (j['rsync_backup_status'] != 1) or (j['sanity_check'] != 1):
+                addto = bad
                 ret = "error"
             j['commanderror'] = 'ok'
             for c in j['commands']:
                 if c['returncode'] != 0:
+                    addto = bad
                     j['commanderror'] = "error"
                     ret = "error"
+            addto.append(j)
         if not self.history:
             ret = "error"
+        else:
+            self.history = bad + good
         return ret
 
     def getBackupHosts(self, jobs):
