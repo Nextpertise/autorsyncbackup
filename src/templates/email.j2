@@ -395,6 +395,9 @@
                                                     <td class="data-value">{{ jrh.startdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
                                                   </tr>
                                                   <tr>
+                                                    <td class="data-heading" width="50%">Backup protocol</td>
+                                                    <td class="data-value">{%- if jrh.ssh %}ssh+rsync{%- else %}rsync{%- endif %}</td>
+                                                  <tr>
                                                     <td class="data-heading" width="50%">Backup duration</td>
                                                     <td class="data-value">{{ (jrh.enddatetime - jrh.startdatetime)|secondsformat }}</td>
                                                   </tr>
@@ -402,6 +405,9 @@
                                                     <td class="data-heading" width="50%">Backup speed limit</td>
                                                     <td class="data-value">{{ jrh.speedlimitkb }} KB/s</td>
                                                   </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Fileset</td>
+                                                    <td class="data-value">{{ jrh.fileset|replace(':', '<br/>') }}</td>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Number of files</td>
                                                     <td class="data-value">{{ jrh.rsync_number_of_files|numberformat }}</td>
