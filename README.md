@@ -58,7 +58,7 @@ Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
 
     ---
     debug: True
-    weeklybackup: 7
+    weeklybackup: 6
     monthlybackup: 1
     backupmailrecipients:
         - your@mail.com
