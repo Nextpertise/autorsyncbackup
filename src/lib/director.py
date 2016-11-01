@@ -358,4 +358,5 @@ class director():
                     job.backupstatus[key] = ''
                     logger().debug("no match!")
             except:
-                logger().error("FAILING regexp[%s] %s" % (key, regexps[key]))
+                job.backupstatus[key] = ''
+                logger().debug("FAILING regexp[%s] %s" % (key, regexps[key]))
