@@ -1,7 +1,11 @@
 import datetime
+import re
 from collections import OrderedDict
+from jinja2 import Markup
 
 class jinjafilters():
+    _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+
     def _epochToStrDate(self, epoch, strftime):
         return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
         
@@ -56,3 +60,8 @@ class jinjafilters():
             x, r = divmod(x, 1000)
             result = ".%03d%s" % (r, result)
         return "%d%s" % (x, result)
+
+    def _nl2br(self, value):
+        result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n') \
+            for p in self._paragraph_re.split(value))
+        return Markup(result)

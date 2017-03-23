@@ -38,6 +38,7 @@ class statusemail():
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
         env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
+        env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email.j2')
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs)
 
@@ -47,6 +48,7 @@ class statusemail():
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
         env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
+        env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email_exc.j2')
         return template.render(exc=exc)
 

@@ -463,12 +463,12 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stdout:</li></td>
-                                                    <td class="data-value">{{ c.stdout }}</td>
+                                                    <td class="data-value">{{ c.stdout|nl2br }}</td>
                                                   </tr>
                                                   {% if c.returncode != 0 %}
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stderr:</li></td>
-                                                    <td class="data-value">{{ c.stderr }}</td>
+                                                    <td class="data-value">{{ c.stderr|nl2br }}</td>
                                                   </tr>
                                                   {% endif %}
                                                   {% endfor %}
