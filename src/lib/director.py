@@ -48,6 +48,8 @@ class director():
                 c['returncode'] = 0
 
     def executeRsync(self, job, latest):
+        job.backupstatus['startdatetime'] = 0
+        job.backupstatus['enddatetime'] = 0
         try:
             self.executeJobs(job, job.beforeLocalHooks)
             self.executeJobs(job, job.beforeRemoteHooks)

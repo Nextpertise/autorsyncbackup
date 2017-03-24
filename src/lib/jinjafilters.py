@@ -7,7 +7,8 @@ class jinjafilters():
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
     def _epochToStrDate(self, epoch, strftime):
-        return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
+        if epoch:
+            return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
         
     def _bytesToReadableStr(self, bytes):
         try:
