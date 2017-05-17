@@ -18,12 +18,12 @@ class statusemail():
 
     def sendStatusEmail(self, jobs, durationstats):
         self.history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
-        state = self.getOverallBackupState(jobs)
+        state, good, warning, bad = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
 
-        subject = "%d jobs OK - %d jobs FAILED - %s" % (stats['total_backups_success'], stats['total_backups_failed'], datetime.datetime.today().strftime("%a, %d/%m/%Y"))
+        subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (len(good), len(warning), len(bad), datetime.datetime.today().strftime("%a, %d/%m/%Y"))
         body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs)
         self._send(subject=subject, htmlbody=body)
 
@@ -58,6 +58,7 @@ class statusemail():
         ret = "ok"
         good = []
         bad = []
+        warning = []
         for j in self.history:
             addto = good
             if (j['rsync_backup_status'] != 1) or (j['sanity_check'] != 1):
@@ -65,16 +66,21 @@ class statusemail():
                 ret = "error"
             j['commanderror'] = 'ok'
             for c in j['commands']:
-                if c['returncode'] != 0:
+                if c['returncode'] != 0 and not c['continueonerror']:
                     addto = bad
                     j['commanderror'] = "error"
                     ret = "error"
+                elif c['returncode'] != 0 and c['continueonerror']:
+                    addto = warning
+                    j['commanderror'] = "warning"
+                    if ret == "ok":
+                        ret = "warning"
             addto.append(j)
         if not self.history:
             ret = "error"
         else:
-            self.history = bad + good
-        return ret
+            self.history = good + warning + bad
+        return ret, good, warning, bad
 
     def getBackupHosts(self, jobs):
         """Get all configured hosts"""

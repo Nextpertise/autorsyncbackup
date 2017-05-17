@@ -91,6 +91,7 @@ class jobrunhistory():
                 local integer,
                 before integer,
                 returncode integer,
+                continueonerror integer,
                 script text,
                 stdout text,
                 stderr text);
@@ -112,11 +113,12 @@ class jobrunhistory():
             jobid = c.lastrowid
             if hooks != None:
                 for hook in hooks:
-                    sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, script, stdout, stderr) values (%d, %d, %d, %d, '%s', '%s', '%s')" % (
+                    sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, continueonerror, script, stdout, stderr) values (%d, %d, %d, %d, %d, '%s', '%s', '%s')" % (
                         jobid,
                         hook['local'],
                         hook['runtime'] == 'before',
                         hook['returncode'],
+                        int(hook['continueonerror'] == True),
                         hook['script'], 
                         hook['stdout'],
                         hook['stderr'])

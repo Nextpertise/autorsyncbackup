@@ -216,10 +216,10 @@
                                   <center>
                                     <table cellpadding="0" cellspacing="0" class="card">
                                       <tr>
-                                        <td style="background-color:{%- if state == "ok" %}green{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup state: {{ state }}</td>
+                                        <td style="background-color:{%- if state == "ok" %}green{% elif state == "warning" %}orange{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup state: {{ state }}</td>
                                       </tr>
                                       <tr>
-                                        <td style="border:1px solid {% if state == "ok" %}green{% else %}red{% endif %}; padding: 10px;">
+                                        <td style="border:1px solid {% if state == "ok" %}green{% elif state == "warning" %}orange{% else %}red{% endif %}; padding: 10px;">
                                           {%- if state == "ok" %}No errors found, backup succeeded{% else %}Errors found, investigate this e-mail!{% endif %}
                                           <table cellpadding="0" cellspacing="20" width="100%"></table>
                                         </td>
@@ -235,10 +235,10 @@
                                   <center>
                                     <table cellpadding="0" cellspacing="0" class="card">
                                       <tr>
-                                        <td style="background-color:{%- if state == "ok" %}green{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup info</td>
+                                        <td style="background-color:{%- if state == "ok" %}green{% elif state == "warning" %}orange{% else %}red{% endif %}; text-align:center; padding:10px; color:white;">Overall backup info</td>
                                       </tr>
                                       <tr>
-                                        <td style="border:1px solid {% if state == "ok" %}green{% else %}red{% endif %}; padding: 20px 0 20px;">
+                                        <td style="border:1px solid {% if state == "ok" %}green{% elif state == "warning" %}orange{% else %}red{% endif %}; padding: 20px 0 20px;">
                                           <table cellpadding="0" cellspacing="0" width="100%">
                                             <tr>
                                               <td>
@@ -358,10 +358,10 @@
                                     {% for jrh in jobrunhistory %}
                                     <table cellpadding="0" cellspacing="0" class="card" style="margin-top: 20px">
                                       <tr>
-                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
+                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% elif jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'warning' %}orange{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
                                       </tr>
                                       <tr>
-                                        <td style="border:1px solid {% if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% else %}red{% endif %}; padding: 20px 0 20px;">
+                                        <td style="border:1px solid {% if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% elif jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'warning' %}orange{% else %}red{% endif %}; padding: 20px 0 20px;">
                                           <table cellpadding="0" cellspacing="0" width="100%">
                                             <tr>
                                               <td>
@@ -459,7 +459,7 @@
                                                   {% for c in jrh['commands'] %}
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>{{ c.script }} ({% if c.local == true %}Local{% else %} Remote{% endif %}, {% if c.before == true %}Before{% else %}After{% endif %})</li></td>
-                                                    <td class="data-value">{% if c.returncode == 0 %}Success{% else %}Error{% endif %}</td>
+                                                    <td class="data-value">{% if c.returncode == 0 %}Success{% elif c.returncode > 0 and c.continueonerror %}Warning{% else %}Error{% endif %}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stdout:</li></td>

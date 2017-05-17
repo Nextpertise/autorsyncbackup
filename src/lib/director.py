@@ -43,9 +43,6 @@ class director():
             if c['returncode'] != 0 and c['continueonerror'] == False:
                 logger().debug('command failed and continueonerror = false: exception')
                 raise CommandException('Hook %s failed to execute' % c['script'])
-            if c['returncode'] != 0 and c['continueonerror'] == True:
-                # TODO: add continueonerror to sqlite table
-                c['returncode'] = 0
 
     def executeRsync(self, job, latest):
         job.backupstatus['startdatetime'] = 0
