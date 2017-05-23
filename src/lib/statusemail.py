@@ -79,7 +79,7 @@ class statusemail():
         if not self.history:
             ret = "error"
         else:
-            self.history = good + warning + bad
+            self.history = bad + warning + good
         return ret, good, warning, bad
 
     def getBackupHosts(self, jobs):
