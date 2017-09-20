@@ -32,16 +32,15 @@ Create a job directory, this directory will contain .job files with rsync hosts:
 
 The job files are written in YAML syntax and will only apply with the `.job` file extension, config example: `/etc/autorsyncbackup/host.domain.tld.job`
 ```
----
 hostname: host.domain.tld
 username: rsyncuser
 password: rsyncpassword
 share: rsyncshare
 backupdir: /var/data/backups_rsync
 speedlimitkb: 1600
-dailyrotation = 8
-weeklyrotation = 5
-monthlyrotation = 13
+dailyrotation: 8
+weeklyrotation: 5
+monthlyrotation: 13
 fileset:
   - /etc/
   - /home/
@@ -59,7 +58,6 @@ hooks:
 
 Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
 ```
-    ---
     debug: True
     weeklybackup: 6
     monthlybackup: 1
