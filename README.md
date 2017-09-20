@@ -75,7 +75,7 @@ Create a directory which contain the backups:
 
 Create the directory where the SqLite database file will be stored:
 
-`mkdir /var/lib/autorsyncbackup`
+`mkdir /var/spool/autorsyncbackup`
 
 Finally execute the backup (you can cron this command):
 
