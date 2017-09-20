@@ -70,7 +70,7 @@ def runBackup(jobpath, dryrun):
             queueLock.release()
             # Wait for queue to empty
             while not workQueue.empty():
-                pass
+                time.sleep(0.1)
 
             # Notify threads it's time to exit
             exitFlag.set()
