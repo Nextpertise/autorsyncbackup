@@ -58,7 +58,7 @@ hooks:
 
 Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
 ```
-    debug: True
+    debuglevel: 2
     weeklybackup: 6
     monthlybackup: 1
     backupmailrecipients:
