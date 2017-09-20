@@ -11,85 +11,89 @@ Please create an issue if you find any problem.
 Install AutoRsyncbackup (Server):
 -----------
 
-Export by example to: `/usr/local/share/autorsyncbackup`
+Export for example to: `/usr/local/share/autorsyncbackup`
 
-    $ cd /usr/local/share/
-    $ git clone git@github.com:Nextpertise/autorsyncbackup.git
+```
+cd /usr/local/share/
+git clone git@github.com:Nextpertise/autorsyncbackup.git
+```
 
 Install dependencies:
 
-    $ apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable
+`apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable`
     
 Create symlink:
 
-    $ ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup
+`ln -s /usr/local/share/autorsyncbackup/src/autorsyncbackup.py /usr/local/bin/autorsyncbackup`
 
 Create a job directory, this directory will contain .job files with rsync hosts:
 
-    $ mkdir /etc/autorsyncbackup
+`mkdir /etc/autorsyncbackup`
 
 The job files are written in YAML syntax and will only apply with the `.job` file extension, config example: `/etc/autorsyncbackup/host.domain.tld.job`
+```
+---
+hostname: host.domain.tld
+username: rsyncuser
+password: rsyncpassword
+share: rsyncshare
+backupdir: /var/data/backups_rsync
+speedlimitkb: 1600
+dailyrotation = 8
+weeklyrotation = 5
+monthlyrotation = 13
+fileset:
+  - /etc/
+  - /home/
+hooks:
+  - script: /bin/false
+    local: true
+    runtime: before
+    continueonerror: true
 
-    ---
-    hostname: host.domain.tld
-    username: rsyncuser
-    password: rsyncpassword
-    share: rsyncshare
-    backupdir: /var/data/backups_rsync
-    speedlimitkb: 1600
-    dailyrotation = 8
-    weeklyrotation = 5
-    monthlyrotation = 13
-    fileset:
-      - /etc/
-      - /home/
-    hooks:
-      - script: /bin/false
-        local: true
-        runtime: before
-        continueonerror: true
-    
-      - script: /bin/ls -l
-        local: false
-        runtime: after
-        continueonerror: true
+  - script: /bin/ls -l
+    local: false
+    runtime: after
+    continueonerror: true
+```
 
 Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
-
+```
     ---
     debug: True
     weeklybackup: 6
     monthlybackup: 1
     backupmailrecipients:
         - your@mail.com
-    
+```
+
 Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld/`
 
 Create a directory which contain the backups:
 
-    $ mkdir /var/data/backups_rsync
+`mkdir -p /var/data/backups_rsync`
 
 Create the directory where the SqLite database file will be stored:
 
-    $ mkdir /var/lib/autorsyncbackup
+`mkdir /var/lib/autorsyncbackup`
 
 Finally execute the backup (you can cron this command):
 
-    $ /usr/local/bin/autorsyncbackup
+`/usr/local/bin/autorsyncbackup`
     
 Install rsync as deamon (Client)
 -----------------------
     
 Install the debian package:
 
-    $ apt-get install rsync
+`apt-get install rsync`
     
 Enable deamon in `/etc/default/rsync`:
     
-    RSYNC_ENABLE=true
+`RSYNC_ENABLE=true`
     
 Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup server):
-    
+```
     uid = root
     gid = root
     pid file = /var/run/rsyncd.pid
@@ -103,18 +107,19 @@ Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup s
             read only = yes
             auth users= backup
             secrets file = /etc/rsyncd.secrets
-    
+```
+
 Configure a password in `/etc/rsyncd.secrets`:
     
-    backup:VerySecretPasswordHere
+`backup:VerySecretPasswordHere`
     
 Adjust permissions on `/etc/rsyncd.secrets`:
     
-    chmod 500 /etc/rsyncd.secrets
+`chmod 500 /etc/rsyncd.secrets`
 
 Start the rsync daemon with the init script:
 
-    $ /etc/init.d/rsync start
+`/etc/init.d/rsync start`
 
 Command line options
 --------------------
