@@ -18,28 +18,28 @@ class logger():
             if self.debuglevel >= 3:
                 logging.debug(msg)
                 if self.verbose:
-                    print msg
+                    print(msg)
             
         def info(self, msg):
             msg = 'INFO: %s' % msg
             if self.debuglevel >= 2:
                 logging.info(msg)
                 if self.verbose:
-                    print msg
+                    print(msg)
             
         def warning(self, msg):
             msg = 'WARNING: %s' % msg
             if self.debuglevel >= 1:
                 logging.warning(msg)
                 if self.verbose:
-                    print msg
+                    print(msg)
             
         def error(self, msg):
             msg = 'ERROR: %s' % msg
             if self.debuglevel >= 0:
                 logging.error(msg)
                 if self.verbose:
-                    print msg
+                    print(msg)
                     
         def setVerbose(self, verbose):
             self.verbose = verbose

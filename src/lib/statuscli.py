@@ -35,7 +35,7 @@ class statuscli():
             x.add_row([hostname, backupState, starttime, duration, totalNumberOfFiles, totalFileSize])
             x.align = "l"
             x.padding_width = 1
-            print x
+            print(x)
         else:
-            print "Could not find hostname: [%s]" % hostname
+            print("Could not find hostname: [%s]" % hostname)
         return ret

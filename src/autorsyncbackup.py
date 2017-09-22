@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import time, threading, Queue
+import time, threading
 from optparse import OptionParser
 from _version import __version__
 from models.config import config
@@ -11,6 +11,10 @@ from lib.pidfile import Pidfile, ProcessRunningException
 from lib.statuscli import statuscli
 from models.jobrunhistory import jobrunhistory
 
+try:
+    import Queue as queue
+except ImportError:
+    import queue as queue
 
 def setupCliArguments():
     """ Parse CLI options """
@@ -39,7 +43,7 @@ def runBackup(jobpath, dryrun):
     """ Start backup run """
     exitFlag = threading.Event()
     queueLock = threading.Lock()
-    workQueue = Queue.Queue(0)
+    workQueue = queue.Queue(0)
 
     try:
         with Pidfile(config().lockfile, logger().debug, logger().error):
@@ -120,7 +124,7 @@ if __name__ == "__main__":
 
     # Welcome message
     if options.verbose:
-        print "Starting AutoRsyncBackup"
+        print("Starting AutoRsyncBackup")
 
     # Only check if host is reachable, set appropriate settings
     if options.job and options.dryrun:
@@ -137,7 +141,7 @@ if __name__ == "__main__":
 
     # Determine next step based on CLI options
     if options.version:
-        print getVersion()
+        print(getVersion())
         exit(0)
     elif options.hostname:
         exit(getLastBackupStatus(options.hostname))

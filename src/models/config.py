@@ -63,7 +63,7 @@ class config():
                 config = yaml.load(stream)
         except:
             exitcode = 1
-            print "%s: Error while reading main config, exiting (%d)" % (self.mainconfigpath, exitcode)
+            print("%s: Error while reading main config, exiting (%d)" % (self.mainconfigpath, exitcode))
             exit(exitcode)
 
         try:
