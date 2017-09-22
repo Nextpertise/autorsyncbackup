@@ -4,10 +4,10 @@ from optparse import OptionParser
 from _version import __version__
 from models.config import config
 from lib.director import director
-from lib.pidfile import *
 from lib.statusemail import statusemail
 from lib.logger import logger
 from lib.jobthread import jobThread
+from lib.pidfile import Pidfile, ProcessRunningException
 from lib.statuscli import statuscli
 from models.jobrunhistory import jobrunhistory
 
@@ -29,7 +29,7 @@ def setupCliArguments():
     parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
         help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
 
-    (options, args) = parser.parse_args()
+    (options, args) = parser.parse_args()  # @UnusedVariable
     return options
 
 def getVersion():
@@ -51,9 +51,9 @@ def runBackup(jobpath, dryrun):
             threads = []
             if not dryrun:
                 for i in range(0, config().jobworkers):
-                  thread = jobThread(i, exitFlag, queueLock, directorInstance, workQueue)
-                  thread.start()
-                  threads.append(thread)
+                    thread = jobThread(i, exitFlag, queueLock, directorInstance, workQueue)
+                    thread.start()
+                    threads.append(thread)
 
             # Execute jobs
             queueLock.acquire()
