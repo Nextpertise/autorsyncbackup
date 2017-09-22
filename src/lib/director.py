@@ -14,13 +14,13 @@ class director():
     def getJobArray(self, jobpath):
         jobArray = []
         if jobpath is None:
-            dir = config().jobconfigdirectory.rstrip('/')
-            if(os.path.exists(dir)):
-                os.chdir(dir)
-                for file in glob.glob("*.job"):
-                    jobArray.append(job(dir + "/" + file))
+            directory= config().jobconfigdirectory.rstrip('/')
+            if(os.path.exists(directory)):
+                os.chdir(directory)
+                for filename in glob.glob("*.job"):
+                    jobArray.append(job(directory + "/" + filename))
             else:
-                logger().error("Job directory (%s) doesn't exists, exiting (1)" % dir)
+                logger().error("Job directory (%s) doesn't exists, exiting (1)" % directory)
         else:
             jobArray.append(job(jobpath))
 
@@ -73,25 +73,25 @@ class director():
                 os.makedirs(backupdir)
                 logger().info("Backup path (%s) created" % backupdir)
 
-            dir = backupdir + "/" + job.hostname + "/daily"
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            directory = backupdir + "/" + job.hostname + "/daily"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
-            dir = backupdir + "/" + job.hostname + "/weekly"
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            directory = backupdir + "/" + job.hostname + "/weekly"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
-            dir = backupdir + "/" + job.hostname + "/monthly"
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            directory = backupdir + "/" + job.hostname + "/monthly"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
             self._moveLastBackupToCurrentBackup(job)
 
-            dir = backupdir + "/" + job.hostname + "/current"
-            if not os.path.exists(dir):
-                os.makedirs(dir)
+            directory = backupdir + "/" + job.hostname + "/current"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
         except Exception as e:
-            logger().error("Error creating backup directory (%s) for host (%s)" % (dir, job.hostname))
+            logger().error("Error creating backup directory (%s) for host (%s)" % (directory, job.hostname))
             statusemail().sendSuddenDeath(e)
             return False
 
@@ -104,12 +104,12 @@ class director():
 
     def getBackups(self, job):
         retlist = []
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
+        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
         try:
-            list = os.listdir(dir)
+            dirlist = os.listdir(directory)
         except:
-            logger().error("Error while listing working directory (%s) for host (%s)" % (dir, job.hostname))
-        for l in list:
+            logger().error("Error while listing working directory (%s) for host (%s)" % (directory, job.hostname))
+        for l in dirlist:
             if re.match(self.regexp_backupdirectory, l):
                 retlist.append(l)
         return retlist
@@ -131,12 +131,12 @@ class director():
         return ret
 
     def getOldestBackupId(self, job):
-        list = self.getBackups(job)
+        dirlist = self.getBackups(job)
         ret = False
-        id = 0
-        for l in list:
-            if self.getIdfromBackupInstance(l) >= id:
-                ret = id = self.getIdfromBackupInstance(l)
+        backup_id = 0
+        for l in dirlist:
+            if self.getIdfromBackupInstance(l) >= backup_id:
+                ret = backup_id = self.getIdfromBackupInstance(l)
         return ret
 
     def backupRotate(self, job, moveCurrent = True):
@@ -160,10 +160,10 @@ class director():
         workingDirectory = self.getWorkingDirectory()
 
         """Unlink oldest backup(s) if applicable"""
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
+        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
 
         if not self.checkWorkingDirectory(workingDirectory):
-            logger().error("Error working directory not found (%s)" % dir)
+            logger().error("Error working directory not found (%s)" % directory)
             return False
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
@@ -171,7 +171,7 @@ class director():
         for l in self.getBackups(job):
             if self.getIdfromBackupInstance(l):
                 if self.getIdfromBackupInstance(l) > (backupRetention - 1):
-                    self._unlinkExpiredBackup(job, dir + "/" + l)
+                    self._unlinkExpiredBackup(job, directory + "/" + l)
         return True
 
     def _unlinkExpiredBackup(self, job, backupdirectory):
@@ -187,17 +187,17 @@ class director():
     def _rotateBackups(self, job):
         """Rotate backups"""
         ret = True
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
-        id = self.getOldestBackupId(job)
+        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
+        backup_id = self.getOldestBackupId(job)
         while id >= 0:
-            cur = "%s/*.%s" % (dir, id)
+            cur = "%s/*.%s" % (directory, backup_id)
             cur = glob.glob(cur)
             if cur:
                 cur = os.path.basename(cur[0])
                 cur = self.getNamefromBackupInstance(cur)
                 if cur is not False:
-                    src = "%s/%s.%s" % (dir, cur, id)
-                    dest = "%s/%s.%s" % (dir, cur, (id + 1))
+                    src = "%s/%s.%s" % (directory, cur, backup_id)
+                    dest = "%s/%s.%s" % (directory, cur, (backup_id + 1))
 
                     try:
                         os.rename(src, dest)
@@ -205,7 +205,7 @@ class director():
                         ret = False
 
                     logger().debug("mv %s %s" % (src, dest))
-                    id = id - 1
+                    backup_id = backup_id - 1
                 else:
                     ret = False
             else:
@@ -283,20 +283,20 @@ class director():
 
     def sanityCheckWorkingDirectory(self, job):
         src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory() + "/*.*"
-        list = glob.glob(src)
+        dirlist = glob.glob(src)
         found_ids = []
         ret = True
 
         # Check for duplicate id's
-        for l in list:
-            id = self.getIdfromBackupInstance(l)
-            if id in found_ids:
+        for l in dirlist:
+            backup_id = self.getIdfromBackupInstance(l)
+            if backup_id in found_ids:
                 ret = False
-            found_ids.append(id)
+            found_ids.append(backup_id)
 
         # Check sequence
-        for id in range(0, self.getOldestBackupId(job)):
-            if id not in found_ids:
+        for backup_id in range(0, self.getOldestBackupId(job)):
+            if backup_id not in found_ids:
                 ret = False
 
         if ret:
