@@ -92,7 +92,7 @@ class rsync():
         return errcode, stdout
 
     def executeRsyncViaSshProtocol(self, job, latest):
-        dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
+        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshprivatekey)
         options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
         fileset = self.generateFileset(job)
@@ -105,7 +105,7 @@ class rsync():
 
         # Generate rsync CLI command and execute it
         if(fileset):
-            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
+            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, directory)
             logger().info("Executing rsync command (%s)" % command)
             errcode, stdout = self.executeCommand(command)
         else:

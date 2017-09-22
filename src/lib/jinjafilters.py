@@ -10,25 +10,25 @@ class jinjafilters():
         if epoch:
             return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
         
-    def _bytesToReadableStr(self, bytes):
+    def _bytesToReadableStr(self, byte_data):
         try:
-          bytes = float(bytes)
+            byte_data = float(byte_data)
         except:
-          bytes = 0
+            byte_data = 0
         i = 0
         byteUnits = [' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
-        bytesStr = "%.0f" % bytes
-        while bytes > 1024:
-            bytes = bytes / 1024
+        bytesStr = "%.0f" % byte_data
+        while byte_data > 1024:
+            byte_data = byte_data / 1024
             i = i + 1
-            bytesStr = "%.1f" % bytes
+            bytesStr = "%.1f" % byte_data
         return bytesStr + byteUnits[i]
         
     def _secondsToReadableStr(self, seconds, short=False):
         try:
-          seconds = int(seconds)
+            seconds = int(seconds)
         except:
-          seconds = 0
+            seconds = 0
         if seconds == 0:
             return "0 seconds"
         ret = ""
@@ -41,12 +41,12 @@ class jinjafilters():
         for unit in units:
             quot = seconds / units[unit]
             if quot:
-               ret = ret + str(quot) + space + unit
-               seconds = seconds - (quot * units[unit])
-               if abs(quot) > 1:
+                ret = ret + str(quot) + space + unit
+                seconds = seconds - (quot * units[unit])
+                if abs(quot) > 1:
                     if not short:
                         ret = ret + "s"
-               ret = ret + ", "
+                ret = ret + ", "
         return ret[:-2]
         
     def _intToReadableStr(self, x):
