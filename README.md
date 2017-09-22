@@ -58,11 +58,11 @@ hooks:
 
 Define the main config at: `/etc/autorsyncbackup/main.yaml`, config example:
 ```
-    debuglevel: 2
-    weeklybackup: 6
-    monthlybackup: 1
-    backupmailrecipients:
-        - your@mail.com
+debuglevel: 2
+weeklybackup: 6
+monthlybackup: 1
+backupmailrecipients:
+    - your@mail.com
 ```
 
 Note: The backupdir will be postfixed with the hostname, by example: `/var/data/backups_rsync/host.domain.tld/`
@@ -92,19 +92,19 @@ Enable deamon in `/etc/default/rsync`:
     
 Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup server):
 ```
-    uid = root
-    gid = root
-    pid file = /var/run/rsyncd.pid
-    log file = /var/log/rsync.log
-    hosts allow = 1.2.3.4
-    max connections = 2
-    
-    [backup]
-            comment = backup share
-            path = /
-            read only = yes
-            auth users= backup
-            secrets file = /etc/rsyncd.secrets
+uid = root
+gid = root
+pid file = /var/run/rsyncd.pid
+log file = /var/log/rsync.log
+hosts allow = 1.2.3.4
+max connections = 2
+
+[backup]
+        comment = backup share
+        path = /
+        read only = yes
+        auth users= backup
+        secrets file = /etc/rsyncd.secrets
 ```
 
 Configure a password in `/etc/rsyncd.secrets`:
