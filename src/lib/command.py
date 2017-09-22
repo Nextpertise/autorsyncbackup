@@ -1,5 +1,5 @@
 import subprocess, paramiko, time, socket;
-from logger import logger
+from .logger import logger
 
 class command():
 

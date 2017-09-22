@@ -1,5 +1,5 @@
 import yaml
-from config import config
+from .config import config
 from lib.logger import logger
 
 class job():
