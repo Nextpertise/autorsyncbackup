@@ -1,4 +1,6 @@
+import datetime
 import sqlite3
+import time
 from .config import config
 from lib.logger import logger
 
@@ -129,7 +131,23 @@ class jobrunhistory():
             logger().debug("Commited job history to database")
         except Exception as e:
             logger().error("Could not insert job details for host (%s) into the database (%s): %s" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db", e))
-            
+    
+    def identifyJob(self, job, directory):
+        c = self.conn.cursor()
+        query = "SELECT id, startdatetime, rsync_total_file_size, rsync_literal_data FROM jobrunhistory WHERE hostname=? AND startdatetime<=? ORDER BY startdatetime DESC LIMIT 1"
+        dt = datetime.datetime.strptime(directory[:19], '%Y-%m-%d_%H-%M-%S')
+        sec = int(time.mktime(dt.timetuple()))
+        c.execute(query, (job.hostname, sec))
+        ret = c.fetchall()
+        if not ret:
+            logger().error('cannot identify job for %s,%s' % (job.hostname, sec))
+            return None
+        j = ret[0]
+        d = abs(sec-j[1]) 
+        if d > 8:
+            logger().warning('large time difference for job %s,%s: %s' % (job.hostname, sec, d))
+        return j
+    
     def getJobHistory(self, hosts):
         ret = []
         if hosts:

@@ -22,9 +22,10 @@ class statusemail():
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
+        sizes = self.getSizes(jobs)
 
         subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (len(good), len(warning), len(bad), datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs)
+        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes)
         self._send(subject=subject, htmlbody=body)
 
     def sendSuddenDeath(self, exc):
@@ -32,7 +33,7 @@ class statusemail():
         body = self.getHtmlExceptionBody(exc)
         self._send(subject=subject, htmlbody=body)
 
-    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs):
+    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
@@ -40,7 +41,7 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs)
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes)
 
     def getHtmlExceptionBody(self, exc):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
@@ -148,7 +149,14 @@ class statusemail():
             ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']
             ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
-
+    
+    def getSizes(self, jobs):
+        from lib.director import director
+        sizes = {}
+        for job in jobs:
+            sizes[job.hostname] = director().getBackupsSize(job)
+        return sizes
+    
     def _send(self, subject, htmlbody):
         for to in config().backupmailrecipients:
             logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))

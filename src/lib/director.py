@@ -102,9 +102,11 @@ class director():
         else:
             return False
 
-    def getBackups(self, job):
+    def getBackups(self, job, directory=''):
         retlist = []
-        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
+        if directory == '':
+            directory = self.getWorkingDirectory()
+        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + directory
         try:
             dirlist = os.listdir(directory)
         except:
@@ -113,6 +115,22 @@ class director():
             if re.match(self.regexp_backupdirectory, l):
                 retlist.append(l)
         return retlist
+
+    def getBackupsSize(self, job):
+        size = 0
+        latest = os.path.realpath(job.backupdir.rstrip('/') + "/" + job.hostname + "/latest")
+        daily_path = job.backupdir.rstrip('/') + "/" + job.hostname + "/daily"
+        jrh = jobrunhistory(check = True)
+        for interval in ['daily', 'weekly', 'monthly']:
+            dirlist = self.getBackups(job, interval)
+            for directory in dirlist:
+                jobRow = jrh.identifyJob(job, directory)
+                if latest == daily_path + "/" + directory:
+                    size += jobRow[2]
+                else:
+                    size += jobRow[3]
+        jrh.closeDbHandler()
+        return size 
 
     def getIdfromBackupInstance(self, backupDirectoryInstance):
         ret = False

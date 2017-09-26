@@ -453,6 +453,10 @@
                                                     <td class="data-value">{{ jrh.rsync_total_bytes_received|bytesformat }}</td>
                                                   </tr>
                                                   <tr>
+                                                    <td class="data-heading" width="50%">Estimated total backup size</td>
+                                                    <td class="data-value">{{ sizes[jrh.hostname]|bytesformat }}</td>
+                                                  </tr>
+                                                  <tr>
                                                     <td class="data-heading" width="50%">Commands executed</td>
                                                     <td class="data-value">{{ jrh['commands']|length }}</td>
                                                   </tr>
