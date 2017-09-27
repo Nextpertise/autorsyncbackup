@@ -120,7 +120,7 @@ def listJobs(sort):
             sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
         aux = sorted(sizes.items(), key=lambda x: x[1], reverse=True)
         if sort == 'average':
-            aux = sorted(averages.items(), key=lambda x: x[1])
+            aux = sorted(averages.items(), key=lambda x: x[1], reverse=True)
         x = PrettyTable(['Hostname', 'Estimated total backup size', 'Average backup size increase'])
         for elem in aux:
             hostname = elem[0]
