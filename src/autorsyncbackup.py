@@ -32,7 +32,7 @@ def setupCliArguments():
         help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job",
         help="run only the given job file")
-    parser.add_option("-l", "--list-jobs", metavar="total|average", dest="sort", default='total',
+    parser.add_option("-l", "--list-jobs", metavar="total|average", dest="sort", choices=["total", "average"],
         help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
     parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
         help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
@@ -114,18 +114,24 @@ def listJobs(sort):
         jobs = directorInstance.getJobArray()
         sizes = {}
         averages = {}
+        tot_size=0
+        tot_avg=0
         for job in jobs:
             sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
-        
-        aux = sorted(sizes.items(), key=lambda x: x[1])
+        aux = sorted(sizes.items(), key=lambda x: x[1], reverse=True)
         if sort == 'average':
             aux = sorted(averages.items(), key=lambda x: x[1])
         x = PrettyTable(['Hostname', 'Estimated total backup size', 'Average backup size increase'])
         for elem in aux:
             hostname = elem[0]
+            tot_size += sizes[hostname]
+            tot_avg += averages[hostname] 
             size = jinjafilters()._bytesToReadableStr(sizes[hostname])
             avg = jinjafilters()._bytesToReadableStr(averages[hostname])
             x.add_row([hostname, size, avg])
+        tot_size = jinjafilters()._bytesToReadableStr(tot_size)
+        tot_avg = jinjafilters()._bytesToReadableStr(tot_avg)
+        x.add_row(['Total', tot_size, tot_avg])
         x.align = "l"
         x.padding_width = 1
         print(x)
