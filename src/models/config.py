@@ -144,7 +144,7 @@ class config():
             defaultPrefix = "backup@"
             fqdn = socket.getfqdn()
             self.backupmailfrom = "%s%s" % (defaultPrefix, fqdn)
-            self.debugmessages.append("%s: No backupmailfrom is set, using default value: %s" % (self.mainconfigpath, self.monthlybackup))
+            self.debugmessages.append("%s: No backupmailfrom is set, using default value: %s" % (self.mainconfigpath, self.backupmailfrom))
                 
         try:
             if type(config['backupmailrecipients']) is list:
@@ -160,4 +160,4 @@ class config():
         try:
             self.databaseretention = config['databaseretention']
         except:
-            self.debugmessages.append("%s: No database retention set, using default value: %d" % (self.mainconfigpath,  self.jobworkers))
+            self.debugmessages.append("%s: No database retention set, using default value: %d" % (self.mainconfigpath,  self.databaseretention))
