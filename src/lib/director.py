@@ -11,7 +11,7 @@ class director():
 
     regexp_backupdirectory = r".*?(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"
 
-    def getJobArray(self, jobpath):
+    def getJobArray(self, jobpath=None):
         jobArray = []
         if jobpath is None:
             directory= config().jobconfigdirectory.rstrip('/')
@@ -118,6 +118,7 @@ class director():
 
     def getBackupsSize(self, job):
         size = 0
+        values = []
         latest = os.path.realpath(job.backupdir.rstrip('/') + "/" + job.hostname + "/latest")
         daily_path = job.backupdir.rstrip('/') + "/" + job.hostname + "/daily"
         jrh = jobrunhistory(check = True)
@@ -125,12 +126,15 @@ class director():
             dirlist = self.getBackups(job, interval)
             for directory in dirlist:
                 jobRow = jrh.identifyJob(job, directory)
+                if interval == 'daily':
+                    values.append(jobRow[3])
                 if latest == daily_path + "/" + directory:
                     size += jobRow[2]
                 else:
                     size += jobRow[3]
         jrh.closeDbHandler()
-        return size 
+        avg = sum(values) / len(values) if values else 0
+        return size, avg
 
     def getIdfromBackupInstance(self, backupDirectoryInstance):
         ret = False

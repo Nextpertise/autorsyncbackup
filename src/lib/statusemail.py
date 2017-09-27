@@ -22,10 +22,10 @@ class statusemail():
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
         stats = self.getStats(jobs)
-        sizes = self.getSizes(jobs)
+        sizes, averages = self.getSizes(jobs)
 
         subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (len(good), len(warning), len(bad), datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes)
+        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
         self._send(subject=subject, htmlbody=body)
 
     def sendSuddenDeath(self, exc):
@@ -33,7 +33,7 @@ class statusemail():
         body = self.getHtmlExceptionBody(exc)
         self._send(subject=subject, htmlbody=body)
 
-    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes):
+    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
@@ -41,7 +41,8 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes)
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
+                               jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
 
     def getHtmlExceptionBody(self, exc):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
@@ -153,9 +154,10 @@ class statusemail():
     def getSizes(self, jobs):
         from lib.director import director
         sizes = {}
+        averages = {}
         for job in jobs:
-            sizes[job.hostname] = director().getBackupsSize(job)
-        return sizes
+            sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
+        return sizes, averages
     
     def _send(self, subject, htmlbody):
         for to in config().backupmailrecipients:

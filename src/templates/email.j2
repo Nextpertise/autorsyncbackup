@@ -457,6 +457,10 @@
                                                     <td class="data-value">{{ sizes[jrh.hostname]|bytesformat }}</td>
                                                   </tr>
                                                   <tr>
+                                                    <td class="data-heading" width="50%">Average backup size increase</td>
+                                                    <td class="data-value">{{ averages[jrh.hostname]|bytesformat }}</td>
+                                                  </tr>
+                                                  <tr>
                                                     <td class="data-heading" width="50%">Commands executed</td>
                                                     <td class="data-value">{{ jrh['commands']|length }}</td>
                                                   </tr>

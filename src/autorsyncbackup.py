@@ -1,11 +1,13 @@
 #!/usr/bin/python
 import time, threading
 from optparse import OptionParser
+from prettytable import PrettyTable
 from _version import __version__
 from models.config import config
 from lib.director import director
 from lib.statusemail import statusemail
 from lib.logger import logger
+from lib.jinjafilters import jinjafilters
 from lib.jobthread import jobThread
 from lib.pidfile import Pidfile, ProcessRunningException
 from lib.statuscli import statuscli
@@ -30,6 +32,8 @@ def setupCliArguments():
         help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job",
         help="run only the given job file")
+    parser.add_option("-l", "--list-jobs", metavar="sort", dest="sort", default='total',
+        help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
     parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
         help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
 
@@ -103,6 +107,29 @@ def runBackup(jobpath, dryrun):
         statusemail().sendSuddenDeath(m)
         logger().error(m)
 
+def listJobs(sort):
+    with Pidfile(config().lockfile, logger().debug, logger().error):
+        # Run director
+        directorInstance = director()
+        jobs = directorInstance.getJobArray()
+        sizes = {}
+        averages = {}
+        for job in jobs:
+            sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
+        
+        aux = sorted(sizes.items(), key=lambda x: x[1])
+        if sort == 'average':
+            aux = sorted(averages.items(), key=lambda x: x[1])
+        x = PrettyTable(['Hostname', 'Estimated total backup size', 'Average backup size increase'])
+        for elem in aux:
+            hostname = elem[0]
+            size = jinjafilters()._bytesToReadableStr(sizes[hostname])
+            avg = jinjafilters()._bytesToReadableStr(averages[hostname])
+            x.add_row([hostname, size, avg])
+        x.align = "l"
+        x.padding_width = 1
+        print(x)
+
 def checkRemoteHost(jobpath):
     """ Check remote host and exit with exitcode 0 (success) or 1 (error) """
     directorInstance = director()
@@ -145,6 +172,8 @@ if __name__ == "__main__":
         exit(0)
     elif options.hostname:
         exit(getLastBackupStatus(options.hostname))
+    elif options.sort:
+        exit(listJobs(options.sort))
     elif checkSingleHost:
         exit(checkRemoteHost(options.job))
     else:
