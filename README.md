@@ -127,6 +127,7 @@ Command line options
 * `--version                        `Show version number
 * `-j, --single-job <jobfile>       `Run only the given job file
 * `-s, --status <hostname>          `Get status of last backup run of the given hostname. The exit code will be set (0 for success, 1 for error)
+* `-l, --list-jobs total|average    `Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)
 
 Config file options
 -------------------
