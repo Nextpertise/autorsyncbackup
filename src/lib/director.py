@@ -127,11 +127,11 @@ class director():
             for directory in dirlist:
                 jobRow = jrh.identifyJob(job, directory)
                 if interval == 'daily':
-                    values.append(jobRow[3])
+                    values.append(jobRow[3] or 0)
                 if latest == daily_path + "/" + directory:
-                    size += jobRow[2]
+                    size += jobRow[2] or 0
                 else:
-                    size += jobRow[3]
+                    size += jobRow[3] or 0
         jrh.closeDbHandler()
         avg = sum(values) / len(values) if values else 0
         return size, avg

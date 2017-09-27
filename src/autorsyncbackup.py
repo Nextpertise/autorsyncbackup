@@ -32,7 +32,7 @@ def setupCliArguments():
         help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job",
         help="run only the given job file")
-    parser.add_option("-l", "--list-jobs", metavar="sort", dest="sort", default='total',
+    parser.add_option("-l", "--list-jobs", metavar="total|average", dest="sort", default='total',
         help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
     parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
         help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")

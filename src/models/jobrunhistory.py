@@ -146,6 +146,8 @@ class jobrunhistory():
         d = abs(sec-j[1]) 
         if d > 8:
             logger().warning('large time difference for job %s,%s: %s' % (job.hostname, sec, d))
+        if j[2] is None or j[2] == '' or j[3] is None or j[3] == '':
+            logger().warning('invalid values for job %s, id %s, total %s, average %s' % (job.hostname, j[0], j[2], j[3]))
         return j
     
     def getJobHistory(self, hosts):
