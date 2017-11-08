@@ -109,11 +109,11 @@ class director():
         directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + directory
         try:
             dirlist = os.listdir(directory)
+            for l in dirlist:
+                if re.match(self.regexp_backupdirectory, l):
+                    retlist.append(l)
         except:
             logger().error("Error while listing working directory (%s) for host (%s)" % (directory, job.hostname))
-        for l in dirlist:
-            if re.match(self.regexp_backupdirectory, l):
-                retlist.append(l)
         return retlist
 
     def getBackupsSize(self, job):
