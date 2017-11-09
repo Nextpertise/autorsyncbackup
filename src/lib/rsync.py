@@ -68,6 +68,9 @@ class rsync():
         """Execute rsync command via rsync protocol"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         options = "--contimeout=5 -aR --delete --stats --bwlimit=%d" % job.speedlimitkb
+        exclude = self.generateExclude(job)
+        if exclude:
+            options += exclude
         fileset = self.generateFileset(job)
 
         # Link files to the same inodes as last backup to save disk space and boost backup performance
@@ -75,7 +78,7 @@ class rsync():
             latest = "--link-dest=%s" % latest
         else:
             latest = ""
-
+        
         # Generate rsync CLI command and execute it
         if(fileset):
             password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
@@ -84,7 +87,7 @@ class rsync():
             logger().info("Executing rsync command (%s)" % rsyncCommand)
             errcode, stdout = self.executeCommand(command)
         else:
-            stdout = "Fileset is missing, Rsync is never invoked"
+            stdout = "Include/Fileset is missing, Rsync is never invoked"
             errcode = 9
 
         job.backupstatus['rsync_stdout'] = stdout
@@ -95,6 +98,9 @@ class rsync():
         directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshprivatekey)
         options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
+        exclude = self.generateExclude(job)
+        if exclude:
+            options += exclude
         fileset = self.generateFileset(job)
 
         # Link files to the same inodes as last backup to save disk space and boost backup performance
@@ -109,7 +115,7 @@ class rsync():
             logger().info("Executing rsync command (%s)" % command)
             errcode, stdout = self.executeCommand(command)
         else:
-            stdout = "Fileset is missing, Rsync is never invoked"
+            stdout = "Include/Fileset is missing, Rsync is never invoked"
             errcode = 9
 
         job.backupstatus['rsync_stdout'] = stdout
@@ -119,7 +125,7 @@ class rsync():
     def generateFileset(self, job):
         """Create fileset string"""
         if not job.fileset:
-            logger().error("No fileset specified")
+            logger().error("No include/fileset specified")
             return False
         fileset = ""
         for fs in job.fileset:
@@ -128,6 +134,13 @@ class rsync():
             else:
                 fileset = fileset + " rsync://%s@%s:%s/%s%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare, fs)
         return fileset
+
+    def generateExclude(self, job):
+        """Create exclude string"""
+        exclude = ""
+        for fs in job.exclude:
+            exclude = exclude + " --exclude '%s'" % fs
+        return exclude
 
     def executeCommand(self, command):
         stdout = ""

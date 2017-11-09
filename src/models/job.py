@@ -27,6 +27,7 @@ class job():
         self.afterRemoteHooks = []
         self.filepath = filepath
         self.fileset = []
+        self.exclude = []
         self.backupstatus = {}
         self.readJob()
     
@@ -167,11 +168,21 @@ class job():
             logger().info("%s: No hooks defined, skipping hooks (exception: %s)." % (self.filepath,  e))
             
         try:
-            self.fileset = jobconfig['fileset']
+            self.fileset = jobconfig['include']
         except:
-            logger().info("%s: No fileset is set, skipping job." % self.filepath)
-            self.enabled = False
-            return False
+            try:
+                self.fileset = jobconfig['fileset']
+                logger().warning("%s: fileset detected; consider using include." % self.filepath)
+            except:
+                logger().info("%s: Neither fileset nor include are set, skipping job." % self.filepath)
+                self.enabled = False
+                return False
+
+        try:
+            self.exclude = jobconfig['exclude']
+        except:
+            self.exclude = config().exclude
+            logger().debug("%s: No exclude is set, using default" % self.exclude)
 
     def addhook(self,  hook):
         if not 'script' in hook:
@@ -217,7 +228,8 @@ class job():
         print("monthlyrotation: %s" % str(self.monthlyrotation))
         print("weeklybackup: %s" % str(self.weeklybackup))
         print("monthlybackup: %s" % str(self.monthlybackup))
-        print("fileset: %s" % str(self.fileset))
+        print("include: %s" % str(self.fileset))
+        print("exclude: %s" % str(self.exclude))
         print("backupstatus: %s" % str(self.backupstatus))
         print("hooks: %s" % str(self.hooks))
         print("beforeLocalHooks: %s" % str(self.beforeLocalHooks))

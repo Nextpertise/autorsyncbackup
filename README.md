@@ -41,9 +41,12 @@ speedlimitkb: 1600
 dailyrotation: 8
 weeklyrotation: 5
 monthlyrotation: 13
-fileset:
+include: #formerly fileset
   - /etc/
   - /home/
+exclude:
+  - "*.bak"
+  - ".cache/*"
 hooks:
   - script: /bin/false
     local: true
@@ -146,6 +149,12 @@ weeklyrotation:     5                                               # how many '
 monthlyrotation:    13                                              # how many 'monthly' backups to keep
 weeklybackup:       6                                               # the day of the week (0 = sunday) on which to make a weekly backup
 monthlybackup:      1                                               # the day of the month on which to make a monthly backup
+include	     														# list of dirs and files to backup; formerly fileset 
+  - /etc/
+  - /home/
+exclude:															# exclude files matching PATTERN
+  - "*.bak"
+  - ".cache/*"                                               
 backupmailfrom:     ""                                              # email from address
 jobworkers:         3                                               # number of concurrent jobs
 debuglevel:         0                                               # sets the verbosity of the logfile
@@ -177,10 +186,12 @@ weeklyrotation:   _taken_from_main_config_file_            # see Config file opt
 monthlyrotation:  _taken_from_main_config_file_            # see Config file options
 weeklybackup:     _taken_from_main_config_file_            # see Config file options
 monthlybackup:    _taken_from_main_config_file_            # see Config file options
-fileset:                                                   # list of dirs and files to backup (no defaults)
-  - list
-  - of files and
-  - directories/
+include	     														# list of dirs and files to backup; formerly fileset 
+  - /etc/
+  - /home/
+exclude:															# exclude files matching PATTERN
+  - "*.bak:"
+  - ".cache/*"                                             
 hooks:                                                     # list of pre/post backup scripts (no defaults)
   - script:       name_and_full_path_of_executable         # full path to executable
     local:        False                                    # whether the script runs locally on the server or remote on the client
