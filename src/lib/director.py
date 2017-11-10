@@ -126,6 +126,8 @@ class director():
             dirlist = self.getBackups(job, interval)
             for directory in dirlist:
                 jobRow = jrh.identifyJob(job, directory)
+                if not jobRow:
+                    continue
                 if interval == 'daily':
                     values.append(jobRow[3] or 0)
                 if latest == daily_path + "/" + directory:
@@ -344,7 +346,8 @@ class director():
             job.backupstatus['username'] = job.rsyncusername
         job.backupstatus['ssh'] = ssh
         job.backupstatus['share'] = job.rsyncshare
-        job.backupstatus['fileset'] = ':'.join(job.fileset)
+        job.backupstatus['include'] = ':'.join(job.include)
+        job.backupstatus['exclude'] = ':'.join(job.exclude)
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb
         job.backupstatus['type'] = self.getWorkingDirectory()

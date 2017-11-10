@@ -407,7 +407,11 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Include</td>
-                                                    <td class="data-value">{{ jrh.fileset|replace(':', '<br/>') }}</td>
+                                                    <td class="data-value">{{ jrh.include|replace(':', '<br/>') }}</td>
+                                                  <tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Exclude</td>
+                                                    <td class="data-value">{{ jrh.exclude|replace(':', '<br/>') }}</td>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Number of files</td>
                                                     <td class="data-value">{{ jrh.rsync_number_of_files|numberformat }}</td>

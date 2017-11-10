@@ -71,7 +71,7 @@ class rsync():
         exclude = self.generateExclude(job)
         if exclude:
             options += exclude
-        fileset = self.generateFileset(job)
+        include = self.generateInclude(job)
 
         # Link files to the same inodes as last backup to save disk space and boost backup performance
         if(latest):
@@ -80,9 +80,9 @@ class rsync():
             latest = ""
         
         # Generate rsync CLI command and execute it
-        if(fileset):
+        if(include):
             password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
-            rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, dir)
+            rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, include, dir)
             command = "%s; %s" % (password, rsyncCommand)
             logger().info("Executing rsync command (%s)" % rsyncCommand)
             errcode, stdout = self.executeCommand(command)
@@ -101,7 +101,7 @@ class rsync():
         exclude = self.generateExclude(job)
         if exclude:
             options += exclude
-        fileset = self.generateFileset(job)
+        include = self.generateInclude(job)
 
         # Link files to the same inodes as last backup to save disk space and boost backup performance
         if(latest):
@@ -110,8 +110,8 @@ class rsync():
             latest = ""
 
         # Generate rsync CLI command and execute it
-        if(fileset):
-            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, fileset, directory)
+        if(include):
+            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, include, directory)
             logger().info("Executing rsync command (%s)" % command)
             errcode, stdout = self.executeCommand(command)
         else:
@@ -122,18 +122,18 @@ class rsync():
         job.backupstatus['rsync_return_code'] = errcode
         return errcode, stdout
 
-    def generateFileset(self, job):
-        """Create fileset string"""
-        if not job.fileset:
+    def generateInclude(self, job):
+        """Create includestring"""
+        if not job.include:
             logger().error("No include/fileset specified")
             return False
-        fileset = ""
-        for fs in job.fileset:
+        include = ""
+        for fs in job.include:
             if job.ssh:
-                fileset = fileset + " %s@%s:%s" % (job.sshusername, job.hostname, fs)
+                include = include + " %s@%s:%s" % (job.sshusername, job.hostname, fs)
             else:
-                fileset = fileset + " rsync://%s@%s:%s/%s%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare, fs)
-        return fileset
+                include = include + " rsync://%s@%s:%s/%s%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare, fs)
+        return include
 
     def generateExclude(self, job):
         """Create exclude string"""

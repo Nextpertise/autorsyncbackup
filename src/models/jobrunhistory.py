@@ -58,7 +58,8 @@ class jobrunhistory():
                                     username TEXT, \
                                     ssh INTEGER, \
                                     share TEXT, \
-                                    fileset TEXT, \
+                                    include TEXT, \
+                                    exclude TEXT, \
                                     backupdir TEXT, \
                                     speedlimitkb INTEGER, \
                                     filesrotate TEXT, \

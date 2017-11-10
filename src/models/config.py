@@ -19,7 +19,7 @@ class config():
         monthlyrotation = 13
         weeklybackup = 6
         monthlybackup = 1
-        fileset = []
+        include = []
         exclude = []
         backupmailfrom = ""
         backupmailrecipients = []
@@ -135,9 +135,9 @@ class config():
             self.debugmessages.append("%s: No monthlybackup is set, using default value: %d" % (self.mainconfigpath, self.monthlybackup))
         
         try:
-            self.fileset = config['include']
+            self.include = config['include']
         except:
-            self.debugmessages.append("%s: No fileset/include is set, using default value: %s" % (self.mainconfigpath, self.fileset))
+            self.debugmessages.append("%s: No include/fileset is set, using default value: %s" % (self.mainconfigpath, self.include))
         
         try:
             self.exclude = config['exclude']
