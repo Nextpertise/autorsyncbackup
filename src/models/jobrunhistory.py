@@ -174,6 +174,7 @@ class jobrunhistory():
     def deleteHistory(self):
         try:
             c = self.conn.cursor()
+            c.row_factory = self.dict_factory
             c.execute("select id from jobrunhistory where startdatetime < strftime('%s','now','-%d days')" % ('%s', config().databaseretention))
             result = c.fetchall()
             for row in result:
