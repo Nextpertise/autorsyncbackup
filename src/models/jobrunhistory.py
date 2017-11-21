@@ -120,11 +120,11 @@ class jobrunhistory():
                         jobid,
                         hook['local'],
                         hook['runtime'] == 'before',
-                        hook['returncode'],
+                        hook.get('returncode', -1),
                         int(hook['continueonerror'] == True),
                         hook['script'], 
-                        hook['stdout'],
-                        hook['stderr'])
+                        hook.get('stdout', 'not run'),
+                        hook.get('stderr', 'not run'))
                     logger().debug(sql)
                     c.execute(sql)
 
