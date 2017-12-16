@@ -33,9 +33,12 @@ Create a job directory, this directory will contain .job files with rsync hosts:
 The job files are written in YAML syntax and will only apply with the `.job` file extension, config example: `/etc/autorsyncbackup/host.domain.tld.job`
 ```
 hostname: host.domain.tld
-username: rsyncuser
-password: rsyncpassword
-share: rsyncshare
+rsync_username: rsyncuser
+rsync_password: rsyncpassword
+rsync_share: rsyncshare
+ssh: False
+ssh_username: sshuser
+ssh_privatekey: /home/user/.ssh/id_rsa
 backupdir: /var/data/backups_rsync
 speedlimitkb: 1600
 dailyrotation: 8
@@ -177,7 +180,7 @@ rsync_username:   _no_default_value_                       # rsync user account
 rsync_password:   _no_default_value_                       # rsync password
 rsync_share:      _no_default_value_                       # rsync share
 ssh_username:     _no_default_value_                       # ssh username
-ssh_publickey:    _no_default_value_                       # ssh private key file (public key on client)
+ssh_privatekey:   _no_default_value_                       # ssh private key file (public key on client)
 port:             22 or 873                                # defaults to either ssh or rsync port depending on the value of the ssh entry
 backupdir:        _taken_from_main_config_file_            # see Config file options
 speedlimitkb:     _taken_from_main_config_file_            # see Config file options
