@@ -1,0 +1,84 @@
+AutoRsyncBackup report
+================================================================================
+
+Overall backup state:              {{ state }}
+{% if state == "ok" %}
+No errors found, backup succeeded
+{% else %}
+Errors found, investigate this e-mail!
+{% endif %}
+
+Overall backup info
+--------------------------------------------------------------------------------
+
+Backup host count:                 {{ stats.total_host_count }}
+Backup host list:
+{% for item in hosts %}                                   * {{ item }}
+{% endfor %}
+Missing hosts:
+{% if missinghosts %}{% for item in missinghosts %}                                   * {{ item }}
+{% endfor %}{% else %}                                   * None{% endif %}
+
+Backup start time:                 {{ durationstats.backupstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}
+Total backup duration:             {{ (durationstats.backupenddatetime - durationstats.backupstartdatetime)|secondsformat }}
+Housekeeping start time:           {{ durationstats.housekeepingstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}
+Total housekeeping duration:       {{ (durationstats.housekeepingenddatetime - durationstats.housekeepingstartdatetime)|secondsformat }}
+Total rsync duration:              {{ stats.total_rsync_duration|secondsformat }}
+Average rsync duration:            {{ stats.average_backup_duration|secondsformat }}
+Average speed limit in KBs:        {{ stats.average_speed_limit_kb }}
+Total number of files:             {{ stats.total_number_of_files|numberformat }}
+Total number of files transferred: {{ stats.total_number_of_files_transferred|numberformat }}
+Total file size:                   {{ stats.total_file_size|bytesformat }}
+Total transferred file size:       {{ stats.total_transferred_file_size|bytesformat }} 
+Total literal data:                {{ stats.total_literal_data|bytesformat }}
+Total matched data:                {{ stats.total_matched_data|bytesformat }}
+Total file list size:              {{ stats.total_file_list_size|bytesformat }}
+Total file list generation time:   {{ stats.total_file_list_generation_time|secondsformat }}
+Total file list transfer time:     {{ stats.total_file_list_transfer_time|secondsformat }}
+Total sent:                        {{ stats.total_bytes_sent|bytesformat }}
+Total received:                    {{ stats.total_bytes_received|bytesformat }}
+
+{% for jrh in jobrunhistory %}
+{{ jrh.hostname }}
+--------------------------------------------------------------------------------
+
+Rsync return message:              {% if jrh.rsync_backup_status == 1 %}Success{% else %}Error{% endif %}
+Rsync errors:                      {% if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - {{ jrh.rsync_stdout }}{% else %}No errors ({{ jrh.rsync_return_code}}){% endif %}
+Sanity check:                      {% if jrh.sanity_check == 1 %}Ok{% else %}Error, check backup folder for duplicate id's and/or check the sequence.{% endif %}
+Missing files and directories:     {% if jrh.rsync_backup_status == 1 and jrh.rsync_return_code != 0 %}{{ jrh.rsync_pre_stdout }}{% else %}None{% endif %}
+Sanity check:                      {% if jrh.sanity_check == 1 %}Ok{% else %}Error, check backup folder for duplicate id's and/or check the sequence.{% endif %}
+Missing files and directories:     {% if jrh.rsync_backup_status == 1 and jrh.rsync_return_code != 0 %}{{ jrh.rsync_pre_stdout }}{% else %}None{% endif %}
+Backup datetime:                   {{ jrh.startdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}
+Backup protocol:                   {% if jrh.ssh %}ssh+rsync{% else %}rsync{% endif %}
+Backup duration:                   {{ (jrh.enddatetime - jrh.startdatetime)|secondsformat }}
+Backup speed limit:                {{ jrh.speedlimitkb }} KB/s
+Include:                           {{ jrh.include|replace(':', '\n                                   ') }}
+Exclude:                           {{ jrh.exclude|replace(':', '\n                                   ') }}
+Number of files:                   {{ jrh.rsync_number_of_files|numberformat }}
+Number of files transferred:       {{ jrh.rsync_number_of_files_transferred|numberformat }}
+Total file size:                   {{ jrh.rsync_total_file_size|bytesformat }}
+Total file size transferred:       {{ jrh.rsync_total_transferred_file_size|bytesformat }}
+Literal data:                      {{ jrh.rsync_literal_data|bytesformat }}
+Matched data:                      {{ jrh.rsync_matched_data|bytesformat }}
+File list size:                    {{ jrh.rsync_file_list_size|bytesformat }}
+File list generation time:         {{ jrh.rsync_file_list_generation_time|secondsformat }}
+File list transfer time:           {{ jrh.rsync_file_list_transfer_time|secondsformat }}
+Total sent:                        {{ jrh.rsync_total_bytes_sent|bytesformat }}
+Total received:                    {{ jrh.rsync_total_bytes_received|bytesformat }}
+Estimated total backup size:       {{ sizes[jrh.hostname]|bytesformat }}
+Average backup size increase:      {{ averages[jrh.hostname]|bytesformat }}
+Commands executed:                 {{ jrh['commands']|length }}
+{% for c in jrh['commands'] %}
+{{ c.script }} ({% if c.local == true %}Local{% else %} Remote{% endif %}, {% if c.before == true %}Before{% else %}After{% endif %}): {% if c.returncode == 0 %}Success{% elif c.returncode > 0 and c.continueonerror %}Warning{% else %}Error{% endif %}
+stdout:
+{{ c.stdout }}
+{%- if c.returncode != 0 %}
+stderr:
+{{ c.stderr }}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+
+Kind Regards,
+
+AutoRsyncBackup
