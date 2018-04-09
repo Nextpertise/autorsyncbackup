@@ -25,13 +25,15 @@ class statusemail():
         sizes, averages = self.getSizes(jobs)
 
         subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (len(good), len(warning), len(bad), datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        body = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
-        self._send(subject=subject, htmlbody=body)
+        htmlbody = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
+        textbody = self.getTextEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
+        self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
 
     def sendSuddenDeath(self, exc):
         subject = "AUTORSYNCBACKUP Sudden Death - %s" % datetime.datetime.today().strftime("%a, %d/%m/%Y")
-        body = self.getHtmlExceptionBody(exc)
-        self._send(subject=subject, htmlbody=body)
+        htmlbody = self.getHtmlExceptionBody(exc)
+        textbody = self.getTextExceptionBody(exc)
+        self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
 
     def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
@@ -44,6 +46,17 @@ class statusemail():
         return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
                                jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
 
+    def getTextEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
+        env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
+        env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
+        env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
+        env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
+        env.filters['numberformat'] = jinjafilters()._intToReadableStr
+        env.filters['nl2br'] = jinjafilters()._nl2br
+        template = env.get_template('text_email.j2')
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
+                               jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
+
     def getHtmlExceptionBody(self, exc):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
@@ -52,6 +65,16 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email_exc.j2')
+        return template.render(exc=exc)
+
+    def getTextExceptionBody(self, exc):
+        env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
+        env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
+        env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
+        env.filters['secondsformat'] = jinjafilters()._secondsToReadableStr
+        env.filters['numberformat'] = jinjafilters()._intToReadableStr
+        env.filters['nl2br'] = jinjafilters()._nl2br
+        template = env.get_template('text_email_exc.j2')
         return template.render(exc=exc)
 
     def getOverallBackupState(self, jobs):
@@ -159,12 +182,12 @@ class statusemail():
             sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
         return sizes, averages
     
-    def _send(self, subject, htmlbody):
+    def _send(self, subject, htmlbody, textbody):
         for to in config().backupmailrecipients:
             logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))
             message = Message(From=config().backupmailfrom, To=to, charset="utf-8")
             message.Subject = subject
             message.Html = htmlbody
-            message.Body = """This is an HTML e-mail with the backup overview, please use a HTML enabled e-mail client."""
+            message.Body = textbody
             sender = Mailer(config().smtphost)
             sender.send(message)
