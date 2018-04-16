@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import glob, os, re, time, datetime, shutil
 from models.job import job
 from models.config import config

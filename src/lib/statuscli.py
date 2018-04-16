@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import print_function
+
 from prettytable import PrettyTable
 from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters

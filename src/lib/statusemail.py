@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import datetime
 from models.config import config
 from models.jobrunhistory import jobrunhistory

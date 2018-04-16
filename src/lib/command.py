@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import subprocess, paramiko, time, socket;
 from .logger import logger
 
