@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import division
 
 import glob, os, re, time, datetime, shutil
 from models.job import job
