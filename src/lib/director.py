@@ -38,9 +38,9 @@ class director():
                 logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
             else:
                 logger().debug('Running remote command %s' % c['script'])
-                c['returncode'],  c['stdout'],  c['stderr'] =  comm.executeRemoteCommand(job,  c['script'])
+                c['returncode'],  c['stdout'],  c['stderr'] = comm.executeRemoteCommand(job,  c['script'])
                 logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
-            if c['returncode'] != 0 and c['continueonerror'] == False:
+            if c['returncode'] != 0 and c['continueonerror'] is False:
                 logger().debug('command failed and continueonerror = false: exception')
                 raise CommandException('Hook %s failed to execute' % c['script'])
 
@@ -54,7 +54,7 @@ class director():
             logger().error("Required command failed (%s), skipping remainder of job" % e)
             job.backupstatus['rsync_backup_status'] = 0
             job.backupstatus['rsync_stdout'] = "No output due to failed required 'Before' command"
-            return 0;
+            return 0
         job.backupstatus['startdatetime'] = int(time.time())
         ret = rsync().executeRsync(job, latest)
         job.backupstatus['enddatetime'] = int(time.time())
@@ -63,7 +63,7 @@ class director():
             self.executeJobs(job, job.afterLocalHooks)
         except CommandException as e:
             logger().error("Required command failed (%s), skipping remainder of job" % e)
-            return 0;
+            return 0
         return ret
 
     def checkBackupEnvironment(self, job):
@@ -351,8 +351,9 @@ class director():
         job.backupstatus['backupdir'] = job.backupdir
         job.backupstatus['speedlimitkb'] = job.speedlimitkb
         job.backupstatus['type'] = self.getWorkingDirectory()
+        job.backupstatus['integrity_id'] = job.integrity_id
         self.parseRsyncOutput(job)
-        jrh = jobrunhistory(check = True)
+        jrh = jobrunhistory(check=True)
         jrh.insertJob(job.backupstatus,  job.hooks)
         jrh.closeDbHandler()
 

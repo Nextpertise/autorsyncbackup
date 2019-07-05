@@ -54,7 +54,6 @@ def runBackup(jobpath, dryrun):
             # Run director
             directorInstance = director()
             jobs = directorInstance.getJobArray(jobpath)
-
             # Start threads
             threads = []
             if not dryrun:
