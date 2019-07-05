@@ -18,6 +18,7 @@ class statusemail():
 
     def sendStatusEmail(self, jobs, durationstats):
         self.history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
+        self.checkJobIntegrity(jobs)
         state, good, warning, bad = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
         missinghosts = self.getMissingHosts(jobs)
@@ -28,6 +29,15 @@ class statusemail():
         htmlbody = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
         textbody = self.getTextEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
         self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
+
+
+    def checkJobIntegrity(self, jobs):
+        self.history.sort(key=lambda j: j['id'])
+        jobs.sort(key=lambda j: j.integrity_id)
+
+        for job_history, job in zip(self.history, jobs):
+            job_history['integrity_confirmed'] = job_history['integrity_id'] == job.integrity_id
+
 
     def sendSuddenDeath(self, exc):
         subject = "AUTORSYNCBACKUP Sudden Death - %s" % datetime.datetime.today().strftime("%a, %d/%m/%Y")
@@ -84,23 +94,30 @@ class statusemail():
         good = []
         bad = []
         warning = []
-        for j in self.history:
+
+        #Jobs can be disabled, but there should never be more history than jobs.
+        if len(self.history) > len(jobs):
+            ret = "error"
+
+        for job_history, job in zip(self.history, jobs):
             addto = good
-            if (j['rsync_backup_status'] != 1) or (j['sanity_check'] != 1):
+            if (job_history['rsync_backup_status'] != 1)\
+                    or (job_history['sanity_check'] != 1)\
+                    or not job_history['integrity_confirmed']:
                 addto = bad
                 ret = "error"
-            j['commanderror'] = 'ok'
-            for c in j['commands']:
+            job_history['commanderror'] = 'ok'
+            for c in job_history['commands']:
                 if c['returncode'] != 0 and not c['continueonerror']:
                     addto = bad
-                    j['commanderror'] = "error"
+                    job_history['commanderror'] = "error"
                     ret = "error"
                 elif c['returncode'] != 0 and c['continueonerror']:
                     addto = warning
-                    j['commanderror'] = "warning"
+                    job_history['commanderror'] = "warning"
                     if ret == "ok":
                         ret = "warning"
-            addto.append(j)
+            addto.append(job_history)
         if not self.history:
             ret = "error"
         else:

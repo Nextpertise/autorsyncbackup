@@ -358,7 +358,7 @@
                                     {% for jrh in jobrunhistory %}
                                     <table cellpadding="0" cellspacing="0" class="card" style="margin-top: 20px">
                                       <tr>
-                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% elif jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'warning' %}orange{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
+                                        <td style="background-color:{%- if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' and jrh.integrity_confirmed %}green{% elif jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'warning' %}orange{%- else %}red{%- endif %}; text-align:center; padding:10px; color:white !important;"><span style="color: #fff">{{ jrh.hostname }}</span></td>
                                       </tr>
                                       <tr>
                                         <td style="border:1px solid {% if jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'ok' %}green{% elif jrh.rsync_backup_status == 1 and jrh.sanity_check == 1 and jrh.commanderror == 'warning' %}orange{% else %}red{% endif %}; padding: 20px 0 20px;">
@@ -381,6 +381,10 @@
                                                   <tr>
                                                     <td class="data-heading" width="50%">Sanity check</td>
                                                     <td class="data-value">{%- if jrh.sanity_check == 1 %}Ok{%- else %}Error, check backup folder for duplicate id's and/or check the sequence.{%- endif %}</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td class="data-heading" width="50%">Integrity</td>
+                                                    <td class="data-value">{%- if jrh.integrity_confirmed == 1 %}Ok{%- else %}The integrity of the job log (this section of this email) could not be confirmed. Something probably went wrong while trying to insert the logs into the database. This does not necessarily mean that the job has failed.{%- endif %}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Missing files and directories</td>

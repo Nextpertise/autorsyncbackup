@@ -1,4 +1,4 @@
-import yaml
+import yaml, uuid
 from .config import config
 from lib.logger import logger
 
@@ -29,6 +29,7 @@ class job():
         self.include = []
         self.exclude = []
         self.backupstatus = {}
+        self.integrity_id = str(uuid.uuid1())
         self.readJob()
     
     def readJob(self):
