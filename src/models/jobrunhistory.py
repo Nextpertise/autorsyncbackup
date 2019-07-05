@@ -52,6 +52,7 @@ class jobrunhistory():
         jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
                                 ( \
                                     id INTEGER PRIMARY KEY  AUTOINCREMENT, \
+                                    integrity_id TEXT, \
                                     hostname TEXT, \
                                     startdatetime INTEGER, \
                                     enddatetime INTEGER, \
@@ -131,6 +132,8 @@ class jobrunhistory():
             self.conn.commit()
             logger().debug("Commited job history to database")
         except Exception as e:
+            logger().debug(columns)
+            logger().debug(backupstatus.values())
             logger().error("Could not insert job details for host (%s) into the database (%s): %s" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db", e))
     
     def identifyJob(self, job, directory):
