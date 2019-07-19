@@ -32,8 +32,8 @@ class statusemail():
 
 
     def checkJobIntegrity(self, jobs):
-        self.history.sort(key=lambda j: j['id'])
-        jobs.sort(key=lambda j: j.integrity_id)
+        self.history.sort(key=lambda j: j['hostname'])
+        jobs.sort(key=lambda j: j.hostname)
 
         for job_history, job in zip(self.history, jobs):
             job_history['integrity_confirmed'] = job_history['integrity_id'] == job.integrity_id
