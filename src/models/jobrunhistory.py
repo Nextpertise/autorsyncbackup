@@ -117,17 +117,21 @@ class jobrunhistory():
             jobid = c.lastrowid
             if hooks != None:
                 for hook in hooks:
-                    sql = "insert into jobcommandhistory (jobrunid, local, before, returncode, continueonerror, script, stdout, stderr) values (%d, %d, %d, %d, %d, '%s', '%s', '%s')" % (
-                        jobid,
-                        hook['local'],
-                        hook['runtime'] == 'before',
-                        hook.get('returncode', -1),
-                        int(hook['continueonerror'] == True),
-                        hook['script'], 
-                        hook.get('stdout', 'not run'),
-                        hook.get('stderr', 'not run'))
+                    sql = "INSERT INTO jobcommandhistory (jobrunid, local, before, returncode, continueonerror, script, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
                     logger().debug(sql)
-                    c.execute(sql)
+                    c.execute(
+                        sql,
+                        (
+                            jobid,
+                            hook['local'],
+                            hook['runtime'] == 'before',
+                            hook.get('returncode', -1),
+                            int(hook['continueonerror'] == True),
+                            hook['script'],
+                            hook.get('stdout', 'not run'),
+                            hook.get('stderr', 'not run')
+                        )
+                    )
 
             self.conn.commit()
             logger().debug("Commited job history to database")
