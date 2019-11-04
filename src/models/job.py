@@ -7,6 +7,7 @@ class job():
         self.enabled = None
         self.hostname = None
         self.ssh = None
+        self.sudo_ssh = None
         self.rsyncusername = None
         self.rsyncpassword = None
         self.rsyncshare = None
@@ -59,6 +60,12 @@ class job():
         except:
             self.ssh = False
             logger().debug("%s: No SSH jobconfig variable set." % self.filepath)
+
+        try:
+            self.sudo_ssh = jobconfig['sudo_ssh']
+        except:
+            self.sudo_ssh = False
+            logger().debug("%s: No SUDO_SSH jobconfig variable set." % self.filepath)
         
         try:
             self.sshusername = jobconfig['ssh_username']
