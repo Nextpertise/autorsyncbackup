@@ -37,6 +37,7 @@ rsync_username: rsyncuser
 rsync_password: rsyncpassword
 rsync_share: rsyncshare
 ssh: False
+ssh_sudo: False
 ssh_username: sshuser
 ssh_privatekey: /home/user/.ssh/id_rsa
 backupdir: /var/data/backups_rsync
@@ -176,6 +177,7 @@ Job file options
 enabled:          True                                     # (en/dis)able this entry
 hostname:         _no_default_value_                       # fully qualified domain name of the host being backedup
 ssh:              False                                    # whether to use rsync over ssh (True) or plain rsync (False)
+ssh_sudo:         False                                    # invoke rsync with sudo on remotehost when ssh is true
 rsync_username:   _no_default_value_                       # rsync user account
 rsync_password:   _no_default_value_                       # rsync password
 rsync_share:      _no_default_value_                       # rsync share
