@@ -96,7 +96,8 @@ class rsync():
 
     def executeRsyncViaSshProtocol(self, job, latest):
         directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
-        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"'" % (job.port, job.sshprivatekey)
+        sudo_path = "--rsync-path='sudo rsync'" if job.ssh_sudo else ''
+        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"' %s" % (job.port, job.sshprivatekey, sudo_path)
         options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
         exclude = self.generateExclude(job)
         if exclude:
