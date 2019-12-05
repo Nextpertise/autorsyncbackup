@@ -157,8 +157,6 @@ class rsync():
         ret = False
         if errorCode == 0:
             ret = True
-        elif errorCode == 23:
-            ret = True
         elif errorCode == 24:
             ret = True
         return ret
