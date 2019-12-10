@@ -24,7 +24,7 @@ class jobrunhistory():
         try:
             self.conn = sqlite3.connect(path)
             logger().debug("open db [%s]" % path)
-        except:
+        except Exception:
             exitcode = 1
             logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
             exit(exitcode)
@@ -34,7 +34,7 @@ class jobrunhistory():
         try:
             self.conn.close()
             logger().debug("close db [%s]" % path)
-        except:
+        except Exception:
             pass
 
     def checkTables(self):

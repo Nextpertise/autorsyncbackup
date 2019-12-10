@@ -119,7 +119,7 @@ class director():
             for l in dirlist:
                 if re.match(self.regexp_backupdirectory, l):
                     retlist.append(l)
-        except:
+        except Exception:
             logger().error("Error while listing working directory (%s) for host (%s)" % (directory, job.hostname))
         return retlist
 
@@ -210,7 +210,7 @@ class director():
         logger().debug("Unlink expired backup (rm -rf %s)" % backupdirectory)
         try:
             shutil.rmtree(backupdirectory)
-        except:
+        except Exception:
             logger().error("Error while removing (%s)" % backupdirectory)
             ret = False
         return ret
@@ -232,7 +232,7 @@ class director():
 
                     try:
                         os.rename(src, dest)
-                    except:
+                    except Exception:
                         ret = False
 
                     logger().debug("mv %s %s" % (src, dest))
@@ -254,7 +254,7 @@ class director():
 
         try:
             os.rename(src, dest)
-        except:
+        except Exception:
             ret = False
 
         logger().debug("mv %s %s " % (src, dest))
@@ -266,11 +266,11 @@ class director():
         logger().debug("Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile))
         try:
             os.unlink(symlinkfile)
-        except:
+        except Exception:
             pass
         try:
             os.symlink(latest, symlinkfile)
-        except:
+        except Exception:
             ret = False
         return ret
 
@@ -280,7 +280,7 @@ class director():
         rotation = 0
         try:
             rotation = getattr(job, workingDirectory + 'rotation')
-        except:
+        except Exception:
             pass
 
         oldestId = self.getOldestBackupId(job)
@@ -299,7 +299,7 @@ class director():
             try:
                 os.rename(g[0], dest)
                 logger().info("mv %s %s" % (g[0], dest))
-            except:
+            except Exception:
                 ret = False
             return ret
 
@@ -389,6 +389,6 @@ class director():
                 else:
                     job.backupstatus[key] = ''
                     logger().debug("no match!")
-            except:
+            except Exception:
                 job.backupstatus[key] = ''
                 logger().debug("FAILING regexp[%s] %s" % (key, regexps[key]))

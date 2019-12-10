@@ -66,96 +66,96 @@ class config():
             self.debugmessages.append("Reading main config from %s" % self.mainconfigpath)
             with open(self.mainconfigpath, 'r') as stream:
                 config = yaml.load(stream)
-        except:
+        except Exception:
             exitcode = 1
             print("%s: Error while reading main config, exiting (%d)" % (self.mainconfigpath, exitcode))
             exit(exitcode)
 
         try:
             self.debuglevel = config['debuglevel']
-        except:
+        except Exception:
             pass
 
         try:
             self.rsyncpath = config['rsyncpath']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No rsyncpath is set, using default value: %s" % (self.mainconfigpath, self.rsyncpath))
 
         try:
             self.lockfile = config['lockfile']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No lockfile path is set, using default value: %s" % (self.mainconfigpath, self.lockfile))
 
         try:
             self.jobconfigdirectory = config['jobconfigdirectory']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No jobconfigdirectory is set, using default value: %s" % (self.mainconfigpath, self.jobconfigdirectory))
 
         try:
             self.jobspooldirectory = config['jobspooldirectory']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No jobspooldirectory is set, using default value: %s" % (self.mainconfigpath, self.jobspooldirectory))
 
         try:
             self.backupdir = config['backupdir']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No backupdir is set, using default value: %s" % (self.mainconfigpath, self.backupdir))
 
         try:
             self.logfile = config['logfile']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No logfile is set, using default value: %s" % (self.mainconfigpath, self.logfile))
         self.debugmessages.append("Writing to logfile %s" % self.logfile)
 
         try:
             self.speedlimitkb = config['speedlimitkb']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No speedlimitkb is set, using default value: %d" % (self.mainconfigpath, self.speedlimitkb))
 
         try:
             self.dailyrotation = config['dailyrotation']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No dailyrotation is set, using default value: %d" % (self.mainconfigpath, self.dailyrotation))
 
         try:
             self.weeklyrotation = config['weeklyrotation']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No weeklyrotation is set, using default value: %d" % (self.mainconfigpath, self.weeklyrotation))
 
         try:
             self.monthlyrotation = config['monthlyrotation']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No monthlyrotation is set, using default value: %d" % (self.mainconfigpath, self.monthlyrotation))
 
         try:
             self.weeklybackup = config['weeklybackup']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No weeklybackup is set, using default value: %d" % (self.mainconfigpath, self.weeklybackup))
 
         try:
             self.monthlybackup = config['monthlybackup']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No monthlybackup is set, using default value: %d" % (self.mainconfigpath, self.monthlybackup))
 
         try:
             self.include = config['include']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No include/fileset is set, using default value: %s" % (self.mainconfigpath, self.include))
 
         try:
             self.exclude = config['exclude']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No exclude is set, using default value: %s" % (self.mainconfigpath, self.exclude))
 
         try:
             self.smtphost = config['smtphost']
-        except:
+        except Exception:
             self.smtphost = 'localhost'
             self.debugmessages.append("%s: No smtphost is set, using default value: %s" % (self.mainconfigpath, self.smtphost))
 
         try:
             self.backupmailfrom = config['backupmailfrom']
-        except:
+        except Exception:
             defaultPrefix = "backup@"
             fqdn = socket.getfqdn()
             self.backupmailfrom = "%s%s" % (defaultPrefix, fqdn)
@@ -164,15 +164,15 @@ class config():
         try:
             if type(config['backupmailrecipients']) is list:
                 self.backupmailrecipients = config['backupmailrecipients']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No backupmailrecipient(s) are set, there will no backup report be sent" % self.mainconfigpath)
 
         try:
             self.jobworkers = config['jobworkers']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No jobworkers is set, using default value: %d" % (self.mainconfigpath, self.jobworkers))
 
         try:
             self.databaseretention = config['databaseretention']
-        except:
+        except Exception:
             self.debugmessages.append("%s: No database retention set, using default value: %d" % (self.mainconfigpath,  self.databaseretention))

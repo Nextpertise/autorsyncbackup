@@ -15,7 +15,7 @@ class jinjafilters():
     def _bytesToReadableStr(self, byte_data):
         try:
             byte_data = float(byte_data)
-        except:
+        except Exception:
             byte_data = 0
         i = 0
         byteUnits = [' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
@@ -29,7 +29,7 @@ class jinjafilters():
     def _secondsToReadableStr(self, seconds, short=False):
         try:
             seconds = int(seconds)
-        except:
+        except Exception:
             seconds = 0
         if seconds == 0:
             return "0 seconds"
@@ -54,7 +54,7 @@ class jinjafilters():
     def _intToReadableStr(self, x):
         try:
             x = int(x)
-        except:
+        except Exception:
             x = 0
         if x < 0:
             return '-' + self._intToReadableStr(-x)
