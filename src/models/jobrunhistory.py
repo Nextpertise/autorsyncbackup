@@ -152,7 +152,7 @@ class jobrunhistory():
             logger().error('cannot identify job for %s,%s' % (job.hostname, sec))
             return None
         j = ret[0]
-        d = abs(sec-j[1]) 
+        d = abs(sec-j[1])
         if d > 8:
             logger().warning('large time difference for job %s,%s: %s' % (job.hostname, sec, d))
         if j[2] is None or j[2] == '' or j[3] is None or j[3] == '':

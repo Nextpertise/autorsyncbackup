@@ -129,7 +129,7 @@ def listJobs(sort):
         for elem in aux:
             hostname = elem[0]
             tot_size += sizes[hostname]
-            tot_avg += averages[hostname] 
+            tot_avg += averages[hostname]
             size = jinjafilters()._bytesToReadableStr(sizes[hostname])
             avg = jinjafilters()._bytesToReadableStr(averages[hostname])
             x.add_row([hostname, size, avg])

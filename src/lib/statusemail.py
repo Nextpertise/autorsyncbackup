@@ -55,7 +55,7 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats,
                                jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
 
     def getTextEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
@@ -66,7 +66,7 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('text_email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
+        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats,
                                jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
 
     def getHtmlExceptionBody(self, exc):
