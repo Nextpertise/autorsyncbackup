@@ -84,7 +84,7 @@ class jobrunhistory():
                                     sanity_check INTEGER \
                                 );'
         logger().debug("create table `jobrunhistory`")
-        logger().debug("%s" % jobrunhistoryTable.replace("\n",""))
+        logger().debug("%s" % jobrunhistoryTable.replace("\n", ""))
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
 
