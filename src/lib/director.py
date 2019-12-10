@@ -245,7 +245,7 @@ class director():
         directory = (job.backupdir.rstrip('/') + "/" +
                      job.hostname + "/" + self.getWorkingDirectory())
         backup_id = self.getOldestBackupId(job)
-        while id >= 0:
+        while backup_id >= 0:
             cur = "%s/*.%s" % (directory, backup_id)
             cur = glob.glob(cur)
             if cur:
