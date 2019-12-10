@@ -20,7 +20,7 @@ git clone git@github.com:Nextpertise/autorsyncbackup.git
 
 Install dependencies:
 
-`apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable rsync`
+`apt-get install python3 python3-yaml python3-jinja2 python3-mailer python3-paramiko python3-prettytable rsync`
     
 Create symlink:
 
