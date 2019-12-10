@@ -26,7 +26,10 @@ class jobrunhistory():
             logger().debug("open db [%s]" % path)
         except Exception:
             exitcode = 1
-            logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
+            logger().error(("Error while opening db (%s)"
+                            " due to unexisting directory"
+                            " or permission error,"
+                            " exiting (%d)") % (path, exitcode))
             exit(exitcode)
 
     def closeDbHandler(self):
@@ -40,49 +43,52 @@ class jobrunhistory():
     def checkTables(self):
         logger().debug("Check for table `jobrunhistory`")
         c = self.conn.cursor()
-        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
+        c.execute(("SELECT name FROM sqlite_master"
+                   " WHERE type='table' AND name='jobrunhistory'"))
         if c.fetchone() is None:
             self.createTableJobrunhistoryTable()
 
         logger().debug("Check for table jobcommandhistory")
-        c.execute("select name from sqlite_master where type='table' and name='jobcommandhistory'")
+        c.execute(("SELECT name FROM sqlite_master"
+                   " WHERE type='table' AND name='jobcommandhistory'"))
         if c.fetchone() is None:
             self.createTableJobcommandhistoryTable()
 
     def createTableJobrunhistoryTable(self):
-        jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
-                                ( \
-                                    id INTEGER PRIMARY KEY  AUTOINCREMENT, \
-                                    integrity_id TEXT, \
-                                    hostname TEXT, \
-                                    startdatetime INTEGER, \
-                                    enddatetime INTEGER, \
-                                    username TEXT, \
-                                    ssh INTEGER, \
-                                    share TEXT, \
-                                    include TEXT, \
-                                    exclude TEXT, \
-                                    backupdir TEXT, \
-                                    speedlimitkb INTEGER, \
-                                    filesrotate TEXT, \
-                                    type TEXT, \
-                                    rsync_backup_status INTEGER, \
-                                    rsync_return_code INTEGER, \
-                                    rsync_pre_stdout TEXT, \
-                                    rsync_stdout TEXT, \
-                                    rsync_number_of_files INTEGER, \
-                                    rsync_number_of_files_transferred INTEGER, \
-                                    rsync_total_file_size INTEGER, \
-                                    rsync_total_transferred_file_size INTEGER, \
-                                    rsync_literal_data INTEGER, \
-                                    rsync_matched_data INTEGER, \
-                                    rsync_file_list_size INTEGER, \
-                                    rsync_file_list_generation_time NUMERIC, \
-                                    rsync_file_list_transfer_time NUMERIC, \
-                                    rsync_total_bytes_sent INTEGER, \
-                                    rsync_total_bytes_received INTEGER, \
-                                    sanity_check INTEGER \
-                                );'
+        jobrunhistoryTable = '''
+                             CREATE TABLE IF NOT EXISTS jobrunhistory (
+                                 id INTEGER PRIMARY KEY  AUTOINCREMENT,
+                                 integrity_id TEXT,
+                                 hostname TEXT,
+                                 startdatetime INTEGER,
+                                 enddatetime INTEGER,
+                                 username TEXT,
+                                 ssh INTEGER,
+                                 share TEXT,
+                                 include TEXT,
+                                 exclude TEXT,
+                                 backupdir TEXT,
+                                 speedlimitkb INTEGER,
+                                 filesrotate TEXT,
+                                 type TEXT,
+                                 rsync_backup_status INTEGER,
+                                 rsync_return_code INTEGER,
+                                 rsync_pre_stdout TEXT,
+                                 rsync_stdout TEXT,
+                                 rsync_number_of_files INTEGER,
+                                 rsync_number_of_files_transferred INTEGER,
+                                 rsync_total_file_size INTEGER,
+                                 rsync_total_transferred_file_size INTEGER,
+                                 rsync_literal_data INTEGER,
+                                 rsync_matched_data INTEGER,
+                                 rsync_file_list_size INTEGER,
+                                 rsync_file_list_generation_time NUMERIC,
+                                 rsync_file_list_transfer_time NUMERIC,
+                                 rsync_total_bytes_sent INTEGER,
+                                 rsync_total_bytes_received INTEGER,
+                                 sanity_check INTEGER
+                             );
+                             '''
         logger().debug("create table `jobrunhistory`")
         logger().debug("%s" % jobrunhistoryTable.replace("\n", ""))
         c = self.conn.cursor()
@@ -90,18 +96,19 @@ class jobrunhistory():
 
     def createTableJobcommandhistoryTable(self):
         sql = '''
-            create table if not exists jobcommandhistory(
-                id integer primary key autoincrement,
-                jobrunid integer not null,
-                local integer,
-                before integer,
-                returncode integer,
-                continueonerror integer,
-                script text,
-                stdout text,
-                stderr text);
-        '''
-        logger().debug('create table jobcommandhistory')
+              CREATE TABLE IF NOT EXISTS jobcommandhistory (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  jobrunid INTEGER NOT NULL,
+                  local INTEGER,
+                  before INTEGER,
+                  returncode INTEGER,
+                  continueonerror INTEGER,
+                  script TEXT,
+                  stdout TEXT,
+                  stderr TEXT
+              );
+              '''
+        logger().debug('create table `jobcommandhistory`')
         logger().debug("%s" % sql.replace("\n",  ""))
         c = self.conn.cursor()
         c.execute(sql)
@@ -111,15 +118,29 @@ class jobrunhistory():
         try:
             columns = ', '.join(backupstatus.keys())
             placeholders = ', '.join(['?'] * len(backupstatus))
-            query = "INSERT INTO jobrunhistory ( %s ) VALUES ( %s )" % (columns, placeholders)
+            query = "INSERT INTO jobrunhistory (%s) VALUES (%s)" % (
+                    columns, placeholders)
             c = self.conn.cursor()
             c.execute(query, backupstatus.values())
 
             jobid = c.lastrowid
             if hooks is not None:
                 for hook in hooks:
-                    sql = "INSERT INTO jobcommandhistory (jobrunid, local, before, returncode, continueonerror, script, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-                    logger().debug(sql)
+                    sql = """
+                          INSERT INTO jobcommandhistory (
+                              jobrunid,
+                              local,
+                              before,
+                              returncode,
+                              continueonerror,
+                              script,
+                              stdout,
+                              stderr
+                          ) VALUES (
+                              ?, ?, ?, ?, ?, ?, ?, ?
+                          )
+                          """
+                    logger().debug("%s" % sql.replace("\n",  ""))
                     c.execute(
                         sql,
                         (
@@ -139,24 +160,42 @@ class jobrunhistory():
         except Exception as e:
             logger().debug(columns)
             logger().debug(backupstatus.values())
-            logger().error("Could not insert job details for host (%s) into the database (%s): %s" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db", e))
+            logger().error(("Could not insert job details for host (%s)"
+                            " into the database (%s): %s") % (
+                            backupstatus['hostname'],
+                            self.dbdirectory + "/autorsyncbackup.db",
+                            e))
 
     def identifyJob(self, job, directory):
         c = self.conn.cursor()
-        query = "SELECT id, startdatetime, rsync_total_file_size, rsync_literal_data FROM jobrunhistory WHERE hostname=? AND startdatetime<=? ORDER BY startdatetime DESC LIMIT 1"
+        query = """
+                SELECT id,
+                       startdatetime,
+                       rsync_total_file_size,
+                       rsync_literal_data
+                  FROM jobrunhistory
+                 WHERE hostname = ?
+                   AND startdatetime <= ?
+              ORDER BY startdatetime DESC
+                 LIMIT 1
+                """
         dt = datetime.datetime.strptime(directory[:19], '%Y-%m-%d_%H-%M-%S')
         sec = int(time.mktime(dt.timetuple()))
         c.execute(query, (job.hostname, sec))
         ret = c.fetchall()
         if not ret:
-            logger().error('cannot identify job for %s,%s' % (job.hostname, sec))
+            logger().error('cannot identify job for %s,%s'
+                           % (job.hostname, sec))
             return None
         j = ret[0]
         d = abs(sec-j[1])
         if d > 8:
-            logger().warning('large time difference for job %s,%s: %s' % (job.hostname, sec, d))
+            logger().warning('large time difference for job %s,%s: %s'
+                             % (job.hostname, sec, d))
         if j[2] is None or j[2] == '' or j[3] is None or j[3] == '':
-            logger().warning('invalid values for job %s, id %s, total %s, average %s' % (job.hostname, j[0], j[2], j[3]))
+            logger().warning(('invalid values for job %s,'
+                              ' id %s, total %s, average %s')
+                             % (job.hostname, j[0], j[2], j[3]))
         return j
 
     def getJobHistory(self, hosts):
@@ -167,12 +206,21 @@ class jobrunhistory():
                 c.row_factory = self.dict_factory
                 placeholders = ', '.join(['?'] * len(hosts))
                 # Get last run history of given hosts
-                query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
+                query = """
+                        SELECT *
+                          FROM jobrunhistory
+                         WHERE hostname IN (%s)
+                      GROUP BY hostname;
+                        """ % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
 
                 for row in ret:
-                    query = "select * from jobcommandhistory where jobrunid = %d" % row['id']
+                    query = """
+                            SELECT *
+                              FROM jobcommandhistory
+                             WHERE jobrunid = %d
+                            """ % row['id']
                     c.execute(query)
                     row['commands'] = c.fetchall()
             except Exception as e:
@@ -183,11 +231,18 @@ class jobrunhistory():
         try:
             c = self.conn.cursor()
             c.row_factory = self.dict_factory
-            c.execute("select id from jobrunhistory where startdatetime < strftime('%s','now','-%d days')" % ('%s', config().databaseretention))
+            query = """
+                    SELECT id
+                      FROM jobrunhistory
+                     WHERE startdatetime < strftime('%s','now','-%d days')
+                    """ % ('%s', config().databaseretention)
+            c.execute(query)
             result = c.fetchall()
             for row in result:
-                c.execute("delete from jobcommandhistory where jobrunid = %d" % row['id'])
-                c.execute("delete from jobrunhistory where id = %d" % row['id'])
+                c.execute(("DELETE FROM jobcommandhistory"
+                           " WHERE jobrunid = %d") % row['id'])
+                c.execute(("DELETE FROM jobrunhistory"
+                           " WHERE id = %d") % row['id'])
         except Exception as e:
             logger().error(e)
 
