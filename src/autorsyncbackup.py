@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 
+import queue
 import threading
 import time
 from optparse import OptionParser
-
-try:
-    import Queue as queue
-except ImportError:
-    import queue as queue
 
 from prettytable import PrettyTable
 
