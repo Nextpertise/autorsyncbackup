@@ -428,7 +428,7 @@ class director():
             'rsync_total_bytes_received':        (r"^.*Total bytes received: "
                                                   r"(\d[\d,]*).*$")
         }
-        strings = job.backupstatus['rsync_stdout']
+        strings = job.backupstatus['rsync_stdout'].decode()
         job.backupstatus['rsync_stdout'] = strings[:10000]
         for key in regexps.keys():
             try:
@@ -439,6 +439,7 @@ class director():
                 else:
                     job.backupstatus[key] = ''
                     logger().debug("no match!")
-            except Exception:
+            except Exception as e:
                 job.backupstatus[key] = ''
-                logger().debug("FAILING regexp[%s] %s" % (key, regexps[key]))
+                logger().debug("FAILING regexp[%s] %s (%s)"
+                               % (key, regexps[key], e))
