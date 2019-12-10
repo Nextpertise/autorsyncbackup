@@ -128,7 +128,7 @@ class director():
         values = []
         latest = os.path.realpath(job.backupdir.rstrip('/') + "/" + job.hostname + "/latest")
         daily_path = job.backupdir.rstrip('/') + "/" + job.hostname + "/daily"
-        jrh = jobrunhistory(check = True)
+        jrh = jobrunhistory(check=True)
         for interval in ['daily', 'weekly', 'monthly']:
             dirlist = self.getBackups(job, interval)
             for directory in dirlist:
@@ -170,7 +170,7 @@ class director():
                 ret = backup_id = self.getIdfromBackupInstance(l)
         return ret
 
-    def backupRotate(self, job, moveCurrent = True):
+    def backupRotate(self, job, moveCurrent=True):
         # Check if we need to remove the oldest backup(s)
         self._unlinkExpiredBackups(job)
 

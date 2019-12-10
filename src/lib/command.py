@@ -42,7 +42,7 @@ class command():
             return 1, [], [e]
 
     def executeLocalCommand(self, job, command):
-        p = subprocess.Popen(command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout_value, stderr_value = p.communicate()
         logger().debug("Local execution of %s gives (rc=%d, stdout=%s, stderr=%s)" % (command,  p.returncode,  stdout_value,  stderr_value))
         return p.returncode,  stdout_value, stderr_value
