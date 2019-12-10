@@ -116,7 +116,7 @@ class jobrunhistory():
             c.execute(query, backupstatus.values())
 
             jobid = c.lastrowid
-            if hooks != None:
+            if hooks is not None:
                 for hook in hooks:
                     sql = "INSERT INTO jobcommandhistory (jobrunid, local, before, returncode, continueonerror, script, stdout, stderr) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
                     logger().debug(sql)

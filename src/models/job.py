@@ -167,7 +167,7 @@ class job():
 
         try:
             self.hooks = jobconfig['hooks']
-            if self.sshusername == None or self.sshprivatekey == None:
+            if self.sshusername is None or self.sshprivatekey is None:
                 logger().error('%s: Missing ssh username or keyfile, hooks disabled' % self.filepath)
             else:
                 for hook in self.hooks:
