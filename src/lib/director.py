@@ -21,7 +21,7 @@ class director():
     def getJobArray(self, jobpath=None):
         jobArray = []
         if jobpath is None:
-            directory= config().jobconfigdirectory.rstrip('/')
+            directory = config().jobconfigdirectory.rstrip('/')
             if(os.path.exists(directory)):
                 os.chdir(directory)
                 for filename in glob.glob("*.job"):

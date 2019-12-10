@@ -121,8 +121,8 @@ def listJobs(sort):
         jobs = directorInstance.getJobArray()
         sizes = {}
         averages = {}
-        tot_size=0
-        tot_avg=0
+        tot_size = 0
+        tot_avg = 0
         for job in jobs:
             sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
         aux = sorted(sizes.items(), key=lambda x: x[1], reverse=True)

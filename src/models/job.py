@@ -28,7 +28,7 @@ class job():
         self.hooks = None
         self.beforeLocalHooks = []
         self.afterLocalHooks = []
-        self.beforeRemoteHooks =[]
+        self.beforeRemoteHooks = []
         self.afterRemoteHooks = []
         self.filepath = filepath
         self.include = []
