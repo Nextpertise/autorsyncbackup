@@ -29,7 +29,7 @@ class config():
         jobworkers = 3
         debuglevel = 0
         debugmessages = []
-        databaseretention = 540 # approx 1.5 year
+        databaseretention = 540  # approx 1.5 year
 
         def spam(self):
             """ Test method, return singleton id """
