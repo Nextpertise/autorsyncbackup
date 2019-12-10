@@ -127,7 +127,7 @@ class jobrunhistory():
                             hook['local'],
                             hook['runtime'] == 'before',
                             hook.get('returncode', -1),
-                            int(hook['continueonerror'] == True),
+                            int(hook['continueonerror'] is True),
                             hook['script'],
                             hook.get('stdout', 'not run'),
                             hook.get('stderr', 'not run')
