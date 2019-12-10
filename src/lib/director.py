@@ -16,7 +16,8 @@ from lib.statusemail import statusemail
 
 class director():
 
-    regexp_backupdirectory = r".*?(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"
+    regexp_backupdirectory = (r".*?(\d{4}-\d{2}-\d{2}_"
+                              r"\d{2}-\d{2}-\d{2}_backup)\.(\d+)$")
 
     def getJobArray(self, jobpath=None):
         jobArray = []
@@ -27,7 +28,8 @@ class director():
                 for filename in glob.glob("*.job"):
                     jobArray.append(job(directory + "/" + filename))
             else:
-                logger().error("Job directory (%s) doesn't exists, exiting (1)" % directory)
+                logger().error("Job directory (%s) doesn't exists, exiting (1)"
+                               % directory)
         else:
             jobArray.append(job(jobpath))
 
@@ -41,15 +43,25 @@ class director():
         for c in commands:
             if c['local']:
                 logger().debug('Running local command %s' % c['script'])
-                c['returncode'],  c['stdout'],  c['stderr'] = comm.executeLocalCommand(job,  c['script'])
-                logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
+                (c['returncode'],
+                 c['stdout'],
+                 c['stderr']) = comm.executeLocalCommand(job,  c['script'])
+                logger().debug('command %s' % (
+                               'succeeded' if c['returncode'] == 0 else
+                               'failed'))
             else:
                 logger().debug('Running remote command %s' % c['script'])
-                c['returncode'],  c['stdout'],  c['stderr'] = comm.executeRemoteCommand(job,  c['script'])
-                logger().debug('command %s' % ('succeeded' if c['returncode'] == 0 else 'failed'))
+                (c['returncode'],
+                 c['stdout'],
+                 c['stderr']) = comm.executeRemoteCommand(job,  c['script'])
+                logger().debug('command %s' % (
+                               'succeeded' if c['returncode'] == 0 else
+                               'failed'))
             if c['returncode'] != 0 and c['continueonerror'] is False:
-                logger().debug('command failed and continueonerror = false: exception')
-                raise CommandException('Hook %s failed to execute' % c['script'])
+                logger().debug(('command failed and continueonerror'
+                                ' = false: exception'))
+                raise CommandException('Hook %s failed to execute'
+                                       % c['script'])
 
     def executeRsync(self, job, latest):
         job.backupstatus['startdatetime'] = 0
@@ -58,9 +70,11 @@ class director():
             self.executeJobs(job, job.beforeLocalHooks)
             self.executeJobs(job, job.beforeRemoteHooks)
         except CommandException as e:
-            logger().error("Required command failed (%s), skipping remainder of job" % e)
+            logger().error(("Required command failed (%s),"
+                            " skipping remainder of job") % e)
             job.backupstatus['rsync_backup_status'] = 0
-            job.backupstatus['rsync_stdout'] = "No output due to failed required 'Before' command"
+            job.backupstatus['rsync_stdout'] = ("No output due to failed"
+                                                " required 'Before' command")
             return 0
         job.backupstatus['startdatetime'] = int(time.time())
         ret = rsync().executeRsync(job, latest)
@@ -69,7 +83,8 @@ class director():
             self.executeJobs(job, job.afterRemoteHooks)
             self.executeJobs(job, job.afterLocalHooks)
         except CommandException as e:
-            logger().error("Required command failed (%s), skipping remainder of job" % e)
+            logger().error(("Required command failed (%s),"
+                            " skipping remainder of job") % e)
             return 0
         return ret
 
@@ -98,7 +113,8 @@ class director():
             if not os.path.exists(directory):
                 os.makedirs(directory)
         except Exception as e:
-            logger().error("Error creating backup directory (%s) for host (%s)" % (directory, job.hostname))
+            logger().error(("Error creating backup directory (%s)"
+                            " for host (%s)") % (directory, job.hostname))
             statusemail().sendSuddenDeath(e)
             return False
 
@@ -113,20 +129,23 @@ class director():
         retlist = []
         if directory == '':
             directory = self.getWorkingDirectory()
-        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + directory
+        directory = (job.backupdir.rstrip('/') + "/" +
+                     job.hostname + "/" + directory)
         try:
             dirlist = os.listdir(directory)
             for l in dirlist:
                 if re.match(self.regexp_backupdirectory, l):
                     retlist.append(l)
         except Exception:
-            logger().error("Error while listing working directory (%s) for host (%s)" % (directory, job.hostname))
+            logger().error(("Error while listing working directory (%s)"
+                            " for host (%s)") % (directory, job.hostname))
         return retlist
 
     def getBackupsSize(self, job):
         size = 0
         values = []
-        latest = os.path.realpath(job.backupdir.rstrip('/') + "/" + job.hostname + "/latest")
+        latest = os.path.realpath(job.backupdir.rstrip('/') + "/" +
+                                  job.hostname + "/latest")
         daily_path = job.backupdir.rstrip('/') + "/" + job.hostname + "/daily"
         jrh = jobrunhistory(check=True)
         for interval in ['daily', 'weekly', 'monthly']:
@@ -181,20 +200,25 @@ class director():
                 if(self._updateLatestSymlink(job, latest)):
                     pass
                 else:
-                    logger().error("Error updating current symlink for host: %s" % job.hostname)
+                    logger().error(("Error updating current symlink"
+                                    " for host: %s") % job.hostname)
             else:
-                logger().error("Error moving current backup failed for host: %s" % job.hostname)
+                logger().error(("Error moving current backup failed"
+                                " for host: %s") % job.hostname)
         else:
-            logger().error("Error rotating backups for host: %s" % job.hostname)
+            logger().error("Error rotating backups for host: %s"
+                           % job.hostname)
 
     def _unlinkExpiredBackups(self, job):
         workingDirectory = self.getWorkingDirectory()
 
         """Unlink oldest backup(s) if applicable"""
-        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory
+        directory = (job.backupdir.rstrip('/') + "/" +
+                     job.hostname + "/" + workingDirectory)
 
         if not self.checkWorkingDirectory(workingDirectory):
-            logger().error("Error working directory not found (%s)" % directory)
+            logger().error("Error working directory not found (%s)"
+                           % directory)
             return False
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
@@ -218,7 +242,8 @@ class director():
     def _rotateBackups(self, job):
         """Rotate backups"""
         ret = True
-        directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory()
+        directory = (job.backupdir.rstrip('/') + "/" +
+                     job.hostname + "/" + self.getWorkingDirectory())
         backup_id = self.getOldestBackupId(job)
         while id >= 0:
             cur = "%s/*.%s" % (directory, backup_id)
@@ -248,7 +273,8 @@ class director():
         src = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
 
         # BackupDirectoryInstance format: 2015-10-27_04-56-59_backup.0
-        folder = datetime.datetime.today().strftime("%Y-%m-%d_%H-%M-%S_backup.0")
+        folder = datetime.datetime.today().strftime(
+                 "%Y-%m-%d_%H-%M-%S_backup.0")
         ret = self.getWorkingDirectory() + "/" + folder
         dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + ret
 
@@ -262,8 +288,10 @@ class director():
 
     def _updateLatestSymlink(self, job, latest):
         ret = True
-        symlinkfile = job.backupdir.rstrip('/') + "/" + job.hostname + "/latest"
-        logger().debug("Create symlink to latest backup (ln -s %s %s" % (latest, symlinkfile))
+        symlinkfile = (job.backupdir.rstrip('/') + "/" +
+                       job.hostname + "/latest")
+        logger().debug("Create symlink to latest backup (ln -s %s %s)"
+                       % (latest, symlinkfile))
         try:
             os.unlink(symlinkfile)
         except Exception:
@@ -285,7 +313,8 @@ class director():
 
         oldestId = self.getOldestBackupId(job)
         if rotation > 0 and oldestId >= rotation:
-            src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + workingDirectory + "/*." + str(oldestId)
+            src = (job.backupdir.rstrip('/') + "/" + job.hostname + "/" +
+                   workingDirectory + "/*." + str(oldestId))
             dest = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
             g = glob.glob(src)
             if not len(g) == 1:
@@ -293,7 +322,8 @@ class director():
                 logger().error(errorMsg)
                 raise Exception(errorMsg)
             if os.path.exists(dest):
-                logger().info("Do not move oldest backup (%s) because current directory already exists")
+                logger().info(("Do not move oldest backup (%s)"
+                               " because current directory already exists"))
                 return True
             ret = True
             try:
@@ -306,14 +336,17 @@ class director():
     def getWorkingDirectory(self):
         """Check in which folder we place the backup today"""
         ret = "daily"
-        if(int(datetime.datetime.today().strftime("%w")) == config().weeklybackup):
+        if(int(datetime.datetime.today().strftime("%w")) ==
+           config().weeklybackup):
             ret = "weekly"
-        if(int(datetime.datetime.today().strftime("%d")) == config().monthlybackup):
+        if(int(datetime.datetime.today().strftime("%d")) ==
+           config().monthlybackup):
             ret = "monthly"
         return ret
 
     def sanityCheckWorkingDirectory(self, job):
-        src = job.backupdir.rstrip('/') + "/" + job.hostname + "/" + self.getWorkingDirectory() + "/*.*"
+        src = (job.backupdir.rstrip('/') + "/" +
+               job.hostname + "/" + self.getWorkingDirectory() + "/*.*")
         dirlist = glob.glob(src)
         found_ids = []
         ret = True
@@ -331,9 +364,11 @@ class director():
                 ret = False
 
         if ret:
-            logger().debug("Sanity check passed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
+            logger().debug("Sanity check passed for: %s in folder: %s" % (
+                           job.hostname, self.getWorkingDirectory()))
         else:
-            logger().error("Sanity check failed for: %s in folder: %s" % (job.hostname, self.getWorkingDirectory()))
+            logger().error("Sanity check failed for: %s in folder: %s" % (
+                           job.hostname, self.getWorkingDirectory()))
         job.backupstatus['sanity_check'] = int(ret)
         return ret
 
@@ -366,17 +401,32 @@ class director():
 
     def parseRsyncOutput(self, job):
         regexps = {
-            'rsync_number_of_files':             r"^.*Number of files: (\d[\d,]*).*$",
-            'rsync_number_of_files_transferred': r"^.*Number of .*files transferred: (\d[\d,]*).*$",
-            'rsync_total_file_size':             r"^.*Total file size: (\d[\d,]*).*$",
-            'rsync_total_transferred_file_size': r"^.*Total transferred file size: (\d[\d,]*).*$",
-            'rsync_literal_data':                r"^.*Literal data: (\d[\d,]*).*$",
-            'rsync_matched_data':                r"^.*Matched data: (\d[\d,]*).*$",
-            'rsync_file_list_size':              r"^.*File list size: (\d[\d,]*).*$",
-            'rsync_file_list_generation_time':   r"^.*File list generation time: (\d+\.\d*).*$",
-            'rsync_file_list_transfer_time':     r"^.*File list transfer time: (\d+\.\d*).*$",
-            'rsync_total_bytes_sent':            r"^.*Total bytes sent: (\d[\d,]*).*$",
-            'rsync_total_bytes_received':        r"^.*Total bytes received: (\d[\d,]*).*$"
+            'rsync_number_of_files':             (r"^.*Number of files: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_number_of_files_transferred': (r"^.*Number of .*files "
+                                                  r"transferred: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_total_file_size':             (r"^.*Total file size: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_total_transferred_file_size': (r"^.*Total transferred "
+                                                  r"file size: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_literal_data':                (r"^.*Literal data: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_matched_data':                (r"^.*Matched data: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_file_list_size':              (r"^.*File list size: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_file_list_generation_time':   (r"^.*File list "
+                                                  r"generation time: "
+                                                  r"(\d+\.\d*).*$"),
+            'rsync_file_list_transfer_time':     (r"^.*File list "
+                                                  r"transfer time: "
+                                                  r"(\d+\.\d*).*$"),
+            'rsync_total_bytes_sent':            (r"^.*Total bytes sent: "
+                                                  r"(\d[\d,]*).*$"),
+            'rsync_total_bytes_received':        (r"^.*Total bytes received: "
+                                                  r"(\d[\d,]*).*$")
         }
         strings = job.backupstatus['rsync_stdout']
         job.backupstatus['rsync_stdout'] = strings[:10000]
