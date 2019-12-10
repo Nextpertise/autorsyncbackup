@@ -65,6 +65,6 @@ class jinjafilters():
         return "%d%s" % (x, result)
 
     def _nl2br(self, value):
-        result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n') \
+        result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
             for p in self._paragraph_re.split(value))
         return Markup(result)
