@@ -27,20 +27,20 @@ def setupCliArguments():
     """ Parse CLI options """
     parser = OptionParser()
     parser.add_option("-c", "--main-config", dest="mainconfig", metavar="path_to_main.yaml",
-        help="set different main config file, default value = /etc/autorsyncbackup/main.yaml",
-        default="/etc/autorsyncbackup/main.yaml")
+                      help="set different main config file, default value = /etc/autorsyncbackup/main.yaml",
+                      default="/etc/autorsyncbackup/main.yaml")
     parser.add_option("-d", "--dry-run", action="store_true", dest="dryrun", default=False,
-        help="do not invoke rsync, only perform a login attempt on the remote host, when applied with -j the exit code will be set (0 for success, 1 for error)")
+                      help="do not invoke rsync, only perform a login attempt on the remote host, when applied with -j the exit code will be set (0 for success, 1 for error)")
     parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
-        help="Write logoutput also to stdout")
+                      help="Write logoutput also to stdout")
     parser.add_option("--version", action="store_true", dest="version", default=False,
-        help="Show version number")
+                      help="Show version number")
     parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job",
-        help="run only the given job file")
+                      help="run only the given job file")
     parser.add_option("-l", "--list-jobs", metavar="total|average", dest="sort", choices=["total", "average"],
-        help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
+                      help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
     parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
-        help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
+                      help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
 
     (options, args) = parser.parse_args()  # @UnusedVariable
     return options
