@@ -18,7 +18,7 @@ class Pidfile():
                 pid = self._check()
                 if pid:
                     self.pidfd = None
-                    raise ProcessRunningException('process already running in %s as pid %s' % (self.pidfile, pid));
+                    raise ProcessRunningException('process already running in %s as pid %s' % (self.pidfile, pid))
                 else:
                     os.remove(self.pidfile)
                     self.warn('removed staled lockfile %s' % (self.pidfile))
