@@ -35,7 +35,7 @@ class job():
         self.backupstatus = {}
         self.integrity_id = str(uuid.uuid1())
         self.readJob()
-    
+
     def readJob(self):
         try:
             with open(self.filepath, 'r') as stream:
@@ -69,7 +69,7 @@ class job():
         except:
             self.ssh_sudo = False
             logger().debug("%s: No ssh_sudo jobconfig variable set." % self.filepath)
-        
+
         try:
             self.sshusername = jobconfig['ssh_username']
         except:
@@ -93,7 +93,7 @@ class job():
             logger().info("%s: No password is set while not using SSH, skipping job." % self.filepath)
             self.enabled = False
             return False
-            
+
         try:
             self.sshprivatekey = jobconfig['ssh_privatekey']
         except:
@@ -101,7 +101,7 @@ class job():
                 logger().error("%s: SSH is set, but no ssh_privatekey is configured, disabling backup" % self.filepath)
                 self.enabled = False
                 return False
-            
+
         try:
             self.port = jobconfig['port']
         except:
@@ -111,7 +111,7 @@ class job():
             else:
                 self.port = 873
                 logger().debug("%s: No rsync port is set, using default." % self.filepath)
-            
+
         try:
             if not self.ssh:
                 self.rsyncshare = jobconfig['rsync_share']
@@ -121,49 +121,49 @@ class job():
             logger().info("%s: No rsync_share is set, skipping job." % self.filepath)
             self.enabled = False
             return False
-            
+
         try:
             self.backupdir = jobconfig['backupdir']
         except:
             self.backupdir = config().backupdir
             logger().debug("%s: No backupdir is set, using default" % self.filepath)
-            
+
         try:
             self.speedlimitkb = int(jobconfig['speedlimitkb'])
         except:
             self.speedlimitkb = config().speedlimitkb
             logger().debug("%s: No or invalid speedlimitkb is set, using default" % self.filepath)
-            
+
         try:
             self.dailyrotation = jobconfig['dailyrotation']
         except:
             self.dailyrotation = config().dailyrotation
             logger().debug("%s: No dailyrotation is set, using default" % self.filepath)
-            
+
         try:
             self.weeklyrotation = jobconfig['weeklyrotation']
         except:
             self.weeklyrotation = config().weeklyrotation
             logger().debug("%s: No weeklyrotation is set, using default" % self.filepath)
-            
+
         try:
             self.monthlyrotation = jobconfig['monthlyrotation']
         except:
             self.monthlyrotation = config().monthlyrotation
             logger().debug("%s: No monthlyrotation is set, using default" % self.filepath)
-                
+
         try:
             self.weeklybackup = jobconfig['weeklybackup']
         except:
             self.weeklybackup = config().weeklybackup
             logger().debug("%s: No weeklybackup is set, using default" % self.filepath)
-                
+
         try:
             self.monthlybackup = jobconfig['monthlybackup']
         except:
             self.monthlybackup = config().monthlybackup
             logger().debug("%s: No monthlybackup is set, using default" % self.filepath)
-            
+
         try:
             self.hooks = jobconfig['hooks']
             if self.sshusername == None or self.sshprivatekey == None:
@@ -177,7 +177,7 @@ class job():
                         return False
         except Exception as e:
             logger().info("%s: No hooks defined, skipping hooks (exception: %s)." % (self.filepath,  e))
-            
+
         try:
             self.include = jobconfig['include']
         except:
@@ -198,7 +198,7 @@ class job():
     def addhook(self,  hook):
         if not 'script' in hook:
             raise KeyError("script not defined in hook")
-        
+
         hook['local'] = hook.get('local',  False)
         if not hook['local'] in (False,  True):
             raise KeyError("local not one of True or False in hook")
@@ -206,11 +206,11 @@ class job():
         hook['runtime'] = hook.get('runtime',  'before')
         if not hook['runtime'] in ('before',  'after'):
             raise KeyError("runtime must be before or after in hook")
-        
+
         hook['continueonerror'] = hook.get('continueonerror',  False)
         if not hook['continueonerror'] in (False,  True):
             raise KeyError("continueonerror must be True of False in hook")
-        
+
         if hook['local']:
             if hook['runtime'] == 'before':
                 self.beforeLocalHooks.append(hook)
@@ -221,7 +221,7 @@ class job():
                 self.beforeRemoteHooks.append(hook)
             else:
                 self.afterRemoteHooks.append(hook)
-    
+
     def showjob(self):
         print("Show job:")
         print("enabled: %s" % str(self.enabled))

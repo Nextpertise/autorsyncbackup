@@ -5,16 +5,16 @@ from lib.jinjafilters import jinjafilters
 
 class statuscli():
     jobrunhistory = None
-    
+
     def __init__(self):
         self.jobrunhistory = jobrunhistory()
-        
+
     def __del__(self):
         self.jobrunhistory.closeDbHandler()
-        
+
     def getList(self, hostname):
         return self.jobrunhistory.getJobHistory([hostname])
-    
+
     def printOutput(self, hostname):
         ret = 1
         l = self.getList(hostname)

@@ -192,7 +192,7 @@ class statusemail():
             ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']
             ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
         return ret
-    
+
     def getSizes(self, jobs):
         from lib.director import director
         sizes = {}
@@ -200,7 +200,7 @@ class statusemail():
         for job in jobs:
             sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
         return sizes, averages
-    
+
     def _send(self, subject, htmlbody, textbody):
         for to in config().backupmailrecipients:
             logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))

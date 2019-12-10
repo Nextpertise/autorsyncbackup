@@ -9,7 +9,7 @@ class jobrunhistory():
     # Default config values
     dbdirectory = None
     conn = None
-    
+
     def __init__(self, dbdirectory=None, check=False):
         self.dbdirectory = config().jobspooldirectory
         if dbdirectory:
@@ -27,7 +27,7 @@ class jobrunhistory():
             exitcode = 1
             logger().error("Error while opening db (%s) due to unexisting directory or permission error, exiting (%d)" % (path, exitcode))
             exit(exitcode)
-            
+
     def closeDbHandler(self):
         path = "%s/autorsyncbackup.db" % self.dbdirectory
         try:
@@ -35,20 +35,20 @@ class jobrunhistory():
             logger().debug("close db [%s]" % path)
         except:
             pass
-            
+
     def checkTables(self):
         logger().debug("Check for table `jobrunhistory`")
         c = self.conn.cursor()
         c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='jobrunhistory'")
         if c.fetchone() is None:
             self.createTableJobrunhistoryTable()
-        
+
         logger().debug("Check for table jobcommandhistory")
         c.execute("select name from sqlite_master where type='table' and name='jobcommandhistory'")
         if c.fetchone() is None:
             self.createTableJobcommandhistoryTable()
-      
-        
+
+
     def createTableJobrunhistoryTable(self):
         jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
                                 ( \
@@ -87,7 +87,7 @@ class jobrunhistory():
         logger().debug("%s" % jobrunhistoryTable.replace("\n",""))
         c = self.conn.cursor()
         c.execute(jobrunhistoryTable)
-        
+
     def createTableJobcommandhistoryTable(self):
         sql = '''
             create table if not exists jobcommandhistory(
@@ -105,7 +105,7 @@ class jobrunhistory():
         logger().debug("%s" % sql.replace("\n",  ""))
         c = self.conn.cursor()
         c.execute(sql)
-        
+
     def insertJob(self, backupstatus,  hooks):
         """Insert job run details into the database"""
         try:
@@ -140,7 +140,7 @@ class jobrunhistory():
             logger().debug(columns)
             logger().debug(backupstatus.values())
             logger().error("Could not insert job details for host (%s) into the database (%s): %s" % (backupstatus['hostname'], self.dbdirectory + "/autorsyncbackup.db", e))
-    
+
     def identifyJob(self, job, directory):
         c = self.conn.cursor()
         query = "SELECT id, startdatetime, rsync_total_file_size, rsync_literal_data FROM jobrunhistory WHERE hostname=? AND startdatetime<=? ORDER BY startdatetime DESC LIMIT 1"
@@ -158,7 +158,7 @@ class jobrunhistory():
         if j[2] is None or j[2] == '' or j[3] is None or j[3] == '':
             logger().warning('invalid values for job %s, id %s, total %s, average %s' % (job.hostname, j[0], j[2], j[3]))
         return j
-    
+
     def getJobHistory(self, hosts):
         ret = []
         if hosts:
@@ -170,7 +170,7 @@ class jobrunhistory():
                 query = "SELECT * FROM jobrunhistory WHERE hostname in (%s) GROUP BY hostname;" % placeholders
                 c.execute(query, hosts)
                 ret = c.fetchall()
-                
+
                 for row in ret:
                     query = "select * from jobcommandhistory where jobrunid = %d" % row['id']
                     c.execute(query)

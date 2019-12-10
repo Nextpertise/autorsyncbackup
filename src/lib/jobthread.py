@@ -11,18 +11,18 @@ class jobThread (threading.Thread):
         self.queueLock = queueLock
         self.director = director
         self.q = q
-        
+
     def run(self):
         logger().debug("Starting thread: %d" % self.id)
         self.executeJob(self.q)
         logger().debug("Exiting thread: %d" % self.id)
-        
+
     def executeJob(self, q):
         while not self.exitFlag.is_set():
             self.queueLock.acquire()
             if not q.empty():
                 job = q.get()
-                
+
                 self.queueLock.release()
                 logger().info("Start job for hostname: [%s] in queue: [%d]" % (job.hostname, self.id))
                 self.director.checkBackupEnvironment(job)

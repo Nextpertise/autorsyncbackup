@@ -68,9 +68,9 @@ class Pidfile():
                 return False
             else:
                 return pid
-                
+
 class ProcessRunningException(BaseException):
     pass
-    
+
 class PidfileProcessRunningException(BaseException):
     pass

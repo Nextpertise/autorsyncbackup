@@ -83,7 +83,7 @@ class rsync():
             latest = "--link-dest=%s" % latest
         else:
             latest = ""
-        
+
         # Generate rsync CLI command and execute it
         if(include):
             password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword

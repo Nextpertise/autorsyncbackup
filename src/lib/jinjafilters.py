@@ -10,7 +10,7 @@ class jinjafilters():
     def _epochToStrDate(self, epoch, strftime):
         if epoch:
             return datetime.datetime.fromtimestamp(epoch).strftime(strftime)
-        
+
     def _bytesToReadableStr(self, byte_data):
         try:
             byte_data = float(byte_data)
@@ -24,7 +24,7 @@ class jinjafilters():
             i = i + 1
             bytesStr = "%.1f" % byte_data
         return bytesStr + byteUnits[i]
-        
+
     def _secondsToReadableStr(self, seconds, short=False):
         try:
             seconds = int(seconds)
@@ -49,7 +49,7 @@ class jinjafilters():
                         ret = ret + "s"
                 ret = ret + ", "
         return ret[:-2]
-        
+
     def _intToReadableStr(self, x):
         try:
             x = int(x)

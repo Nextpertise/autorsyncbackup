@@ -175,10 +175,10 @@ if __name__ == "__main__":
     logger().setVerbose(options.verbose)
     for msg in config().debugmessages:
         logger().debug(msg)
-    
+
     #make sure database structure is created
     jobrunhistory(check=True)
-    
+
     # Determine next step based on CLI options
     if options.version:
         print(getVersion())
