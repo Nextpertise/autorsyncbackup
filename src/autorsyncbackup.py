@@ -26,21 +26,47 @@ from models.jobrunhistory import jobrunhistory
 def setupCliArguments():
     """ Parse CLI options """
     parser = OptionParser()
-    parser.add_option("-c", "--main-config", dest="mainconfig", metavar="path_to_main.yaml",
-                      help="set different main config file, default value = /etc/autorsyncbackup/main.yaml",
+    parser.add_option("-c", "--main-config",
+                      dest="mainconfig",
+                      metavar="path_to_main.yaml",
+                      help=("set different main config file,"
+                            " default value = /etc/autorsyncbackup/main.yaml"),
                       default="/etc/autorsyncbackup/main.yaml")
-    parser.add_option("-d", "--dry-run", action="store_true", dest="dryrun", default=False,
-                      help="do not invoke rsync, only perform a login attempt on the remote host, when applied with -j the exit code will be set (0 for success, 1 for error)")
-    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False,
+    parser.add_option("-d", "--dry-run",
+                      action="store_true",
+                      dest="dryrun",
+                      default=False,
+                      help=("do not invoke rsync, only perform a login attempt"
+                            " on the remote host, when applied with -j the"
+                            " exit code will be set"
+                            " (0 for success, 1 for error)"))
+    parser.add_option("-v", "--verbose",
+                      action="store_true",
+                      dest="verbose",
+                      default=False,
                       help="Write logoutput also to stdout")
-    parser.add_option("--version", action="store_true", dest="version", default=False,
+    parser.add_option("--version",
+                      action="store_true",
+                      dest="version",
+                      default=False,
                       help="Show version number")
-    parser.add_option("-j", "--single-job", metavar="path_to_jobfile.job", dest="job",
+    parser.add_option("-j", "--single-job",
+                      metavar="path_to_jobfile.job",
+                      dest="job",
                       help="run only the given job file")
-    parser.add_option("-l", "--list-jobs", metavar="total|average", dest="sort", choices=["total", "average"],
-                      help="Get list of jobs, sorted by total disk usage (total) or by average backup size increase (average)")
-    parser.add_option("-s", "--status", metavar="hostname", dest="hostname",
-                      help="Get status of last backup run of the given hostname, the exit code will be set (0 for success, 1 for error)")
+    parser.add_option("-l", "--list-jobs",
+                      metavar="total|average",
+                      dest="sort",
+                      choices=["total", "average"],
+                      help=("Get list of jobs, sorted by total disk usage"
+                            " (total) or by average backup size increase"
+                            " (average)"))
+    parser.add_option("-s", "--status",
+                      metavar="hostname",
+                      dest="hostname",
+                      help=("Get status of last backup run of the given"
+                            " hostname, the exit code will be set"
+                            " (0 for success, 1 for error)"))
 
     (options, args) = parser.parse_args()  # @UnusedVariable
     return options
@@ -65,7 +91,8 @@ def runBackup(jobpath, dryrun):
             threads = []
             if not dryrun:
                 for i in range(0, config().jobworkers):
-                    thread = jobThread(i, exitFlag, queueLock, directorInstance, workQueue)
+                    thread = jobThread(i, exitFlag, queueLock,
+                                       directorInstance, workQueue)
                     thread.start()
                     threads.append(thread)
 
@@ -124,11 +151,14 @@ def listJobs(sort):
         tot_size = 0
         tot_avg = 0
         for job in jobs:
-            sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
+            (sizes[job.hostname],
+             averages[job.hostname]) = director().getBackupsSize(job)
         aux = sorted(sizes.items(), key=lambda x: x[1], reverse=True)
         if sort == 'average':
             aux = sorted(averages.items(), key=lambda x: x[1], reverse=True)
-        x = PrettyTable(['Hostname', 'Estimated total backup size', 'Average backup size increase'])
+        x = PrettyTable(['Hostname',
+                         'Estimated total backup size',
+                         'Average backup size increase'])
         for elem in aux:
             hostname = elem[0]
             tot_size += sizes[hostname]
@@ -152,7 +182,8 @@ def checkRemoteHost(jobpath):
 
 
 def getLastBackupStatus(hostname):
-    """ Get status of last backup run of given hostname and exit with exitcode 0 (success) or 1 (error) """
+    """ Get status of last backup run of given hostname
+        and exit with exitcode 0 (success) or 1 (error) """
     return statuscli().printOutput(hostname)
 
 
