@@ -18,7 +18,15 @@ class jinjafilters():
         except Exception:
             byte_data = 0
         i = 0
-        byteUnits = [' Bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
+        byteUnits = [' Bytes',
+                     ' KB',
+                     ' MB',
+                     ' GB',
+                     ' TB',
+                     ' PB',
+                     ' EB',
+                     ' ZB',
+                     ' YB']
         bytesStr = "%.0f" % byte_data
         while byte_data > 1024:
             byte_data = byte_data / 1024
@@ -35,10 +43,18 @@ class jinjafilters():
             return "0 seconds"
         ret = ""
         if short:
-            units = OrderedDict([('w', 7*24*3600), ('d', 24*3600), ('h', 3600), ('m', 60), ('s', 1)])
+            units = OrderedDict([('w', 7*24*3600),
+                                 ('d', 24*3600),
+                                 ('h', 3600),
+                                 ('m', 60),
+                                 ('s', 1)])
             space = ""
         else:
-            units = OrderedDict([('week', 7*24*3600), ('day', 24*3600), ('hour', 3600), ('minute', 60), ('second', 1)])
+            units = OrderedDict([('week', 7*24*3600),
+                                 ('day', 24*3600),
+                                 ('hour', 3600),
+                                 ('minute', 60),
+                                 ('second', 1)])
             space = " "
         for unit in units:
             quot = seconds / units[unit]
