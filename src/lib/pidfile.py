@@ -11,18 +11,22 @@ class Pidfile():
 
     def __enter__(self):
         try:
-            self.pidfd = os.open(self.pidfile, os.O_CREAT | os.O_WRONLY | os.O_EXCL)
+            self.pidfd = os.open(self.pidfile,
+                                 os.O_CREAT | os.O_WRONLY | os.O_EXCL)
             self.log('locked pidfile %s' % self.pidfile)
         except OSError as e:
             if e.errno == errno.EEXIST:
                 pid = self._check()
                 if pid:
                     self.pidfd = None
-                    raise ProcessRunningException('process already running in %s as pid %s' % (self.pidfile, pid))
+                    raise ProcessRunningException(('process already running'
+                                                   ' in %s as pid %s')
+                                                  % (self.pidfile, pid))
                 else:
                     os.remove(self.pidfile)
                     self.warn('removed staled lockfile %s' % (self.pidfile))
-                    self.pidfd = os.open(self.pidfile, os.O_CREAT | os.O_WRONLY | os.O_EXCL)
+                    self.pidfd = os.open(self.pidfile,
+                                         os.O_CREAT | os.O_WRONLY | os.O_EXCL)
             else:
                 raise
 
