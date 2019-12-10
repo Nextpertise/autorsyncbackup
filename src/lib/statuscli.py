@@ -20,13 +20,23 @@ class statuscli():
         ret = 1
         history = self.getList(hostname)
         if history:
-            x = PrettyTable(['Hostname', 'Backup status', 'Start time', 'Duration', 'Total number of files', 'Total filesize'])
+            x = PrettyTable(['Hostname',
+                             'Backup status',
+                             'Start time',
+                             'Duration',
+                             'Total number of files',
+                             'Total filesize'])
             backupState = 'Failed'
             hostname = history[0]['hostname']
-            totalNumberOfFiles = jinjafilters()._intToReadableStr(history[0]['rsync_number_of_files'])
-            totalFileSize = jinjafilters()._bytesToReadableStr(history[0]['rsync_total_file_size'])
-            duration = jinjafilters()._secondsToReadableStr(history[0]['enddatetime'] - history[0]['startdatetime'] + 1, True)
-            starttime = jinjafilters()._epochToStrDate(history[0]['startdatetime'], "%d-%m-%Y %H:%M:%S")
+            totalNumberOfFiles = jinjafilters()._intToReadableStr(
+                                 history[0]['rsync_number_of_files'])
+            totalFileSize = jinjafilters()._bytesToReadableStr(
+                            history[0]['rsync_total_file_size'])
+            duration = jinjafilters()._secondsToReadableStr(
+                       history[0]['enddatetime'] - history[0]['startdatetime']
+                       + 1, True)
+            starttime = jinjafilters()._epochToStrDate(
+                        history[0]['startdatetime'], "%d-%m-%Y %H:%M:%S")
             if history[0]['rsync_backup_status'] == 1:
                 backupState = 'Ok'
                 ret = 0
@@ -34,7 +44,12 @@ class statuscli():
                 duration = '-'
                 totalNumberOfFiles = '-'
                 totalFileSize = '-'
-            x.add_row([hostname, backupState, starttime, duration, totalNumberOfFiles, totalFileSize])
+            x.add_row([hostname,
+                       backupState,
+                       starttime,
+                       duration,
+                       totalNumberOfFiles,
+                       totalFileSize])
             x.align = "l"
             x.padding_width = 1
             print(x)
