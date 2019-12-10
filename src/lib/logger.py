@@ -69,7 +69,10 @@ class logger():
                 logdirectory = os.path.dirname(logfile)
                 if not os.path.exists(logdirectory):
                     os.makedirs(logdirectory)
-                logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%b %d %H:%M:%S')
+                logging.basicConfig(filename=logfile,
+                                    level=logging.DEBUG,
+                                    format='%(asctime)s %(message)s',
+                                    datefmt='%b %d %H:%M:%S')
 
         # Store instance reference as the only member in the handle
         self.__dict__['_logger__instance'] = logger.__instance
