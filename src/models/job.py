@@ -197,7 +197,7 @@ class job():
             logger().debug("%s: No exclude is set, using default" % self.exclude)
 
     def addhook(self,  hook):
-        if not 'script' in hook:
+        if 'script' not in hook:
             raise KeyError("script not defined in hook")
 
         hook['local'] = hook.get('local',  False)
