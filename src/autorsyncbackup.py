@@ -182,7 +182,7 @@ if __name__ == "__main__":
     for msg in config().debugmessages:
         logger().debug(msg)
 
-    #make sure database structure is created
+    # Make sure database structure is created
     jobrunhistory(check=True)
 
     # Determine next step based on CLI options

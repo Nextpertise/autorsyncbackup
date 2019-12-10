@@ -96,7 +96,7 @@ class statusemail():
         bad = []
         warning = []
 
-        #Jobs can be disabled, but there should never be more history than jobs.
+        # Jobs can be disabled, but there should never be more history than jobs.
         if len(self.history) > len(jobs):
             ret = "error"
 
