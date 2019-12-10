@@ -20,38 +20,58 @@ class rsync():
         return ret
 
     def checkRemoteHostViaRsyncProtocol(self, job):
-        """Check if remote host is up and able to accept connections with our credentials"""
+        """Check if remote host is up and able to accept
+           connections with our credentials"""
         password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
-        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare)
+        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (
+                       job.rsyncusername,
+                       job.hostname,
+                       job.port,
+                       job.rsyncshare)
         command = "%s; %s" % (password, rsyncCommand)
         logger().info("Executing rsync check (%s)" % rsyncCommand)
         errcode, stdout = self.executeCommand(command)
 
         if errcode != 0:
-            logger().error("Error while connecting to host (%s) - %s" % (job.hostname, stdout))
+            logger().error("Error while connecting to host (%s) - %s"
+                           % (job.hostname, stdout))
             job.backupstatus['startdatetime'] = int(time.time())
             job.backupstatus['enddatetime'] = int(time.time())
             job.backupstatus['hostname'] = job.hostname
-            job.backupstatus['rsync_stdout'] = "Error while connecting to host (%s) - %s" % (job.hostname, stdout)
+            job.backupstatus['rsync_stdout'] = ("Error while connecting"
+                                                " to host (%s) - %s") % (
+                                               job.hostname, stdout)
             ret = False
         else:
             ret = True
-            logger().info("Succesfully connected to host via rsync protocol (%s)" % job.hostname)
+            logger().info(("Succesfully connected to host"
+                           " via rsync protocol (%s)") % job.hostname)
 
         return ret
 
-    def checkRemoteHostViaSshProtocol(self, job, initial_wait=0, interval=0, retries=1):
+    def checkRemoteHostViaSshProtocol(self, job,
+                                      initial_wait=0,
+                                      interval=0,
+                                      retries=1):
         status = None
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         time.sleep(initial_wait)
         for x in range(retries):
             try:
-                ssh.connect(job.hostname, username=job.sshusername, key_filename=job.sshprivatekey)
-                logger().info("Succesfully connected to host via ssh protocol (%s)" % job.hostname)
+                ssh.connect(job.hostname,
+                            username=job.sshusername,
+                            key_filename=job.sshprivatekey)
+                logger().info(("Succesfully connected to host"
+                               " via ssh protocol (%s)") % job.hostname)
                 return True
-            except (paramiko.BadHostKeyException, paramiko.AuthenticationException, paramiko.SSHException, socket.error, IOError) as e:
-                status = "Error while connecting to host (%s) - %s" % (job.hostname, e)
+            except (paramiko.BadHostKeyException,
+                    paramiko.AuthenticationException,
+                    paramiko.SSHException,
+                    socket.error,
+                    IOError) as e:
+                status = "Error while connecting to host (%s) - %s" % (
+                         job.hostname, e)
                 logger().error(status)
                 time.sleep(interval)
         job.backupstatus['startdatetime'] = int(time.time())
@@ -73,13 +93,15 @@ class rsync():
     def executeRsyncViaRsyncProtocol(self, job, latest):
         """Execute rsync command via rsync protocol"""
         dir = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
-        options = "--contimeout=5 -aR --delete --stats --bwlimit=%d" % job.speedlimitkb
+        options = "--contimeout=5 -aR --delete --stats --bwlimit=%d" % (
+                  job.speedlimitkb)
         exclude = self.generateExclude(job)
         if exclude:
             options += exclude
         include = self.generateInclude(job)
 
-        # Link files to the same inodes as last backup to save disk space and boost backup performance
+        # Link files to the same inodes as last backup to save disk space
+        # and boost backup performance
         if(latest):
             latest = "--link-dest=%s" % latest
         else:
@@ -88,7 +110,8 @@ class rsync():
         # Generate rsync CLI command and execute it
         if(include):
             password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
-            rsyncCommand = "%s %s %s %s %s" % (config().rsyncpath, options, latest, include, dir)
+            rsyncCommand = "%s %s %s %s %s" % (
+                           config().rsyncpath, options, latest, include, dir)
             command = "%s; %s" % (password, rsyncCommand)
             logger().info("Executing rsync command (%s)" % rsyncCommand)
             errcode, stdout = self.executeCommand(command)
@@ -103,14 +126,18 @@ class rsync():
     def executeRsyncViaSshProtocol(self, job, latest):
         directory = job.backupdir.rstrip('/') + "/" + job.hostname + "/current"
         sudo_path = "--rsync-path='sudo rsync'" if job.ssh_sudo else ''
-        sshoptions = "-e 'ssh -p%d -i %s -o \"PasswordAuthentication no\"' %s" % (job.port, job.sshprivatekey, sudo_path)
-        options = "-aR %s --delete --stats --bwlimit=%d" % (sshoptions, job.speedlimitkb)
+        sshoptions = ("-e 'ssh -p%d -i %s"
+                      " -o \"PasswordAuthentication no\"' %s") % (
+                     job.port, job.sshprivatekey, sudo_path)
+        options = "-aR %s --delete --stats --bwlimit=%d" % (
+                  sshoptions, job.speedlimitkb)
         exclude = self.generateExclude(job)
         if exclude:
             options += exclude
         include = self.generateInclude(job)
 
-        # Link files to the same inodes as last backup to save disk space and boost backup performance
+        # Link files to the same inodes as last backup to save disk space
+        # and boost backup performance
         if(latest):
             latest = "--link-dest=%s" % latest
         else:
@@ -118,7 +145,8 @@ class rsync():
 
         # Generate rsync CLI command and execute it
         if(include):
-            command = "%s %s %s %s %s" % (config().rsyncpath, options, latest, include, directory)
+            command = "%s %s %s %s %s" % (
+                      config().rsyncpath, options, latest, include, directory)
             logger().info("Executing rsync command (%s)" % command)
             errcode, stdout = self.executeCommand(command)
         else:
@@ -137,9 +165,12 @@ class rsync():
         include = ""
         for fs in job.include:
             if job.ssh:
-                include = include + " %s@%s:%s" % (job.sshusername, job.hostname, fs)
+                include = include + " %s@%s:%s" % (
+                          job.sshusername, job.hostname, fs)
             else:
-                include = include + " rsync://%s@%s:%s/%s%s" % (job.rsyncusername, job.hostname, job.port, job.rsyncshare, fs)
+                include = include + " rsync://%s@%s:%s/%s%s" % (
+                          job.rsyncusername, job.hostname, job.port,
+                          job.rsyncshare, fs)
         return include
 
     def generateExclude(self, job):
@@ -153,7 +184,9 @@ class rsync():
         stdout = ""
         errcode = 0
         try:
-            stdout = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+            stdout = subprocess.check_output(command,
+                                             stderr=subprocess.STDOUT,
+                                             shell=True)
         except subprocess.CalledProcessError as exc:
             stdout = exc.output
             errcode = exc.returncode
