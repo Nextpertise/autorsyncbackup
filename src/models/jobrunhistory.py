@@ -49,7 +49,6 @@ class jobrunhistory():
         if c.fetchone() is None:
             self.createTableJobcommandhistoryTable()
 
-
     def createTableJobrunhistoryTable(self):
         jobrunhistoryTable = 'CREATE TABLE IF NOT EXISTS jobrunhistory \
                                 ( \

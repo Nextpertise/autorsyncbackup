@@ -33,14 +33,12 @@ class statusemail():
         textbody = self.getTextEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
         self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
 
-
     def checkJobIntegrity(self, jobs):
         self.history.sort(key=lambda j: j['hostname'])
         jobs.sort(key=lambda j: j.hostname)
 
         for job_history, job in zip(self.history, jobs):
             job_history['integrity_confirmed'] = job_history['integrity_id'] == job.integrity_id
-
 
     def sendSuddenDeath(self, exc):
         subject = "AUTORSYNCBACKUP Sudden Death - %s" % datetime.datetime.today().strftime("%a, %d/%m/%Y")
