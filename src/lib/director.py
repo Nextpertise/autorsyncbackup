@@ -366,17 +366,17 @@ class director():
 
     def parseRsyncOutput(self, job):
         regexps = {
-            'rsync_number_of_files'             : r"^.*Number of files: (\d[\d,]*).*$",
-            'rsync_number_of_files_transferred' : r"^.*Number of .*files transferred: (\d[\d,]*).*$",
-            'rsync_total_file_size'             : r"^.*Total file size: (\d[\d,]*).*$",
-            'rsync_total_transferred_file_size' : r"^.*Total transferred file size: (\d[\d,]*).*$",
-            'rsync_literal_data'                : r"^.*Literal data: (\d[\d,]*).*$",
-            'rsync_matched_data'                : r"^.*Matched data: (\d[\d,]*).*$",
-            'rsync_file_list_size'              : r"^.*File list size: (\d[\d,]*).*$",
-            'rsync_file_list_generation_time'   : r"^.*File list generation time: (\d+\.\d*).*$",
-            'rsync_file_list_transfer_time'     : r"^.*File list transfer time: (\d+\.\d*).*$",
-            'rsync_total_bytes_sent'            : r"^.*Total bytes sent: (\d[\d,]*).*$",
-            'rsync_total_bytes_received'        : r"^.*Total bytes received: (\d[\d,]*).*$"
+            'rsync_number_of_files':             r"^.*Number of files: (\d[\d,]*).*$",
+            'rsync_number_of_files_transferred': r"^.*Number of .*files transferred: (\d[\d,]*).*$",
+            'rsync_total_file_size':             r"^.*Total file size: (\d[\d,]*).*$",
+            'rsync_total_transferred_file_size': r"^.*Total transferred file size: (\d[\d,]*).*$",
+            'rsync_literal_data':                r"^.*Literal data: (\d[\d,]*).*$",
+            'rsync_matched_data':                r"^.*Matched data: (\d[\d,]*).*$",
+            'rsync_file_list_size':              r"^.*File list size: (\d[\d,]*).*$",
+            'rsync_file_list_generation_time':   r"^.*File list generation time: (\d+\.\d*).*$",
+            'rsync_file_list_transfer_time':     r"^.*File list transfer time: (\d+\.\d*).*$",
+            'rsync_total_bytes_sent':            r"^.*Total bytes sent: (\d[\d,]*).*$",
+            'rsync_total_bytes_received':        r"^.*Total bytes received: (\d[\d,]*).*$"
         }
         strings = job.backupstatus['rsync_stdout']
         job.backupstatus['rsync_stdout'] = strings[:10000]
