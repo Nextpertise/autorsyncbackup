@@ -30,7 +30,7 @@ class Pidfile():
             else:
                 raise
 
-        os.write(self.pidfd, str(os.getpid()))
+        os.write(self.pidfd, str(os.getpid()).encode())
         os.close(self.pidfd)
         return self
 
