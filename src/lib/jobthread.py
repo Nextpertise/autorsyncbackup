@@ -3,6 +3,7 @@ import time
 
 from lib.logger import logger
 
+
 class jobThread (threading.Thread):
     def __init__(self, id, exitFlag, queueLock, director, q):
         threading.Thread.__init__(self)

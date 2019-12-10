@@ -8,6 +8,7 @@ from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters
 from lib.logger import logger
 
+
 class statusemail():
     jobrunhistory = None
     history = None

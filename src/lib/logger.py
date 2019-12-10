@@ -1,6 +1,7 @@
 import logging
 import os
 
+
 class logger():
     class __impl:
         """ Implementation of the singleton interface """

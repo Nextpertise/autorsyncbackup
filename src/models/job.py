@@ -5,6 +5,7 @@ import yaml
 from .config import config
 from lib.logger import logger
 
+
 class job():
     def __init__(self, filepath=None):
         self.enabled = None

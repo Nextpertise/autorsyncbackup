@@ -5,6 +5,7 @@ import time
 from .config import config
 from lib.logger import logger
 
+
 class jobrunhistory():
     # Default config values
     dbdirectory = None

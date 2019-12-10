@@ -2,6 +2,7 @@ import errno
 import os
 import sys
 
+
 class Pidfile():
     def __init__(self, path, log=sys.stdout.write, warn=sys.stderr.write):
         self.pidfile = path
@@ -69,8 +70,10 @@ class Pidfile():
             else:
                 return pid
 
+
 class ProcessRunningException(BaseException):
     pass
+
 
 class PidfileProcessRunningException(BaseException):
     pass

@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from jinja2 import Markup
 
+
 class jinjafilters():
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 

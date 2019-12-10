@@ -45,8 +45,10 @@ def setupCliArguments():
     (options, args) = parser.parse_args()  # @UnusedVariable
     return options
 
+
 def getVersion():
     return __version__
+
 
 def runBackup(jobpath, dryrun):
     """ Start backup run """
@@ -111,6 +113,7 @@ def runBackup(jobpath, dryrun):
         statusemail().sendSuddenDeath(m)
         logger().error(m)
 
+
 def listJobs(sort):
     with Pidfile(config().lockfile, logger().debug, logger().error):
         # Run director
@@ -140,15 +143,18 @@ def listJobs(sort):
         x.padding_width = 1
         print(x)
 
+
 def checkRemoteHost(jobpath):
     """ Check remote host and exit with exitcode 0 (success) or 1 (error) """
     directorInstance = director()
     jobs = directorInstance.getJobArray(jobpath)
     return not directorInstance.checkRemoteHost(jobs[0])
 
+
 def getLastBackupStatus(hostname):
     """ Get status of last backup run of given hostname and exit with exitcode 0 (success) or 1 (error) """
     return statuscli().printOutput(hostname)
+
 
 if __name__ == "__main__":
     """ Start application """

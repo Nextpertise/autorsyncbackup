@@ -13,6 +13,7 @@ from lib.logger import logger
 from lib.command import command,  CommandException
 from lib.statusemail import statusemail
 
+
 class director():
 
     regexp_backupdirectory = r".*?(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_backup)\.(\d+)$"

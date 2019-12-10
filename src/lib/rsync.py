@@ -7,6 +7,7 @@ import paramiko
 from models.config import config
 from lib.logger import logger
 
+
 class rsync():
 
     def checkRemoteHost(self, job):
