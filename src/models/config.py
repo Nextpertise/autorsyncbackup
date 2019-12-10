@@ -1,4 +1,6 @@
-import yaml, socket
+import socket
+
+import yaml
 
 class config():
     

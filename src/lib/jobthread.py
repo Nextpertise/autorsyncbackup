@@ -1,4 +1,6 @@
-import threading, time
+import threading
+import time
+
 from lib.logger import logger
 
 class jobThread (threading.Thread):

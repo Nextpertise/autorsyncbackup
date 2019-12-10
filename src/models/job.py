@@ -1,4 +1,7 @@
-import yaml, uuid
+import uuid
+
+import yaml
+
 from .config import config
 from lib.logger import logger
 

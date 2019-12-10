@@ -1,6 +1,11 @@
+import socket
+import subprocess
+import time
+
+import paramiko
+
 from models.config import config
 from lib.logger import logger
-import subprocess, paramiko, time, socket;
 
 class rsync():
 

@@ -1,9 +1,17 @@
 #!/usr/bin/python
-import time, threading
+
+import threading
+import time
 from optparse import OptionParser
+
+try:
+    import Queue as queue
+except ImportError:
+    import queue as queue
+
 from prettytable import PrettyTable
+
 from _version import __version__
-from models.config import config
 from lib.director import director
 from lib.statusemail import statusemail
 from lib.logger import logger
@@ -11,12 +19,9 @@ from lib.jinjafilters import jinjafilters
 from lib.jobthread import jobThread
 from lib.pidfile import Pidfile, ProcessRunningException
 from lib.statuscli import statuscli
+from models.config import config
 from models.jobrunhistory import jobrunhistory
 
-try:
-    import Queue as queue
-except ImportError:
-    import queue as queue
 
 def setupCliArguments():
     """ Parse CLI options """

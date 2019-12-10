@@ -1,10 +1,12 @@
 import datetime
+
+from jinja2 import Environment, PackageLoader
+from mailer import Mailer, Message
+
 from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters
 from lib.logger import logger
-from mailer import Mailer, Message
-from jinja2 import Environment, PackageLoader
 
 class statusemail():
     jobrunhistory = None

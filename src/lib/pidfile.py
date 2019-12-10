@@ -1,4 +1,6 @@
-import sys, os, errno
+import errno
+import os
+import sys
 
 class Pidfile():
     def __init__(self, path, log=sys.stdout.write, warn=sys.stderr.write):

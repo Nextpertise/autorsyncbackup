@@ -1,4 +1,9 @@
-import subprocess, paramiko, time, socket;
+import socket
+import subprocess
+import time
+
+import paramiko
+
 from .logger import logger
 
 class command():

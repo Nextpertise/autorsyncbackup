@@ -1,4 +1,5 @@
 from prettytable import PrettyTable
+
 from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters
 
