@@ -201,30 +201,33 @@ class jobrunhistory():
     def getJobHistory(self, hosts):
         ret = []
         if hosts:
-            try:
-                c = self.conn.cursor()
-                c.row_factory = self.dict_factory
-                placeholders = ', '.join(['?'] * len(hosts))
-                # Get last run history of given hosts
-                query = """
-                        SELECT *
-                          FROM jobrunhistory
-                         WHERE hostname IN (%s)
-                      GROUP BY hostname;
-                        """ % placeholders
-                c.execute(query, hosts)
-                ret = c.fetchall()
-
-                for row in ret:
+            for host in hosts:
+                try:
+                    c = self.conn.cursor()
+                    c.row_factory = self.dict_factory
+                    # Get last run history of given hosts
                     query = """
                             SELECT *
-                              FROM jobcommandhistory
-                             WHERE jobrunid = %d
-                            """ % row['id']
-                    c.execute(query)
-                    row['commands'] = c.fetchall()
-            except Exception as e:
-                logger().error(e)
+                              FROM jobrunhistory
+                             WHERE hostname = ?
+                          ORDER BY startdatetime DESC
+                             LIMIT 1
+                            """
+                    c.execute(query, [host])
+                    rows = c.fetchall()
+
+                    for row in rows:
+                        query = """
+                                SELECT *
+                                  FROM jobcommandhistory
+                                 WHERE jobrunid = ?
+                                """
+                        c.execute(query, [row['id']])
+                        row['commands'] = c.fetchall()
+
+                        ret.append(row)
+                except Exception as e:
+                    logger().error(e)
         return ret
 
     def deleteHistory(self):
