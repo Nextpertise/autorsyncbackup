@@ -47,8 +47,6 @@ Rsync errors:                      {% if jrh.rsync_backup_status == 0 %}{{ jrh.r
 Sanity check:                      {% if jrh.sanity_check == 1 %}Ok{% else %}Error, check backup folder for duplicate id's and/or check the sequence.{% endif %}
 Integrity:                         {% if jrh.integrity_confirmed == 1 %}Ok{% else %}The integrity of the job log (this section of this email) could not be confirmed. Something probably went wrong while trying to insert the logs into the database. This does not necessarily mean that the job has failed.{% endif %}
 Missing files and directories:     {% if jrh.rsync_backup_status == 1 and jrh.rsync_return_code != 0 %}{{ jrh.rsync_pre_stdout }}{% else %}None{% endif %}
-Sanity check:                      {% if jrh.sanity_check == 1 %}Ok{% else %}Error, check backup folder for duplicate id's and/or check the sequence.{% endif %}
-Missing files and directories:     {% if jrh.rsync_backup_status == 1 and jrh.rsync_return_code != 0 %}{{ jrh.rsync_pre_stdout }}{% else %}None{% endif %}
 Backup datetime:                   {{ jrh.startdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}
 Backup protocol:                   {% if jrh.ssh %}ssh+rsync{% else %}rsync{% endif %}
 Backup duration:                   {{ (jrh.enddatetime - jrh.startdatetime)|secondsformat }}
