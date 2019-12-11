@@ -54,8 +54,8 @@ class command():
                            % (command, job.hostname,
                               returncode, stdout_value, stderr_value))
             return (returncode,
-                    "\n".join(stdout_value[:10000]).encode('ascii'),
-                    "\n".join(stderr_value[:10000]).encode('ascii'))
+                    "".join(stdout_value[:10000]).encode(),
+                    "".join(stderr_value[:10000]).encode())
         except (paramiko.BadHostKeyException,
                 paramiko.AuthenticationException,
                 paramiko.SSHException,

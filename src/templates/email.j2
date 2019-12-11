@@ -374,7 +374,7 @@
                                                     <td class="data-heading" width="50%">Rsync errors</td>
                                                     <td class="data-value">
                                                       <ul>
-                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - {{ jrh.rsync_stdout }}{%- else %}No errors ({{ jrh.rsync_return_code}}){%- endif %}</li>
+                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - <pre>{{ jrh.rsync_stdout }}</pre>{%- else %}No errors ({{ jrh.rsync_return_code}}){%- endif %}</li>
                                                       </ul>
                                                     </td>
                                                   </tr>
@@ -479,12 +479,12 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stdout:</li></td>
-                                                    <td class="data-value">{{ c.stdout.decode()|nl2br }}</td>
+                                                    <td class="data-value"><pre>{{ c.stdout.decode() }}</pre></td>
                                                   </tr>
                                                   {% if c.returncode != 0 %}
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stderr:</li></td>
-                                                    <td class="data-value">{{ c.stderr.decode()|nl2br }}</td>
+                                                    <td class="data-value"><pre>{{ c.stderr.decode() }}</pre></td>
                                                   </tr>
                                                   {% endif %}
                                                   {% endfor %}
