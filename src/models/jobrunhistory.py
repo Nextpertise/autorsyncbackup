@@ -121,7 +121,7 @@ class jobrunhistory():
             query = "INSERT INTO jobrunhistory (%s) VALUES (%s)" % (
                     columns, placeholders)
             c = self.conn.cursor()
-            c.execute(query, backupstatus.values())
+            c.execute(query, list(backupstatus.values()))
 
             jobid = c.lastrowid
             if hooks is not None:
