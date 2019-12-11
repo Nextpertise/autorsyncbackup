@@ -72,10 +72,10 @@ Commands executed:                 {{ jrh['commands']|length }}
 {% for c in jrh['commands'] %}
 {{ c.script }} ({% if c.local == true %}Local{% else %} Remote{% endif %}, {% if c.before == true %}Before{% else %}After{% endif %}): {% if c.returncode == 0 %}Success{% elif c.returncode > 0 and c.continueonerror %}Warning{% else %}Error{% endif %}
 stdout:
-{{ c.stdout }}
+{{ c.stdout.decode() }}
 {%- if c.returncode != 0 %}
 stderr:
-{{ c.stderr }}
+{{ c.stderr.decode() }}
 {%- endif %}
 {%- endfor %}
 {%- endfor %}
