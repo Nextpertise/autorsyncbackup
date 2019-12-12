@@ -63,7 +63,7 @@ class command():
                 IOError) as e:
             logger().error("Error while connecting to host (%s) - %s"
                            % (job.hostname, e))
-            return 1, [], [e]
+            return 1, ''.encode(), str(e).encode()
 
     def executeLocalCommand(self, job, command):
         p = subprocess.Popen(command,
