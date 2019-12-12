@@ -21,6 +21,13 @@ git clone https://github.com/Nextpertise/autorsyncbackup.git
 Install dependencies:
 
 `apt install python3 python3-yaml python3-jinja2 python3-mailer python3-paramiko python3-prettytable rsync`
+
+On Debian jessie python3-mailer is not available, install it from PyPI:
+
+```
+apt install python3-pip
+pip3 install mailer
+```
     
 Create symlink:
 
