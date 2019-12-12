@@ -156,7 +156,7 @@ class jobrunhistory():
                     )
 
             self.conn.commit()
-            logger().debug("Commited job history to database")
+            logger().debug("Committed job history to database")
         except Exception as e:
             logger().debug(columns)
             logger().debug(backupstatus.values())

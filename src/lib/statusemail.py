@@ -162,8 +162,8 @@ class statusemail():
         return ret
 
     def getMissingHosts(self, jobs):
-        """Add all configured hosts, remove all runned hosts,
-           incase there are elements left we have 'missing' hosts"""
+        """Add all configured hosts, remove all ran hosts,
+           in case there are elements left we have 'missing' hosts"""
         hosts = []
         for i in jobs:
             if i.enabled:

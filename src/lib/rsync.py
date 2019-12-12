@@ -44,7 +44,7 @@ class rsync():
             ret = False
         else:
             ret = True
-            logger().info(("Succesfully connected to host"
+            logger().info(("Successfully connected to host"
                            " via rsync protocol (%s)") % job.hostname)
 
         return ret
@@ -62,7 +62,7 @@ class rsync():
                 ssh.connect(job.hostname,
                             username=job.sshusername,
                             key_filename=job.sshprivatekey)
-                logger().info(("Succesfully connected to host"
+                logger().info(("Successfully connected to host"
                                " via ssh protocol (%s)") % job.hostname)
                 return True
             except (paramiko.BadHostKeyException,
