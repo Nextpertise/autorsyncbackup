@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
+import argparse
 import queue
 import threading
 import time
-from optparse import OptionParser
 
 from prettytable import PrettyTable
 
@@ -21,51 +21,50 @@ from models.jobrunhistory import jobrunhistory
 
 def setupCliArguments():
     """ Parse CLI options """
-    parser = OptionParser()
-    parser.add_option("-c", "--main-config",
-                      dest="mainconfig",
-                      metavar="path_to_main.yaml",
-                      help=("set different main config file,"
-                            " default value = /etc/autorsyncbackup/main.yaml"),
-                      default="/etc/autorsyncbackup/main.yaml")
-    parser.add_option("-d", "--dry-run",
-                      action="store_true",
-                      dest="dryrun",
-                      default=False,
-                      help=("do not invoke rsync, only perform a login attempt"
-                            " on the remote host, when applied with -j the"
-                            " exit code will be set"
-                            " (0 for success, 1 for error)"))
-    parser.add_option("-v", "--verbose",
-                      action="store_true",
-                      dest="verbose",
-                      default=False,
-                      help="Write logoutput also to stdout")
-    parser.add_option("--version",
-                      action="store_true",
-                      dest="version",
-                      default=False,
-                      help="Show version number")
-    parser.add_option("-j", "--single-job",
-                      metavar="path_to_jobfile.job",
-                      dest="job",
-                      help="run only the given job file")
-    parser.add_option("-l", "--list-jobs",
-                      metavar="total|average",
-                      dest="sort",
-                      choices=["total", "average"],
-                      help=("Get list of jobs, sorted by total disk usage"
-                            " (total) or by average backup size increase"
-                            " (average)"))
-    parser.add_option("-s", "--status",
-                      metavar="hostname",
-                      dest="hostname",
-                      help=("Get status of last backup run of the given"
-                            " hostname, the exit code will be set"
-                            " (0 for success, 1 for error)"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--main-config",
+                        dest="mainconfig",
+                        metavar="path_to_main.yaml",
+                        help=("set different main config file,"
+                              " default value ="
+                              " /etc/autorsyncbackup/main.yaml"),
+                        default="/etc/autorsyncbackup/main.yaml")
+    parser.add_argument("-d", "--dry-run",
+                        action="store_true",
+                        dest="dryrun",
+                        default=False,
+                        help=("do not invoke rsync, only perform a login"
+                              " attempt on the remote host, when applied with"
+                              " -j the exit code will be set"
+                              " (0 for success, 1 for error)"))
+    parser.add_argument("-v", "--verbose",
+                        action="store_true",
+                        dest="verbose",
+                        help="Write logoutput also to stdout")
+    parser.add_argument("--version",
+                        action="store_true",
+                        dest="version",
+                        help="Show version number")
+    parser.add_argument("-j", "--single-job",
+                        metavar="path_to_jobfile.job",
+                        dest="job",
+                        help="run only the given job file")
+    parser.add_argument("-l", "--list-jobs",
+                        metavar="total|average",
+                        dest="sort",
+                        choices=["total", "average"],
+                        help=("Get list of jobs, sorted by total disk usage"
+                              " (total) or by average backup size increase"
+                              " (average)"))
+    parser.add_argument("-s", "--status",
+                        metavar="hostname",
+                        dest="hostname",
+                        help=("Get status of last backup run of the given"
+                              " hostname, the exit code will be set"
+                              " (0 for success, 1 for error)"))
 
-    (options, args) = parser.parse_args()  # @UnusedVariable
-    return options
+    args = parser.parse_args()
+    return args
 
 
 def getVersion():
