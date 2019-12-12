@@ -428,7 +428,7 @@ class director():
             'rsync_total_bytes_received':        (r"^.*Total bytes received: "
                                                   r"(\d[\d,]*).*$")
         }
-        strings = job.backupstatus['rsync_stdout'].decode()
+        strings = job.backupstatus['rsync_stdout']
         job.backupstatus['rsync_stdout'] = strings[:10000]
         for key in regexps.keys():
             try:

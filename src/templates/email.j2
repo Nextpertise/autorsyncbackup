@@ -479,12 +479,12 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stdout:</li></td>
-                                                    <td class="data-value"><pre>{{ c.stdout.decode() }}</pre></td>
+                                                    <td class="data-value"><pre>{{ c.stdout }}</pre></td>
                                                   </tr>
                                                   {% if c.returncode != 0 %}
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stderr:</li></td>
-                                                    <td class="data-value"><pre>{{ c.stderr.decode() }}</pre></td>
+                                                    <td class="data-value"><pre>{{ c.stderr }}</pre></td>
                                                   </tr>
                                                   {% endif %}
                                                   {% endfor %}

@@ -54,8 +54,8 @@ class command():
                            % (command, job.hostname,
                               returncode, stdout_value, stderr_value))
             return (returncode,
-                    "".join(stdout_value[:10000]).encode(),
-                    "".join(stderr_value[:10000]).encode())
+                    "".join(stdout_value[:10000]),
+                    "".join(stderr_value[:10000]))
         except (paramiko.BadHostKeyException,
                 paramiko.AuthenticationException,
                 paramiko.SSHException,
@@ -63,7 +63,7 @@ class command():
                 IOError) as e:
             logger().error("Error while connecting to host (%s) - %s"
                            % (job.hostname, e))
-            return 1, ''.encode(), str(e).encode()
+            return 1, '', str(e)
 
     def executeLocalCommand(self, job, command):
         p = subprocess.Popen(command,
@@ -74,7 +74,7 @@ class command():
         logger().debug(("Local execution of %s gives"
                         " (rc=%d, stdout=%s, stderr=%s)")
                        % (command, p.returncode, stdout_value, stderr_value))
-        return p.returncode,  stdout_value, stderr_value
+        return p.returncode, stdout_value.decode(), stderr_value.decode()
 
 
 class CommandException(Exception):

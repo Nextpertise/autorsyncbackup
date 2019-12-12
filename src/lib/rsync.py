@@ -190,7 +190,7 @@ class rsync():
         except subprocess.CalledProcessError as exc:
             stdout = exc.output
             errcode = exc.returncode
-        return errcode, stdout
+        return errcode, stdout.decode()
 
     def rsyncErrorCodeToBoolean(self, errorCode):
         ret = False
