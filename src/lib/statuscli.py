@@ -36,7 +36,7 @@ class statuscli():
                        history[0]['enddatetime'] - history[0]['startdatetime']
                        + 1, True)
             starttime = jinjafilters()._epochToStrDate(
-                        history[0]['startdatetime'], "%d-%m-%Y %H:%M:%S")
+                        history[0]['startdatetime'], "%Y-%m-%d %H:%M:%S")
             if history[0]['rsync_backup_status'] == 1:
                 backupState = 'Ok'
                 ret = 0
