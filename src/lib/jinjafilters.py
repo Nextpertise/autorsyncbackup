@@ -1,6 +1,5 @@
 import datetime
 import re
-from collections import OrderedDict
 
 from jinja2 import Markup
 
@@ -28,7 +27,7 @@ class jinjafilters():
                      ' ZB',
                      ' YB']
         bytesStr = "%.0f" % byte_data
-        while byte_data > 1024:
+        while byte_data >= 1024:
             byte_data = byte_data / 1024
             i = i + 1
             bytesStr = "%.1f" % byte_data
@@ -41,31 +40,86 @@ class jinjafilters():
             seconds = 0
         if seconds == 0:
             return "0 seconds"
+
+        minutes = 0
+        hours = 0
+        days = 0
+        weeks = 0
+
+        while seconds >= 60:
+            minutes += 1
+            seconds -= 60
+
+            if minutes == 60:
+                hours += 1
+                minutes = 0
+
+                if hours == 24:
+                    days += 1
+                    hours = 0
+
+                    if days == 7:
+                        weeks += 1
+                        days = 0
+
         ret = ""
-        if short:
-            units = OrderedDict([('w', 7*24*3600),
-                                 ('d', 24*3600),
-                                 ('h', 3600),
-                                 ('m', 60),
-                                 ('s', 1)])
-            space = ""
-        else:
-            units = OrderedDict([('week', 7*24*3600),
-                                 ('day', 24*3600),
-                                 ('hour', 3600),
-                                 ('minute', 60),
-                                 ('second', 1)])
-            space = " "
-        for unit in units:
-            quot = seconds / units[unit]
-            if quot:
-                ret = ret + str(quot) + space + unit
-                seconds = seconds - (quot * units[unit])
-                if abs(quot) > 1:
-                    if not short:
-                        ret = ret + "s"
-                ret = ret + ", "
-        return ret[:-2]
+
+        if weeks > 0:
+            if ret != "":  # pragma: no cover
+                ret += ", "
+
+            if short:
+                ret += "%s w" % weeks
+            else:
+                ret += "%s week" % weeks
+                if weeks > 1:
+                    ret += "s"
+
+        if days > 0:
+            if ret != "":  # pragma: no cover
+                ret += ", "
+
+            if short:
+                ret += "%s d" % days
+            else:
+                ret += "%s day" % days
+                if days > 1:
+                    ret += "s"
+
+        if hours > 0:
+            if ret != "":  # pragma: no cover
+                ret += ", "
+
+            if short:
+                ret += "%s h" % hours
+            else:
+                ret += "%s hour" % hours
+                if hours > 1:
+                    ret += "s"
+
+        if minutes > 0:
+            if ret != "":  # pragma: no cover
+                ret += ", "
+
+            if short:
+                ret += "%s m" % minutes
+            else:
+                ret += "%s minute" % minutes
+                if minutes > 1:
+                    ret += "s"
+
+        if seconds > 0:
+            if ret != "":  # pragma: no cover
+                ret += ", "
+
+            if short:
+                ret += "%s s" % seconds
+            else:
+                ret += "%s second" % seconds
+                if seconds > 1:
+                    ret += "s"
+
+        return ret
 
     def _intToReadableStr(self, x):
         try:
