@@ -45,7 +45,7 @@ class config():
             # Create and remember instance
             config.__instance = config.__impl()
 
-            if(mainconfigpath):
+            if(mainconfigpath):  # pragma: no branch
                 self.mainconfigpath = mainconfigpath
             self.readConfig()
             self.init = False
@@ -213,10 +213,10 @@ class config():
 
         try:
             if type(config['backupmailrecipients']) is list:
-                self.backupmailrecipients = config['backupmailrecipients']
+                self.backupmailrecipients = config['backupmailrecipients']  # pragma: no cover  # noqa: E501
         except Exception:
             self.debugmessages.append(("%s: No backupmailrecipient(s) are set,"
-                                       " there will no backup report be sent")
+                                       " no backup report will be sent")
                                       % self.mainconfigpath)
 
         try:
