@@ -1,0 +1,4 @@
+hostname: 'localhost'
+ssh: true
+ssh_sudo: true
+ssh_username: 'autorsyncbackup'

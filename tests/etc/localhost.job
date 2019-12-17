@@ -1,0 +1,31 @@
+hostname: localhost
+rsync_username: autorsyncbackup
+rsync_password: fee-fi-fo-fum
+rsync_share: backup
+ssh: False
+ssh_sudo: False
+ssh_username: autorsyncbackup
+ssh_privatekey: /home/autorsyncbackup/.ssh/id_rsa
+port: 10873
+backupdir: /tmp
+speedlimitkb: 10000
+dailyrotation: 3
+weeklyrotation: 2
+monthlyrotation: 1
+weeklybackup: 3
+monthlybackup: 2
+include: #formerly fileset
+  - /etc
+exclude:
+  - "*.bak"
+  - ".cache/*"
+hooks:
+  - script: uptime
+    local: true
+    runtime: before
+    continueonerror: true
+
+  - script: cat /etc/motd
+    local: false
+    runtime: after
+    continueonerror: true
