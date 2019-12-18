@@ -13,7 +13,7 @@ class jobrunhistory():
 
     def __init__(self, dbdirectory=None, check=False):
         self.dbdirectory = config().jobspooldirectory
-        if dbdirectory:
+        if dbdirectory:  # pragma: no branch
             self.dbdirectory = dbdirectory
         self.openDbHandler()
         if check:
@@ -37,7 +37,7 @@ class jobrunhistory():
         try:
             self.conn.close()
             logger().debug("close db [%s]" % path)
-        except Exception:
+        except Exception:  # pragma: no cover
             pass
 
     def checkTables(self):
