@@ -24,7 +24,7 @@ class Pidfile():
                                                   % (self.pidfile, pid))
                 else:
                     os.remove(self.pidfile)
-                    self.warn('removed staled lockfile %s' % (self.pidfile))
+                    self.warn('removed stale lockfile %s' % (self.pidfile))
                     self.pidfd = os.open(self.pidfile,
                                          os.O_CREAT | os.O_WRONLY | os.O_EXCL)
             else:
