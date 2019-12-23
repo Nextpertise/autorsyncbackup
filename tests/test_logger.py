@@ -4,6 +4,8 @@ from lib.logger import logger
 
 
 def test_logger_verbose():
+    logger().verbose = False
+
     assert logger().getVerbose() is False
     assert logger().verbose is False
 
@@ -14,6 +16,8 @@ def test_logger_verbose():
 
 
 def test_debuglevel():
+    logger().debuglevel = 0
+
     assert logger().getDebuglevel() == 0
     assert logger().debuglevel == 0
 

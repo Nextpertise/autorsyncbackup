@@ -7,6 +7,7 @@ import uuid
 
 import pytest
 
+from lib.logger import logger
 from models.job import job
 from models.jobrunhistory import jobrunhistory
 
@@ -257,6 +258,8 @@ def test_insertJob(tmp_path):
 
 
 def test_insertJob_exception(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -274,6 +277,8 @@ def test_insertJob_exception(tmp_path, caplog):
 
 
 def test_insertJob_none_hooks(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -297,6 +302,8 @@ def test_insertJob_none_hooks(tmp_path, caplog):
 
 
 def test_identifyJob(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -335,6 +342,8 @@ def test_identifyJob(tmp_path, caplog):
 
 
 def test_identifyJob_error(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -366,6 +375,8 @@ def test_identifyJob_error(tmp_path, caplog):
 
 
 def test_identifyJob_large_time_difference(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -403,6 +414,8 @@ def test_identifyJob_large_time_difference(tmp_path, caplog):
 
 
 def test_identifyJob_invalid_values(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     backupstatus = {
@@ -503,6 +516,8 @@ def test_getJobHistory(tmp_path):
 
 
 def test_getJobHistory_exception(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     jrh.closeDbHandler()
@@ -561,6 +576,8 @@ def test_deleteHistory(tmp_path):
 
 
 def test_deleteHistory_exception(tmp_path, caplog):
+    logger().debuglevel = 3
+
     jrh = jobrunhistory(str(tmp_path), check=True)
 
     jrh.closeDbHandler()

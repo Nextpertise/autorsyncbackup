@@ -2,6 +2,7 @@ import os
 
 import paramiko
 
+from lib.logger import logger
 from lib.rsync import rsync
 from models.config import config
 from models.job import job
@@ -330,6 +331,8 @@ def test_generateInclude_ssh():
 
 
 def test_generateInclude_error(caplog):
+    logger().debuglevel = 3
+
     path = os.path.join(
                          os.path.dirname(__file__),
                          'etc/rsync-no-include.job',

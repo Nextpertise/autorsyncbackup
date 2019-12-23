@@ -4,6 +4,7 @@ import os
 import paramiko
 
 from lib.command import command
+from lib.logger import logger
 from models.job import job
 
 
@@ -28,6 +29,8 @@ def test_checkRemoteHostViaSshProtocol(monkeypatch):
 
 
 def test_checkRemoteHostViaSshProtocol_exception(monkeypatch, caplog):
+    logger().debuglevel = 3
+
     def mock_connect(self, hostname, username=None, key_filename=None):
         raise IOError('Mock connection failed')
 
@@ -79,6 +82,8 @@ def test_executeRemoteCommand(monkeypatch):
 
 
 def test_executeRemoteCommand_exception(monkeypatch, caplog):
+    logger().debuglevel = 3
+
     def mock_connect(self, hostname, username=None, key_filename=None):
         raise IOError('Mock connection failed')
 
