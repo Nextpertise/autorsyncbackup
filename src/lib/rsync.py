@@ -23,7 +23,8 @@ class rsync():
         """Check if remote host is up and able to accept
            connections with our credentials"""
         password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
-        rsyncCommand = "rsync --contimeout=5 rsync://%s@%s:%s/%s" % (
+        rsyncCommand = "%s --contimeout=5 rsync://%s@%s:%s/%s" % (
+                       config().rsyncpath,
                        job.rsyncusername,
                        job.hostname,
                        job.port,
