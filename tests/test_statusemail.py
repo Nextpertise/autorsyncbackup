@@ -272,6 +272,27 @@ def test_getOverallBackupState_good(tmp_path):
     assert len(warning) == 0
     assert len(bad) == 0
 
+    se.history = [
+                   {
+                     'rsync_backup_status': 1,
+                     'sanity_check':        1,
+                     'integrity_confirmed': True,
+                     'commands':            [
+                                              {
+                                                'returncode':      0,
+                                                'continueonerror': True,
+                                              },
+                                            ],
+                   },
+                 ]
+
+    (ret, good, warning, bad) = se.getOverallBackupState(se.history)
+
+    assert ret == 'ok'
+    assert len(good) == 1
+    assert len(warning) == 0
+    assert len(bad) == 0
+
 
 def test_getOverallBackupState_bad(tmp_path):
     config().jobspooldirectory = str(tmp_path)
