@@ -1,0 +1,6 @@
+hostname: localhost
+ssh: True
+ssh_sudo: False
+ssh_username: autorsyncbackup
+ssh_privatekey: /home/autorsyncbackup/.ssh/id_rsa
+backupdir: /tmp
