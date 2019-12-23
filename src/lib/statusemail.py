@@ -136,15 +136,15 @@ class statusemail():
                 addto = bad
                 ret = "error"
             job_history['commanderror'] = 'ok'
-            for c in job_history['commands']:
-                if c['returncode'] != 0 and not c['continueonerror']:
-                    addto = bad
-                    job_history['commanderror'] = "error"
-                    ret = "error"
-                elif c['returncode'] != 0 and c['continueonerror']:
-                    addto = warning
-                    job_history['commanderror'] = "warning"
-                    if ret == "ok":
+            if ret == "ok":
+                for c in job_history['commands']:
+                    if c['returncode'] != 0 and not c['continueonerror']:
+                        addto = bad
+                        job_history['commanderror'] = "error"
+                        ret = "error"
+                    elif c['returncode'] != 0 and c['continueonerror']:
+                        addto = warning
+                        job_history['commanderror'] = "warning"
                         ret = "warning"
             addto.append(job_history)
         if not self.history:

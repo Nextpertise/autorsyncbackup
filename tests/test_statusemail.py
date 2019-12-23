@@ -345,8 +345,8 @@ def test_getOverallBackupState_bad(tmp_path):
 
     assert ret == 'error'
     assert len(good) == 0
-    assert len(warning) == 1
-    assert len(bad) == 0
+    assert len(warning) == 0
+    assert len(bad) == 1
 
     se.history = [
                    {
