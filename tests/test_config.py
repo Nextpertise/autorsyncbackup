@@ -43,15 +43,19 @@ def test_readConfig(tmp_path):
 
     with open(attributes['mainconfigpath'], 'w') as f:
         for key in [
+                     'rsyncpath',
                      'lockfile',
                      'jobconfigdirectory',
                      'jobspooldirectory',
                      'backupdir',
                      'logfile',
+                     'debuglevel',
                    ]:
             f.write('%s: %s\n' % (key, attributes[key]))
 
-    config(attributes['mainconfigpath'])
+    config().mainconfigpath = attributes['mainconfigpath']
+    config().backupmailrecipients = []
+    config().readConfig()
 
     assert config().mainconfigpath == attributes['mainconfigpath']
     assert config().rsyncpath == attributes['rsyncpath']

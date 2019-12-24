@@ -45,7 +45,7 @@ class config():
             # Create and remember instance
             config.__instance = config.__impl()
 
-            if(mainconfigpath):  # pragma: no branch
+            if(mainconfigpath):  # pragma: no cover
                 self.mainconfigpath = mainconfigpath
             self.readConfig()
             self.init = False
