@@ -308,7 +308,7 @@ def test_identifyJob(tmp_path, caplog):
 
     backupstatus = {
                      'hostname':              'localhost',
-                     'startdatetime':         time.time() - 1,
+                     'startdatetime':         time.time() - 2,
                      'rsync_total_file_size': 1337,
                      'rsync_literal_data':    42,
                    }
