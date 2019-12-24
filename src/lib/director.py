@@ -10,7 +10,7 @@ from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.rsync import rsync
 from lib.logger import logger
-from lib.command import command,  CommandException
+from lib.command import command, CommandException
 from lib.statusemail import statusemail
 
 
@@ -38,14 +38,14 @@ class director():
     def checkRemoteHost(self, job):
         return rsync().checkRemoteHost(job)
 
-    def executeJobs(self,  job,  commands):
+    def executeJobs(self, job, commands):
         comm = command()
         for c in commands:
             if c['local']:
                 logger().debug('Running local command %s' % c['script'])
                 (c['returncode'],
                  c['stdout'],
-                 c['stderr']) = comm.executeLocalCommand(job,  c['script'])
+                 c['stderr']) = comm.executeLocalCommand(job, c['script'])
                 logger().debug('command %s' % (
                                'succeeded' if c['returncode'] == 0 else
                                'failed'))
@@ -53,7 +53,7 @@ class director():
                 logger().debug('Running remote command %s' % c['script'])
                 (c['returncode'],
                  c['stdout'],
-                 c['stderr']) = comm.executeRemoteCommand(job,  c['script'])
+                 c['stderr']) = comm.executeRemoteCommand(job, c['script'])
                 logger().debug('command %s' % (
                                'succeeded' if c['returncode'] == 0 else
                                'failed'))
@@ -114,7 +114,7 @@ class director():
                 os.makedirs(directory)
         except Exception as e:
             logger().error(("Error creating backup directory (%s)"
-                            " for host (%s)") % (directory, job.hostname))
+                            " for host (%s)") % (backupdir, job.hostname))
             statusemail().sendSuddenDeath(e)
             return False
 
@@ -264,6 +264,7 @@ class director():
                     backup_id = backup_id - 1
                 else:
                     ret = False
+                    break
             else:
                 return ret
         return ret
@@ -396,7 +397,7 @@ class director():
         job.backupstatus['integrity_id'] = job.integrity_id
         self.parseRsyncOutput(job)
         jrh = jobrunhistory(check=True)
-        jrh.insertJob(job.backupstatus,  job.hooks)
+        jrh.insertJob(job.backupstatus, job.hooks)
         jrh.closeDbHandler()
 
     def parseRsyncOutput(self, job):
@@ -433,9 +434,9 @@ class director():
         for key in regexps.keys():
             try:
                 logger().debug("matching %s for %s" % (regexps[key], key))
-                m = re.match(regexps[key],  strings,  re.MULTILINE | re.DOTALL)
+                m = re.match(regexps[key], strings, re.MULTILINE | re.DOTALL)
                 if m:
-                    job.backupstatus[key] = m.group(1).replace(',',  '')
+                    job.backupstatus[key] = m.group(1).replace(',', '')
                 else:
                     job.backupstatus[key] = ''
                     logger().debug("no match!")
