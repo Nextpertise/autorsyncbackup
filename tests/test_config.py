@@ -1,7 +1,6 @@
 import os
 import re
 import socket
-import time
 
 import pytest
 import yaml
@@ -56,8 +55,6 @@ def test_readConfig(test_config, tmp_path):
 
     config().mainconfigpath = attributes['mainconfigpath']
     config().backupmailrecipients = []
-
-    time.sleep(0.1)
 
     config().readConfig()
 

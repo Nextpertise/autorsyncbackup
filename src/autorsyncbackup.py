@@ -98,7 +98,7 @@ def runBackup(jobpath, dryrun):
             for job in jobs:
                 if(job.enabled):
                     if directorInstance.checkRemoteHost(job):
-                        if not dryrun:
+                        if not dryrun:  # pragma: no branch
                             # Add to queue
                             workQueue.put(job)
                     else:
@@ -182,7 +182,7 @@ def getLastBackupStatus(hostname):
     return statuscli().printOutput(hostname)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     """ Start application """
     # Initialise variables
     checkSingleHost = False

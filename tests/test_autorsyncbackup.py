@@ -2,10 +2,14 @@ import os
 import time
 import uuid
 
+import mailer
+import pytest
+
 from _version import __version__
 from autorsyncbackup import (
     setupCliArguments,
     getVersion,
+    runBackup,
     listJobs,
     checkRemoteHost,
     getLastBackupStatus,
@@ -28,6 +32,160 @@ def test_setupCliArguments():
 
 def test_getVersion():
     assert getVersion() == __version__
+
+
+def test_runBackup(test_config, tmp_path, monkeypatch):
+    email_path = os.path.join(str(tmp_path), 'status.eml')
+
+    def mock_send(self, message):
+        with open(email_path, 'w') as f:
+            f.write(message.as_string())
+
+        return True
+
+    monkeypatch.setattr(mailer.Mailer, 'send', mock_send)
+
+    config().rsyncpath = os.path.join(
+                                       os.path.dirname(__file__),
+                                       'bin/mock-rsync-ok.sh',
+                                     )
+    config().backupmailrecipients = ['foo@example.com']
+
+    if not os.path.exists(config().jobspooldirectory):
+        os.makedirs(config().jobspooldirectory)
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'etc/rsync.job',
+                       )
+
+    runBackup(path, False)
+
+    assert os.path.exists(email_path) is True
+    assert os.path.exists(config().lockfile) is False
+
+
+def test_runBackup_rsync_fail(test_config, tmp_path, monkeypatch):
+    email_path = os.path.join(str(tmp_path), 'status.eml')
+
+    def mock_send(self, message):
+        with open(email_path, 'w') as f:
+            f.write(message.as_string())
+
+        return True
+
+    monkeypatch.setattr(mailer.Mailer, 'send', mock_send)
+
+    config().rsyncpath = os.path.join(
+                                       os.path.dirname(__file__),
+                                       'bin/mock-rsync-fail.sh',
+                                     )
+    config().backupmailrecipients = ['foo@example.com']
+
+    if not os.path.exists(config().jobspooldirectory):
+        os.makedirs(config().jobspooldirectory)
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'etc/rsync.job',
+                       )
+
+    runBackup(path, False)
+
+    assert os.path.exists(email_path) is True
+    assert os.path.exists(config().lockfile) is False
+
+
+def test_runBackup_dryrun(test_config, tmp_path, monkeypatch):
+    email_path = os.path.join(str(tmp_path), 'status.eml')
+
+    def mock_send(self, message):
+        with open(email_path, 'w') as f:
+            f.write(message.as_string())
+
+        return True
+
+    monkeypatch.setattr(mailer.Mailer, 'send', mock_send)
+
+    config().rsyncpath = os.path.join(
+                                       os.path.dirname(__file__),
+                                       'bin/mock-rsync-ok.sh',
+                                     )
+    config().backupmailrecipients = ['foo@example.com']
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'rsync.job',
+                       )
+
+    runBackup(path, True)
+
+    assert os.path.exists(email_path) is False
+    assert os.path.exists(config().lockfile) is False
+
+
+def test_runBackup_exception(test_config, tmp_path, monkeypatch):
+    email_path = os.path.join(str(tmp_path), 'sudden-death.eml')
+
+    def mock_send(self, message):
+        with open(email_path, 'w') as f:
+            f.write(message.as_string())
+
+        return True
+
+    monkeypatch.setattr(mailer.Mailer, 'send', mock_send)
+
+    config().rsyncpath = os.path.join(
+                                       os.path.dirname(__file__),
+                                       'bin/mock-rsync-ok.sh',
+                                     )
+    config().backupmailrecipients = ['foo@example.com']
+
+    with open(config().lockfile, 'w') as f:
+        f.write(str(os.getpid()))
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'rsync.job',
+                       )
+
+    runBackup(path, False)
+
+    assert os.path.exists(email_path) is True
+    assert os.path.exists(config().lockfile) is True
+
+    if os.path.exists(config().lockfile):
+        os.unlink(config().lockfile)
+
+
+def test_runBackup_no_jobs(test_config, tmp_path, monkeypatch, caplog):
+    email_path = os.path.join(str(tmp_path), 'sudden-death.eml')
+
+    def mock_send(self, message):
+        with open(email_path, 'w') as f:
+            f.write(message.as_string())
+
+        return True
+
+    monkeypatch.setattr(mailer.Mailer, 'send', mock_send)
+
+    config().rsyncpath = os.path.join(
+                                       os.path.dirname(__file__),
+                                       'bin/mock-rsync-ok.sh',
+                                     )
+    config().backupmailrecipients = ['foo@example.com']
+
+    with pytest.raises(Exception) as e:
+        runBackup(str(tmp_path), False)
+
+    assert e is not None
+
+    message = 'Error while reading %s, skipping job' % str(tmp_path)
+
+    assert message in caplog.text
+
+    assert os.path.exists(email_path) is False
+    assert os.path.exists(config().lockfile) is False
 
 
 def test_listJobs(test_config, tmp_path, capsys):
