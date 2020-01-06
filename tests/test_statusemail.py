@@ -18,7 +18,7 @@ def test_init():
     assert se.jobrunhistory is not None
 
 
-def test_sendStatusEmail(tmp_path, monkeypatch):
+def test_sendStatusEmail(test_config, tmp_path, monkeypatch):
     email_path = os.path.join(str(tmp_path), 'status.eml')
 
     def mock_send(self, message):
@@ -153,7 +153,7 @@ def test_sendStatusEmail(tmp_path, monkeypatch):
     assert '>Integrity</td>' in html_body
 
 
-def test_sendSuddenDeath(tmp_path, monkeypatch):
+def test_sendSuddenDeath(test_config, tmp_path, monkeypatch):
     email_path = os.path.join(str(tmp_path), 'sudden-death.eml')
 
     def mock_send(self, message):
@@ -218,7 +218,7 @@ def test_sendSuddenDeath(tmp_path, monkeypatch):
     assert '<p>%s</p>' % exc in html_body
 
 
-def test_getOverallBackupState_error(tmp_path):
+def test_getOverallBackupState_error(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -250,7 +250,7 @@ def test_getOverallBackupState_error(tmp_path):
     assert len(bad) == 0
 
 
-def test_getOverallBackupState_good(tmp_path):
+def test_getOverallBackupState_good(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -294,7 +294,7 @@ def test_getOverallBackupState_good(tmp_path):
     assert len(bad) == 0
 
 
-def test_getOverallBackupState_bad(tmp_path):
+def test_getOverallBackupState_bad(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -391,7 +391,7 @@ def test_getOverallBackupState_bad(tmp_path):
     assert len(bad) == 1
 
 
-def test_getOverallBackupState_warning(tmp_path):
+def test_getOverallBackupState_warning(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -419,7 +419,7 @@ def test_getOverallBackupState_warning(tmp_path):
     assert len(bad) == 0
 
 
-def test_getBackupHosts(tmp_path):
+def test_getBackupHosts(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -455,7 +455,7 @@ def test_getBackupHosts(tmp_path):
     assert ret == ['localhost']
 
 
-def test_getMissingHosts(tmp_path):
+def test_getMissingHosts(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 
@@ -509,7 +509,7 @@ def test_getMissingHosts(tmp_path):
     assert hosts == []
 
 
-def test_getStats(tmp_path):
+def test_getStats(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().backupmailrecipients = ['foo@example.com']
 

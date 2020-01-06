@@ -9,7 +9,7 @@ import yaml
 from models.config import config
 
 
-def test_readConfig(tmp_path):
+def test_readConfig(test_config, tmp_path):
     attributes = {
                    'mainconfigpath':       os.path.join(
                                                str(tmp_path),

@@ -12,7 +12,7 @@ def test_init():
     assert sc.jobrunhistory is not None
 
 
-def test_getList(tmp_path):
+def test_getList(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     jrh = jobrunhistory(str(tmp_path), check=True)
@@ -74,7 +74,7 @@ def test_getList(tmp_path):
     assert history != []
 
 
-def test_printOutput(tmp_path, capsys):
+def test_printOutput(test_config, tmp_path, capsys):
     config().jobspooldirectory = str(tmp_path)
 
     jrh = jobrunhistory(str(tmp_path), check=True)
@@ -125,7 +125,7 @@ def test_printOutput(tmp_path, capsys):
     assert 'Ok' in captured.out
 
 
-def test_printOutput_rsync_failed(tmp_path, capsys):
+def test_printOutput_rsync_failed(test_config, tmp_path, capsys):
     config().jobspooldirectory = str(tmp_path)
 
     jrh = jobrunhistory(str(tmp_path), check=True)
@@ -176,7 +176,7 @@ def test_printOutput_rsync_failed(tmp_path, capsys):
     assert 'Failed' in captured.out
 
 
-def test_printOutput_no_history(tmp_path, capsys):
+def test_printOutput_no_history(test_config, tmp_path, capsys):
     config().jobspooldirectory = str(tmp_path)
 
     jobrunhistory(str(tmp_path), check=True)

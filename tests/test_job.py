@@ -52,7 +52,7 @@ def test_job():
     assert pprint.pformat(j.hooks) == pprint.pformat(hooks)
 
 
-def test_default_config():
+def test_default_config(test_config):
     path = os.path.join(
                os.path.dirname(__file__),
                'etc/default-config.job',

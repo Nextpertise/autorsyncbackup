@@ -8,7 +8,7 @@ from models.config import config
 from models.job import job
 
 
-def test_checkRemoteHost_rsync(tmp_path):
+def test_checkRemoteHost_rsync(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -30,7 +30,7 @@ def test_checkRemoteHost_rsync(tmp_path):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
-def test_checkRemoteHost_rsync_fail(tmp_path):
+def test_checkRemoteHost_rsync_fail(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -52,7 +52,7 @@ def test_checkRemoteHost_rsync_fail(tmp_path):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
-def test_checkRemoteHost_ssh(tmp_path, monkeypatch):
+def test_checkRemoteHost_ssh(test_config, tmp_path, monkeypatch):
     def mock_connect(self, hostname, username=None, key_filename=None):
         return True
 
@@ -75,7 +75,7 @@ def test_checkRemoteHost_ssh(tmp_path, monkeypatch):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
-def test_checkRemoteHost_ssh_fail(tmp_path, monkeypatch):
+def test_checkRemoteHost_ssh_fail(test_config, tmp_path, monkeypatch):
     def mock_connect(self, hostname, username=None, key_filename=None):
         raise IOError('Mock connection failed')
 
@@ -98,7 +98,7 @@ def test_checkRemoteHost_ssh_fail(tmp_path, monkeypatch):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
-def test_executeRsync_rsync(tmp_path):
+def test_executeRsync_rsync(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -122,7 +122,7 @@ def test_executeRsync_rsync(tmp_path):
     assert 'sending incremental file list' in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsync_rsync_latest(tmp_path):
+def test_executeRsync_rsync_latest(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -146,7 +146,7 @@ def test_executeRsync_rsync_latest(tmp_path):
     assert 'sending incremental file list' in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsync_rsync_no_include(tmp_path):
+def test_executeRsync_rsync_no_include(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -172,7 +172,7 @@ def test_executeRsync_rsync_no_include(tmp_path):
            ) in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsync_ssh(tmp_path):
+def test_executeRsync_ssh(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -196,7 +196,7 @@ def test_executeRsync_ssh(tmp_path):
     assert 'sending incremental file list' in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsync_ssh_latest(tmp_path):
+def test_executeRsync_ssh_latest(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -220,7 +220,7 @@ def test_executeRsync_ssh_latest(tmp_path):
     assert 'sending incremental file list' in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsync_ssh_no_include(tmp_path):
+def test_executeRsync_ssh_no_include(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -246,7 +246,7 @@ def test_executeRsync_ssh_no_include(tmp_path):
            ) in j.backupstatus['rsync_stdout']
 
 
-def test_executeRsyncViaRsyncProtocol(tmp_path):
+def test_executeRsyncViaRsyncProtocol(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -268,7 +268,7 @@ def test_executeRsyncViaRsyncProtocol(tmp_path):
     assert 'sending incremental file list' in stdout
 
 
-def test_executeRsyncViaSshProtocol(tmp_path):
+def test_executeRsyncViaSshProtocol(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),

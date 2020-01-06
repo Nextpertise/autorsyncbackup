@@ -30,7 +30,7 @@ def test_getVersion():
     assert getVersion() == __version__
 
 
-def test_listJobs(tmp_path, capsys):
+def test_listJobs(test_config, tmp_path, capsys):
     config().lockfile = os.path.join(
                                       str(tmp_path),
                                       'autorsyncbackup.pid',
@@ -87,7 +87,7 @@ def test_listJobs(tmp_path, capsys):
     assert '0 Bytes' in captured.out
 
 
-def test_checkRemoteHost(tmp_path):
+def test_checkRemoteHost(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -104,7 +104,7 @@ def test_checkRemoteHost(tmp_path):
     assert ret is False
 
 
-def test_checkRemoteHost_fail(tmp_path):
+def test_checkRemoteHost_fail(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -121,7 +121,7 @@ def test_checkRemoteHost_fail(tmp_path):
     assert ret is True
 
 
-def test_getLastBackupStatus(tmp_path, capsys):
+def test_getLastBackupStatus(test_config, tmp_path, capsys):
     config().jobspooldirectory = str(tmp_path)
 
     jrh = jobrunhistory(check=True)

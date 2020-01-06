@@ -50,7 +50,7 @@ def create_job(dir):
     return path
 
 
-def test_getJobArray(tmp_path):
+def test_getJobArray(test_config, tmp_path):
     config().jobconfigdirectory = os.path.join(
                                                 os.path.dirname(__file__),
                                                 'etc/director',
@@ -65,7 +65,7 @@ def test_getJobArray(tmp_path):
     assert len(jobs) == 2
 
 
-def test_getJobArray_error(tmp_path, caplog):
+def test_getJobArray_error(test_config, tmp_path, caplog):
     path = '/non-existent'
 
     config().jobconfigdirectory = path
@@ -83,7 +83,7 @@ def test_getJobArray_error(tmp_path, caplog):
     assert "Job directory (%s) doesn't exists, exiting" % path in caplog.text
 
 
-def test_getJobArray_jobpath(tmp_path):
+def test_getJobArray_jobpath(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = os.path.join(
@@ -99,7 +99,7 @@ def test_getJobArray_jobpath(tmp_path):
     assert len(jobs) == 1
 
 
-def test_checkRemoteHost(tmp_path):
+def test_checkRemoteHost(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -121,7 +121,7 @@ def test_checkRemoteHost(tmp_path):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
-def test_executeJobs_local(tmp_path):
+def test_executeJobs_local(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = os.path.join(
@@ -149,7 +149,7 @@ def test_executeJobs_local(tmp_path):
     assert commands[0]['stderr'] == ''
 
 
-def test_executeJobs_remote(tmp_path, monkeypatch):
+def test_executeJobs_remote(test_config, tmp_path, monkeypatch):
     def mock_connect(self, hostname, username=None, key_filename=None):
         return True
 
@@ -190,7 +190,7 @@ def test_executeJobs_remote(tmp_path, monkeypatch):
     assert commands[0]['stderr'] == ''
 
 
-def test_executeJobs_exception(tmp_path):
+def test_executeJobs_exception(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = os.path.join(
@@ -221,7 +221,7 @@ def test_executeJobs_exception(tmp_path):
     assert 'Hook %s failed to execute' % commands[0]['script'] in str(e)
 
 
-def test_executeRsync(tmp_path):
+def test_executeRsync(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -247,7 +247,7 @@ def test_executeRsync(tmp_path):
     assert 'enddatetime' in j.backupstatus
 
 
-def test_executeRsync_local_before_fail(tmp_path, caplog):
+def test_executeRsync_local_before_fail(test_config, tmp_path, caplog):
     config().jobspooldirectory = str(tmp_path)
 
     logger().debuglevel = 3
@@ -274,7 +274,12 @@ def test_executeRsync_local_before_fail(tmp_path, caplog):
                                              )
 
 
-def test_executeRsync_remote_before_fail(tmp_path, caplog, monkeypatch):
+def test_executeRsync_remote_before_fail(
+                                          test_config,
+                                          tmp_path,
+                                          caplog,
+                                          monkeypatch
+                                        ):
     def mock_connect(self, hostname, username=None, key_filename=None):
         return True
 
@@ -314,7 +319,7 @@ def test_executeRsync_remote_before_fail(tmp_path, caplog, monkeypatch):
                                              )
 
 
-def test_executeRsync_local_after_fail(tmp_path, caplog):
+def test_executeRsync_local_after_fail(test_config, tmp_path, caplog):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -344,7 +349,12 @@ def test_executeRsync_local_after_fail(tmp_path, caplog):
     assert 'enddatetime' in j.backupstatus
 
 
-def test_executeRsync_remote_after_fail(tmp_path, caplog, monkeypatch):
+def test_executeRsync_remote_after_fail(
+                                         test_config,
+                                         tmp_path,
+                                         caplog,
+                                         monkeypatch
+                                       ):
     def mock_connect(self, hostname, username=None, key_filename=None):
         return True
 
@@ -439,7 +449,12 @@ def test_checkBackupEnvironment_twice(tmp_path):
         assert os.path.isdir(subdir_path) is True
 
 
-def test_checkBackupEnvironment_exception(tmp_path, monkeypatch, caplog):
+def test_checkBackupEnvironment_exception(
+                                           test_config,
+                                           tmp_path,
+                                           monkeypatch,
+                                           caplog,
+                                         ):
     config().backupmailrecipients = ['root@localhost']
 
     exc = 'Mock makedirs failure'
@@ -630,7 +645,7 @@ def test_getBackups_exception(tmp_path, caplog):
     assert ret == []
 
 
-def test_getBackupsSize(tmp_path):
+def test_getBackupsSize(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = create_job(str(tmp_path))
@@ -687,7 +702,7 @@ def test_getBackupsSize(tmp_path):
     assert avg == float(backupstatus['rsync_literal_data'])
 
 
-def test_getBackupsSize_no_history(tmp_path):
+def test_getBackupsSize_no_history(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = create_job(str(tmp_path))
@@ -723,7 +738,7 @@ def test_getBackupsSize_no_history(tmp_path):
     assert avg == 0
 
 
-def test_getBackupsSize_not_latest(tmp_path):
+def test_getBackupsSize_not_latest(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = create_job(str(tmp_path))
@@ -766,7 +781,7 @@ def test_getBackupsSize_not_latest(tmp_path):
     assert avg != 0
 
 
-def test_getIdfromBackupInstance(tmp_path):
+def test_getIdfromBackupInstance(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     d = director()
@@ -778,7 +793,7 @@ def test_getIdfromBackupInstance(tmp_path):
     assert ret == 0
 
 
-def test_getIdfromBackupInstance_fail(tmp_path):
+def test_getIdfromBackupInstance_fail(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     d = director()
@@ -788,7 +803,7 @@ def test_getIdfromBackupInstance_fail(tmp_path):
     assert ret is False
 
 
-def test_getNamefromBackupInstance(tmp_path):
+def test_getNamefromBackupInstance(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     d = director()
@@ -802,7 +817,7 @@ def test_getNamefromBackupInstance(tmp_path):
     assert ret == name
 
 
-def test_getNamefromBackupInstance_fail(tmp_path):
+def test_getNamefromBackupInstance_fail(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     d = director()
@@ -812,7 +827,7 @@ def test_getNamefromBackupInstance_fail(tmp_path):
     assert ret is False
 
 
-def test_getOldestBackupId(tmp_path):
+def test_getOldestBackupId(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = create_job(str(tmp_path))
@@ -839,7 +854,7 @@ def test_getOldestBackupId(tmp_path):
     assert ret == 0
 
 
-def test_backupRotate(tmp_path, caplog):
+def test_backupRotate(test_config, tmp_path, caplog):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -873,7 +888,12 @@ def test_backupRotate(tmp_path, caplog):
     assert 'Error working directory not found' not in caplog.text
 
 
-def test_backupRotate_symlink_error(tmp_path, caplog, monkeypatch):
+def test_backupRotate_symlink_error(
+                                     test_config,
+                                     tmp_path,
+                                     caplog,
+                                     monkeypatch,
+                                   ):
     def mock_updateLatestSymlink(self, job, latest):
         return False
 
@@ -917,7 +937,7 @@ def test_backupRotate_symlink_error(tmp_path, caplog, monkeypatch):
     assert 'Error working directory not found' not in caplog.text
 
 
-def test_backupRotate_move_error(tmp_path, caplog, monkeypatch):
+def test_backupRotate_move_error(test_config, tmp_path, caplog, monkeypatch):
     def mock_moveCurrentBackup(self, job):
         return False
 
@@ -957,7 +977,7 @@ def test_backupRotate_move_error(tmp_path, caplog, monkeypatch):
     assert 'Error working directory not found' not in caplog.text
 
 
-def test_backupRotate_rotate_error(tmp_path, caplog, monkeypatch):
+def test_backupRotate_rotate_error(test_config, tmp_path, caplog, monkeypatch):
     def mock_rotateBackups(self, job):
         return False
 
@@ -997,7 +1017,7 @@ def test_backupRotate_rotate_error(tmp_path, caplog, monkeypatch):
     assert 'Error working directory not found' not in caplog.text
 
 
-def test_unlinkExpiredBackups(tmp_path):
+def test_unlinkExpiredBackups(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1042,7 +1062,7 @@ def test_unlinkExpiredBackups(tmp_path):
     assert os.path.exists(daily_path1) is False
 
 
-def test_unlinkExpiredBackups_nop(tmp_path):
+def test_unlinkExpiredBackups_nop(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1087,7 +1107,7 @@ def test_unlinkExpiredBackups_nop(tmp_path):
     assert os.path.exists(daily_path1) is True
 
 
-def test_unlinkExpiredBackups_fail(tmp_path, monkeypatch, caplog):
+def test_unlinkExpiredBackups_fail(test_config, tmp_path, monkeypatch, caplog):
     def mock_checkWorkingDirectory(self, path):
         return False
 
@@ -1115,7 +1135,7 @@ def test_unlinkExpiredBackups_fail(tmp_path, monkeypatch, caplog):
     assert 'Error working directory not found' in caplog.text
 
 
-def test_unlinkExpiredBackup(tmp_path):
+def test_unlinkExpiredBackup(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1148,7 +1168,12 @@ def test_unlinkExpiredBackup(tmp_path):
     assert os.path.exists(daily_path) is False
 
 
-def test_unlinkExpiredBackup_exception(tmp_path, monkeypatch, caplog):
+def test_unlinkExpiredBackup_exception(
+                                        test_config,
+                                        tmp_path,
+                                        monkeypatch,
+                                        caplog,
+                                      ):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1166,7 +1191,7 @@ def test_unlinkExpiredBackup_exception(tmp_path, monkeypatch, caplog):
     assert 'Error while removing' in caplog.text
 
 
-def test_rotateBackups(tmp_path):
+def test_rotateBackups(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1195,7 +1220,7 @@ def test_rotateBackups(tmp_path):
     assert ret is True
 
 
-def test_rotateBackups_exception(tmp_path, monkeypatch):
+def test_rotateBackups_exception(test_config, tmp_path, monkeypatch):
     def mock_rename(src, dst):
         raise IOError('Mock rename failure')
 
@@ -1229,7 +1254,11 @@ def test_rotateBackups_exception(tmp_path, monkeypatch):
     assert ret is False
 
 
-def test_rotateBackups_getNamefromBackupInstance_fail(tmp_path, monkeypatch):
+def test_rotateBackups_getNamefromBackupInstance_fail(
+                                                       test_config,
+                                                       tmp_path,
+                                                       monkeypatch,
+                                                     ):
     def mock_getNamefromBackupInstance(self, path):
         return False
 
@@ -1267,7 +1296,7 @@ def test_rotateBackups_getNamefromBackupInstance_fail(tmp_path, monkeypatch):
     assert ret is False
 
 
-def test_rotateBackups_glob_fail(tmp_path, monkeypatch):
+def test_rotateBackups_glob_fail(test_config, tmp_path, monkeypatch):
     def mock_glob(path):
         return None
 
@@ -1301,7 +1330,7 @@ def test_rotateBackups_glob_fail(tmp_path, monkeypatch):
     assert ret is True
 
 
-def test_moveCurrentBackup(tmp_path):
+def test_moveCurrentBackup(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1319,7 +1348,7 @@ def test_moveCurrentBackup(tmp_path):
     assert ret == time.strftime('daily/%Y-%m-%d_%H-%M-%S_backup.0')
 
 
-def test_moveCurrentBackup_exception(tmp_path, monkeypatch):
+def test_moveCurrentBackup_exception(test_config, tmp_path, monkeypatch):
     def mock_rename(src, dst):
         raise IOError('Mock rename failure')
 
@@ -1342,7 +1371,7 @@ def test_moveCurrentBackup_exception(tmp_path, monkeypatch):
     assert ret is False
 
 
-def test_updateLatestSymlink(tmp_path):
+def test_updateLatestSymlink(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     path = create_job(str(tmp_path))
@@ -1369,7 +1398,7 @@ def test_updateLatestSymlink(tmp_path):
     assert ret is True
 
 
-def test_updateLatestSymlink_exception(tmp_path, monkeypatch):
+def test_updateLatestSymlink_exception(test_config, tmp_path, monkeypatch):
     def mock_symlink(src, dst):
         raise IOError('Mock symlink failure')
 
@@ -1401,7 +1430,7 @@ def test_updateLatestSymlink_exception(tmp_path, monkeypatch):
     assert ret is False
 
 
-def test_moveLastBackupToCurrentBackup(tmp_path):
+def test_moveLastBackupToCurrentBackup(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1450,7 +1479,11 @@ def test_moveLastBackupToCurrentBackup(tmp_path):
     assert ret is True
 
 
-def test_moveLastBackupToCurrentBackup_current_exists(tmp_path, caplog):
+def test_moveLastBackupToCurrentBackup_current_exists(
+                                                       test_config,
+                                                       tmp_path,
+                                                       caplog,
+                                                     ):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1501,7 +1534,10 @@ def test_moveLastBackupToCurrentBackup_current_exists(tmp_path, caplog):
     assert ret is True
 
 
-def test_moveLastBackupToCurrentBackup_getattr_exception(tmp_path):
+def test_moveLastBackupToCurrentBackup_getattr_exception(
+                                                          test_config,
+                                                          tmp_path,
+                                                        ):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1544,7 +1580,7 @@ def test_moveLastBackupToCurrentBackup_getattr_exception(tmp_path):
     assert ret is None
 
 
-def test_moveLastBackupToCurrentBackup_exception(tmp_path):
+def test_moveLastBackupToCurrentBackup_exception(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1602,7 +1638,11 @@ def test_moveLastBackupToCurrentBackup_exception(tmp_path):
     assert 'More than one directory matching on glob' in str(e)
 
 
-def test_moveLastBackupToCurrentBackup_rename_exception(tmp_path, monkeypatch):
+def test_moveLastBackupToCurrentBackup_rename_exception(
+                                                         test_config,
+                                                         tmp_path,
+                                                         monkeypatch,
+                                                       ):
     def mock_rename(src, dst):
         raise IOError('Mock rename failure')
 
@@ -1648,7 +1688,7 @@ def test_moveLastBackupToCurrentBackup_rename_exception(tmp_path, monkeypatch):
     assert ret is False
 
 
-def test_moveLastBackupToCurrentBackup_nop(tmp_path):
+def test_moveLastBackupToCurrentBackup_nop(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1664,7 +1704,7 @@ def test_moveLastBackupToCurrentBackup_nop(tmp_path):
     assert ret is None
 
 
-def test_getWorkingDirectory_daily(tmp_path):
+def test_getWorkingDirectory_daily(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1676,7 +1716,7 @@ def test_getWorkingDirectory_daily(tmp_path):
     assert ret == 'daily'
 
 
-def test_getWorkingDirectory_weekly(tmp_path):
+def test_getWorkingDirectory_weekly(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w"))
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1688,7 +1728,7 @@ def test_getWorkingDirectory_weekly(tmp_path):
     assert ret == 'weekly'
 
 
-def test_getWorkingDirectory_monthly(tmp_path):
+def test_getWorkingDirectory_monthly(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().monthlybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d"))
@@ -1700,7 +1740,7 @@ def test_getWorkingDirectory_monthly(tmp_path):
     assert ret == 'monthly'
 
 
-def test_sanityCheckWorkingDirectory(tmp_path, caplog):
+def test_sanityCheckWorkingDirectory(test_config, tmp_path, caplog):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1752,7 +1792,11 @@ def test_sanityCheckWorkingDirectory(tmp_path, caplog):
     assert 'Sanity check failed for' not in caplog.text
 
 
-def test_sanityCheckWorkingDirectory_duplicate_id(tmp_path, caplog):
+def test_sanityCheckWorkingDirectory_duplicate_id(
+                                                   test_config,
+                                                   tmp_path,
+                                                   caplog,
+                                                 ):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1801,7 +1845,11 @@ def test_sanityCheckWorkingDirectory_duplicate_id(tmp_path, caplog):
     assert 'Sanity check failed for' in caplog.text
 
 
-def test_sanityCheckWorkingDirectory_invalid_sequence(tmp_path, caplog):
+def test_sanityCheckWorkingDirectory_invalid_sequence(
+                                                       test_config,
+                                                       tmp_path,
+                                                       caplog,
+                                                     ):
     config().jobspooldirectory = str(tmp_path)
     config().weeklybackup = int(time.strftime("%w")) + 1
     config().monthlybackup = int(time.strftime("%d")) + 2
@@ -1850,7 +1898,7 @@ def test_sanityCheckWorkingDirectory_invalid_sequence(tmp_path, caplog):
     assert 'Sanity check failed for' in caplog.text
 
 
-def test_checkWorkingDirectory(tmp_path):
+def test_checkWorkingDirectory(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
 
     d = director()
@@ -1865,7 +1913,7 @@ def test_checkWorkingDirectory(tmp_path):
     assert d.checkWorkingDirectory('foo') is False
 
 
-def test_processBackupStatus(tmp_path):
+def test_processBackupStatus(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -1899,7 +1947,7 @@ def test_processBackupStatus(tmp_path):
         assert key in j.backupstatus
 
 
-def test_processBackupStatus_ssh(tmp_path):
+def test_processBackupStatus_ssh(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -1935,7 +1983,7 @@ def test_processBackupStatus_ssh(tmp_path):
         assert key in j.backupstatus
 
 
-def test_parseRsyncOutput(tmp_path):
+def test_parseRsyncOutput(test_config, tmp_path):
     config().jobspooldirectory = str(tmp_path)
     config().rsyncpath = os.path.join(
                                        os.path.dirname(__file__),
@@ -1972,7 +2020,7 @@ def test_parseRsyncOutput(tmp_path):
         assert j.backupstatus[key] != ''
 
 
-def test_parseRsyncOutput_no_match(tmp_path, monkeypatch):
+def test_parseRsyncOutput_no_match(test_config, tmp_path, monkeypatch):
     def mock_match(pattern, string, flags=None):
         return False
 
@@ -2014,7 +2062,7 @@ def test_parseRsyncOutput_no_match(tmp_path, monkeypatch):
         assert j.backupstatus[key] == ''
 
 
-def test_parseRsyncOutput_exception(tmp_path, monkeypatch):
+def test_parseRsyncOutput_exception(test_config, tmp_path, monkeypatch):
     def mock_match(pattern, string, flags=None):
         return Exception('Mock match failure')
 
