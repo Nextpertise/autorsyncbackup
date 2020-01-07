@@ -1,0 +1,11 @@
+dist: bionic
+before_install:
+  - sudo apt-get update
+  # autorsyncbackup dependencies
+  - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y python3-jinja2 python3-mailer python3-paramiko python3-prettytable python3-yaml rsync
+  # test script requirements
+  - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y codespell python3-flake8 python3-pytest python3-pytest-cov
+  # commands used in tests (e.g. uptime)
+  - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y procps
+script:
+  - ./pytest.sh
