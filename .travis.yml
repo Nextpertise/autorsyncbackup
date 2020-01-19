@@ -7,5 +7,8 @@ before_install:
   - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y codespell python3-flake8 python3-pytest python3-pytest-cov
   # commands used in tests (e.g. uptime)
   - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y procps
+  # Use newer versions of dependencies
+  - sudo apt-get install -o Dpkg::Options::=--force-confnew -o Dpkg::Options::=--force-confdef -y python3-pip
+  - sudo pip3 install pytest==3.10.1 pytest-cov==2.6.0
 script:
   - ./pytest.sh
