@@ -2,7 +2,7 @@ AutoRsyncbackup
 ---------------
 
 AutoRsyncBackup is a backup solution written in Python as wrapper around Rsync.
-Currently it's only tested for **Debian Jessie**, but it should work on any other Linux distribution.
+Currently it's only tested for **Debian buster**, but it should work on any other Linux distribution.
 Please create an issue if you find any problem.
 
     @author: Teun Ouwehand (teun@nextpertise.nl)
@@ -15,12 +15,19 @@ Export for example to: `/usr/local/share/autorsyncbackup`
 
 ```
 cd /usr/local/share/
-git clone git@github.com:Nextpertise/autorsyncbackup.git
+git clone https://github.com/Nextpertise/autorsyncbackup.git
 ```
 
 Install dependencies:
 
-`apt-get install python python-yaml python-jinja2 python-mailer python-paramiko python-prettytable rsync`
+`apt install python3 python3-yaml python3-jinja2 python3-mailer python3-paramiko python3-prettytable rsync`
+
+On Debian jessie python3-mailer is not available, install it from PyPI:
+
+```
+apt install python3-pip
+pip3 install mailer
+```
     
 Create symlink:
 
@@ -86,18 +93,14 @@ Finally execute the backup (you can cron this command):
 
 `/usr/local/bin/autorsyncbackup`
     
-Install rsync as deamon (Client)
+Install rsync as daemon (Client)
 -----------------------
     
-Install the debian package:
+Install the Debian package:
 
-`apt-get install rsync`
+`apt install rsync`
     
-Enable deamon in `/etc/default/rsync`:
-    
-`RSYNC_ENABLE=true`
-    
-Configure rsync for accepting connections (Change `1.2.3.4` ip-adres to backup server):
+Configure rsync for accepting connections (Change `1.2.3.4` ip address to backup server):
 ```
 uid = root
 gid = root
@@ -110,7 +113,7 @@ max connections = 2
         comment = backup share
         path = /
         read only = yes
-        auth users= backup
+        auth users = backup
         secrets file = /etc/rsyncd.secrets
 ```
 
@@ -120,11 +123,11 @@ Configure a password in `/etc/rsyncd.secrets`:
     
 Adjust permissions on `/etc/rsyncd.secrets`:
     
-`chmod 500 /etc/rsyncd.secrets`
+`chmod 600 /etc/rsyncd.secrets`
 
-Start the rsync daemon with the init script:
+Restart the rsync daemon:
 
-`/etc/init.d/rsync start`
+`service rsync restart`
 
 Command line options
 --------------------

@@ -277,7 +277,7 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Backup start time</td>
-                                                    <td class="data-value">{{ durationstats.backupstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
+                                                    <td class="data-value">{{ durationstats.backupstartdatetime|datetimeformat("%Y-%m-%d %H:%M:%S") }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total backup duration</td>
@@ -285,7 +285,7 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Housekeeping start time</td>
-                                                    <td class="data-value">{{ durationstats.housekeepingstartdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
+                                                    <td class="data-value">{{ durationstats.housekeepingstartdatetime|datetimeformat("%Y-%m-%d %H:%M:%S") }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Total housekeeping duration</td>
@@ -374,7 +374,7 @@
                                                     <td class="data-heading" width="50%">Rsync errors</td>
                                                     <td class="data-value">
                                                       <ul>
-                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - {{ jrh.rsync_stdout }}{%- else %}No errors ({{ jrh.rsync_return_code}}){%- endif %}</li>
+                                                        <li>{%- if jrh.rsync_backup_status == 0 %}{{ jrh.rsync_return_code}} - <pre>{{ jrh.rsync_stdout }}</pre>{%- else %}No errors ({{ jrh.rsync_return_code}}){%- endif %}</li>
                                                       </ul>
                                                     </td>
                                                   </tr>
@@ -396,7 +396,7 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Backup datetime</td>
-                                                    <td class="data-value">{{ jrh.startdatetime|datetimeformat("%d-%m-%Y %H:%M:%S") }}</td>
+                                                    <td class="data-value">{{ jrh.startdatetime|datetimeformat("%Y-%m-%d %H:%M:%S") }}</td>
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%">Backup protocol</td>
@@ -479,12 +479,12 @@
                                                   </tr>
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stdout:</li></td>
-                                                    <td class="data-value">{{ c.stdout|nl2br }}</td>
+                                                    <td class="data-value"><pre>{{ c.stdout }}</pre></td>
                                                   </tr>
                                                   {% if c.returncode != 0 %}
                                                   <tr>
                                                     <td class="data-heading" width="50%"><li>stderr:</li></td>
-                                                    <td class="data-value">{{ c.stderr|nl2br }}</td>
+                                                    <td class="data-value"><pre>{{ c.stderr }}</pre></td>
                                                   </tr>
                                                   {% endif %}
                                                   {% endfor %}

@@ -1,10 +1,13 @@
 import datetime
+
+from jinja2 import Environment, PackageLoader
+from mailer import Mailer, Message
+
 from models.config import config
 from models.jobrunhistory import jobrunhistory
 from lib.jinjafilters import jinjafilters
 from lib.logger import logger
-from mailer import Mailer, Message
-from jinja2 import Environment, PackageLoader
+
 
 class statusemail():
     jobrunhistory = None
@@ -17,7 +20,8 @@ class statusemail():
         self.jobrunhistory.closeDbHandler()
 
     def sendStatusEmail(self, jobs, durationstats):
-        self.history = self.jobrunhistory.getJobHistory(self.getBackupHosts(jobs))
+        self.history = self.jobrunhistory.getJobHistory(
+                       self.getBackupHosts(jobs))
         self.checkJobIntegrity(jobs)
         state, good, warning, bad = self.getOverallBackupState(jobs)
         hosts = self.getBackupHosts(jobs)
@@ -25,27 +29,35 @@ class statusemail():
         stats = self.getStats(jobs)
         sizes, averages = self.getSizes(jobs)
 
-        subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (len(good), len(warning), len(bad), datetime.datetime.today().strftime("%a, %d/%m/%Y"))
-        htmlbody = self.getHtmlEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
-        textbody = self.getTextEmailBody(state, hosts, missinghosts, stats, durationstats, self.history, jobs, sizes, averages)
+        subject = "%d jobs OK - %d jobs WARNING - %d jobs FAILED - %s" % (
+                  len(good), len(warning), len(bad),
+                  datetime.datetime.today().strftime("%a, %d/%m/%Y"))
+        htmlbody = self.getHtmlEmailBody(state, hosts, missinghosts, stats,
+                                         durationstats, self.history, jobs,
+                                         sizes, averages)
+        textbody = self.getTextEmailBody(state, hosts, missinghosts, stats,
+                                         durationstats, self.history, jobs,
+                                         sizes, averages)
         self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
-
 
     def checkJobIntegrity(self, jobs):
         self.history.sort(key=lambda j: j['hostname'])
         jobs.sort(key=lambda j: j.hostname)
 
         for job_history, job in zip(self.history, jobs):
-            job_history['integrity_confirmed'] = job_history['integrity_id'] == job.integrity_id
-
+            job_history['integrity_confirmed'] = (
+                job_history['integrity_id'] == job.integrity_id)
 
     def sendSuddenDeath(self, exc):
-        subject = "AUTORSYNCBACKUP Sudden Death - %s" % datetime.datetime.today().strftime("%a, %d/%m/%Y")
+        subject = "AUTORSYNCBACKUP Sudden Death - %s" % (
+                  datetime.datetime.today().strftime("%a, %d/%m/%Y"))
         htmlbody = self.getHtmlExceptionBody(exc)
         textbody = self.getTextExceptionBody(exc)
         self._send(subject=subject, htmlbody=htmlbody, textbody=textbody)
 
-    def getHtmlEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
+    def getHtmlEmailBody(self, state, hosts, missinghosts, stats,
+                         durationstats, jobrunhistory, jobs,
+                         sizes, averages):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
@@ -53,10 +65,19 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
-                               jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
+        return template.render(state=state,
+                               hosts=hosts,
+                               missinghosts=missinghosts,
+                               stats=stats,
+                               durationstats=durationstats,
+                               jobrunhistory=jobrunhistory,
+                               jobs=jobs,
+                               sizes=sizes,
+                               averages=averages)
 
-    def getTextEmailBody(self, state, hosts, missinghosts, stats, durationstats, jobrunhistory, jobs, sizes, averages):
+    def getTextEmailBody(self, state, hosts, missinghosts, stats,
+                         durationstats, jobrunhistory, jobs,
+                         sizes, averages):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
         env.filters['datetimeformat'] = jinjafilters()._epochToStrDate
         env.filters['bytesformat'] = jinjafilters()._bytesToReadableStr
@@ -64,8 +85,15 @@ class statusemail():
         env.filters['numberformat'] = jinjafilters()._intToReadableStr
         env.filters['nl2br'] = jinjafilters()._nl2br
         template = env.get_template('text_email.j2')
-        return template.render(state=state, hosts=hosts, missinghosts=missinghosts, stats=stats, durationstats=durationstats, 
-                               jobrunhistory=jobrunhistory, jobs=jobs, sizes=sizes, averages=averages)
+        return template.render(state=state,
+                               hosts=hosts,
+                               missinghosts=missinghosts,
+                               stats=stats,
+                               durationstats=durationstats,
+                               jobrunhistory=jobrunhistory,
+                               jobs=jobs,
+                               sizes=sizes,
+                               averages=averages)
 
     def getHtmlExceptionBody(self, exc):
         env = Environment(loader=PackageLoader('autorsyncbackup', 'templates'))
@@ -89,13 +117,14 @@ class statusemail():
 
     def getOverallBackupState(self, jobs):
         """Overall backup state = 'ok' unless there is at least one failed backup.
-        At the same time reorder the list so errors appear first."""
+           At the same time reorder the list so errors appear first."""
         ret = "ok"
         good = []
         bad = []
         warning = []
 
-        #Jobs can be disabled, but there should never be more history than jobs.
+        # Jobs can be disabled,
+        # but there should never be more history than jobs.
         if len(self.history) > len(jobs):
             ret = "error"
 
@@ -107,15 +136,15 @@ class statusemail():
                 addto = bad
                 ret = "error"
             job_history['commanderror'] = 'ok'
-            for c in job_history['commands']:
-                if c['returncode'] != 0 and not c['continueonerror']:
-                    addto = bad
-                    job_history['commanderror'] = "error"
-                    ret = "error"
-                elif c['returncode'] != 0 and c['continueonerror']:
-                    addto = warning
-                    job_history['commanderror'] = "warning"
-                    if ret == "ok":
+            if ret == "ok":
+                for c in job_history['commands']:
+                    if c['returncode'] != 0 and not c['continueonerror']:
+                        addto = bad
+                        job_history['commanderror'] = "error"
+                        ret = "error"
+                    elif c['returncode'] != 0 and c['continueonerror']:
+                        addto = warning
+                        job_history['commanderror'] = "warning"
                         ret = "warning"
             addto.append(job_history)
         if not self.history:
@@ -133,7 +162,8 @@ class statusemail():
         return ret
 
     def getMissingHosts(self, jobs):
-        """Add all configured hosts, remove all runned hosts, incase there are elements left we have 'missing' hosts"""
+        """Add all configured hosts, remove all ran hosts,
+           in case there are elements left we have 'missing' hosts"""
         hosts = []
         for i in jobs:
             if i.enabled:
@@ -166,43 +196,69 @@ class statusemail():
 
         for i in result:
             if i['rsync_backup_status'] == 1 and i['commanderror'] == 'ok':
-                ret['total_rsync_duration'] = ret['total_rsync_duration'] + (i['enddatetime'] - i['startdatetime'])
-                ret['total_number_of_files'] = ret['total_number_of_files'] + i['rsync_number_of_files']
-                ret['total_number_of_files_transferred'] = ret['total_number_of_files_transferred'] + i['rsync_number_of_files_transferred']
-                ret['total_file_size'] = ret['total_file_size'] + i['rsync_total_file_size']
-                ret['total_transferred_file_size'] = ret['total_transferred_file_size'] + i['rsync_total_transferred_file_size']
-                ret['total_literal_data'] = ret['total_literal_data'] + i['rsync_literal_data']
-                ret['total_matched_data'] = ret['total_matched_data'] + i['rsync_matched_data']
-                ret['total_file_list_size'] = ret['total_file_list_size'] + i['rsync_file_list_size']
-                ret['total_file_list_generation_time'] = ret['total_file_list_generation_time'] + i['rsync_file_list_generation_time']
-                ret['total_file_list_transfer_time'] = ret['total_file_list_transfer_time'] + i['rsync_file_list_transfer_time']
-                ret['total_bytes_sent'] = ret['total_bytes_sent'] + i['rsync_total_bytes_sent']
-                ret['total_bytes_received'] = ret['total_bytes_received'] + i['rsync_total_bytes_received']
+                ret['total_rsync_duration'] = (
+                    ret['total_rsync_duration'] +
+                    (i['enddatetime'] - i['startdatetime']))
+                ret['total_number_of_files'] = (
+                    ret['total_number_of_files'] + i['rsync_number_of_files'])
+                ret['total_number_of_files_transferred'] = (
+                    ret['total_number_of_files_transferred'] +
+                    i['rsync_number_of_files_transferred'])
+                ret['total_file_size'] = (
+                    ret['total_file_size'] + i['rsync_total_file_size'])
+                ret['total_transferred_file_size'] = (
+                    ret['total_transferred_file_size'] +
+                    i['rsync_total_transferred_file_size'])
+                ret['total_literal_data'] = (
+                    ret['total_literal_data'] + i['rsync_literal_data'])
+                ret['total_matched_data'] = (
+                    ret['total_matched_data'] + i['rsync_matched_data'])
+                ret['total_file_list_size'] = (
+                    ret['total_file_list_size'] + i['rsync_file_list_size'])
+                ret['total_file_list_generation_time'] = (
+                    ret['total_file_list_generation_time'] +
+                    i['rsync_file_list_generation_time'])
+                ret['total_file_list_transfer_time'] = (
+                    ret['total_file_list_transfer_time'] +
+                    i['rsync_file_list_transfer_time'])
+                ret['total_bytes_sent'] = (
+                    ret['total_bytes_sent'] + i['rsync_total_bytes_sent'])
+                ret['total_bytes_received'] = (
+                    ret['total_bytes_received'] +
+                    i['rsync_total_bytes_received'])
                 if i['speedlimitkb']:
-                    ret['total_speed_limit_kb'] = ret['total_speed_limit_kb'] + i['speedlimitkb']
+                    ret['total_speed_limit_kb'] = (
+                        ret['total_speed_limit_kb'] + i['speedlimitkb'])
                 if i['sanity_check'] == 0:
-                    ret['total_backups_failed'] = ret['total_backups_failed'] + 1
+                    ret['total_backups_failed'] = (
+                        ret['total_backups_failed'] + 1)
             else:
                 ret['total_backups_failed'] = ret['total_backups_failed'] + 1
 
-        ret['total_backups_success'] = ret['total_host_count'] - ret['total_backups_failed']
+        ret['total_backups_success'] = (
+            ret['total_host_count'] - ret['total_backups_failed'])
         if ret['total_backups_success'] > 0:
-            ret['average_backup_duration'] = ret['total_rsync_duration'] / ret['total_backups_success']
-            ret['average_speed_limit_kb'] = ret['total_speed_limit_kb'] / ret['total_backups_success']
+            ret['average_backup_duration'] = (
+                ret['total_rsync_duration'] / ret['total_backups_success'])
+            ret['average_speed_limit_kb'] = (
+                ret['total_speed_limit_kb'] / ret['total_backups_success'])
         return ret
-    
+
     def getSizes(self, jobs):
         from lib.director import director
         sizes = {}
         averages = {}
         for job in jobs:
-            sizes[job.hostname], averages[job.hostname] = director().getBackupsSize(job)
+            (sizes[job.hostname],
+             averages[job.hostname]) = director().getBackupsSize(job)
         return sizes, averages
-    
+
     def _send(self, subject, htmlbody, textbody):
         for to in config().backupmailrecipients:
-            logger().info("Sent backup report to [%s] via SMTP:%s" % (to, config().smtphost))
-            message = Message(From=config().backupmailfrom, To=to, charset="utf-8")
+            logger().info("Sent backup report to [%s] via SMTP:%s"
+                          % (to, config().smtphost))
+            message = Message(From=config().backupmailfrom,
+                              To=to, charset="utf-8")
             message.Subject = subject
             message.Html = htmlbody
             message.Body = textbody

@@ -1,0 +1,4 @@
+hostname: 'localhost'
+ssh: false
+rsync_username: 'autorsyncbackup'
+rsync_password: 'fee-fi-fo-fum'

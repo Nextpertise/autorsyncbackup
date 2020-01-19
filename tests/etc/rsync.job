@@ -1,0 +1,11 @@
+hostname: localhost
+rsync_username: autorsyncbackup
+rsync_password: fee-fi-fo-fum
+rsync_share: backup
+ssh: False
+backupdir: /tmp
+include: #formerly fileset
+  - /etc
+exclude:
+  - "*.bak"
+  - ".cache/*"

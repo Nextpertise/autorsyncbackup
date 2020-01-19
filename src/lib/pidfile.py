@@ -1,4 +1,7 @@
-import sys, os, errno
+import errno
+import os
+import sys
+
 
 class Pidfile():
     def __init__(self, path, log=sys.stdout.write, warn=sys.stderr.write):
@@ -8,22 +11,26 @@ class Pidfile():
 
     def __enter__(self):
         try:
-            self.pidfd = os.open(self.pidfile, os.O_CREAT|os.O_WRONLY|os.O_EXCL)
+            self.pidfd = os.open(self.pidfile,
+                                 os.O_CREAT | os.O_WRONLY | os.O_EXCL)
             self.log('locked pidfile %s' % self.pidfile)
         except OSError as e:
             if e.errno == errno.EEXIST:
                 pid = self._check()
                 if pid:
                     self.pidfd = None
-                    raise ProcessRunningException('process already running in %s as pid %s' % (self.pidfile, pid));
+                    raise ProcessRunningException(('process already running'
+                                                   ' in %s as pid %s')
+                                                  % (self.pidfile, pid))
                 else:
                     os.remove(self.pidfile)
-                    self.warn('removed staled lockfile %s' % (self.pidfile))
-                    self.pidfd = os.open(self.pidfile, os.O_CREAT|os.O_WRONLY|os.O_EXCL)
+                    self.warn('removed stale lockfile %s' % (self.pidfile))
+                    self.pidfd = os.open(self.pidfile,
+                                         os.O_CREAT | os.O_WRONLY | os.O_EXCL)
             else:
                 raise
 
-        os.write(self.pidfd, str(os.getpid()))
+        os.write(self.pidfd, str(os.getpid()).encode())
         os.close(self.pidfd)
         return self
 
@@ -66,9 +73,11 @@ class Pidfile():
                 return False
             else:
                 return pid
-                
+
+
 class ProcessRunningException(BaseException):
     pass
-    
+
+
 class PidfileProcessRunningException(BaseException):
     pass

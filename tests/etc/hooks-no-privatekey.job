@@ -1,0 +1,12 @@
+hostname: 'localhost'
+rsync_username: 'autorsyncbackup'
+rsync_password: 'fee-fi-fo-fum'
+rsync_share: 'backup'
+ssh_username: 'autorsyncbackup'
+include:
+  - /etc
+hooks:
+  - script: uptime
+    local: false
+    runtime: after
+    continueonerror: true
