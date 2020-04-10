@@ -1,11 +1,19 @@
 import socket
 import subprocess
 import time
+import warnings
 
+from cryptography.utils import CryptographyDeprecationWarning
 import paramiko
 
 from models.config import config
 from lib.logger import logger
+
+
+warnings.filterwarnings(
+                         action='ignore',
+                         category=CryptographyDeprecationWarning,
+                       )
 
 
 class rsync():
