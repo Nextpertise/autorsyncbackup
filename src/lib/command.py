@@ -1,7 +1,6 @@
 import socket
 import subprocess
 import time
-import warnings
 
 from cryptography.utils import CryptographyDeprecationWarning
 import paramiko
@@ -9,10 +8,17 @@ import paramiko
 from .logger import logger
 
 
-warnings.filterwarnings(
-                         action='ignore',
-                         category=CryptographyDeprecationWarning,
-                       )
+try:
+    import warnings
+
+    from cryptography.utils import CryptographyDeprecationWarning
+
+    warnings.filterwarnings(
+                             action='ignore',
+                             category=CryptographyDeprecationWarning,
+                           )
+except ImportError:
+    pass
 
 
 class command():
