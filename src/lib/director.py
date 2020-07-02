@@ -26,7 +26,9 @@ class director():
             if(os.path.exists(directory)):
                 os.chdir(directory)
                 for filename in glob.glob("*.job"):
-                    jobArray.append(job(directory + "/" + filename))
+                    j = job(directory + "/" + filename)
+                    if j.enabled:
+                        jobArray.append(j)
             else:
                 logger().error("Job directory (%s) doesn't exists, exiting (1)"
                                % directory)

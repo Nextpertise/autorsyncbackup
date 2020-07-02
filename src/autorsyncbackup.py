@@ -96,13 +96,12 @@ def runBackup(jobpath, dryrun):
             durationstats = {}
             durationstats['backupstartdatetime'] = int(time.time())
             for job in jobs:
-                if(job.enabled):
-                    if directorInstance.checkRemoteHost(job):
-                        if not dryrun:  # pragma: no branch
-                            # Add to queue
-                            workQueue.put(job)
-                    else:
-                        jobrunhistory().insertJob(job.backupstatus, None)
+                if directorInstance.checkRemoteHost(job):
+                    if not dryrun:  # pragma: no branch
+                        # Add to queue
+                        workQueue.put(job)
+                else:
+                    jobrunhistory().insertJob(job.backupstatus, None)
             queueLock.release()
             # Wait for queue to empty
             while not workQueue.empty():
@@ -120,9 +119,8 @@ def runBackup(jobpath, dryrun):
                 # Do housekeeping
                 durationstats['housekeepingstartdatetime'] = int(time.time())
                 for job in jobs:
-                    if(job.enabled):
-                        if job.backupstatus['rsync_backup_status'] == 1:
-                            directorInstance.backupRotate(job)
+                    if job.backupstatus['rsync_backup_status'] == 1:
+                        directorInstance.backupRotate(job)
                 jobrunhistory().deleteHistory()
                 durationstats['housekeepingenddatetime'] = int(time.time())
 
