@@ -101,7 +101,9 @@ def runBackup(jobpath, dryrun):
                         # Add to queue
                         workQueue.put(job)
                 else:
-                    jobrunhistory().insertJob(job.backupstatus, None)
+                    jrh = jobrunhistory()
+                    jrh.insertJob(job.backupstatus, None)
+                    jrh.closeDbHandler()
             queueLock.release()
             # Wait for queue to empty
             while not workQueue.empty():
@@ -121,7 +123,9 @@ def runBackup(jobpath, dryrun):
                 for job in jobs:
                     if job.backupstatus['rsync_backup_status'] == 1:
                         directorInstance.backupRotate(job)
-                jobrunhistory().deleteHistory()
+                jrh = jobrunhistory()
+                jrh.deleteHistory()
+                jrh.closeDbHandler()
                 durationstats['housekeepingenddatetime'] = int(time.time())
 
                 # Sent status report
