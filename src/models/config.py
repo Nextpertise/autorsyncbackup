@@ -66,7 +66,7 @@ class config():
             self.debugmessages.append("Reading main config from %s"
                                       % self.mainconfigpath)
             with open(self.mainconfigpath, 'r') as stream:
-                config = yaml.load(stream)
+                config = yaml.safe_load(stream)
         except Exception:
             exitcode = 1
             print("%s: Error while reading main config, exiting (%d)"

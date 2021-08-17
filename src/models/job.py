@@ -40,7 +40,7 @@ class job():
     def readJob(self):
         try:
             with open(self.filepath, 'r') as stream:
-                jobconfig = yaml.load(stream)
+                jobconfig = yaml.safe_load(stream)
         except Exception:
             logger().error("Error while reading %s, skipping job"
                            % self.filepath)
