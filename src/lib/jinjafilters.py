@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from jinja2 import Markup
+from markupsafe import Markup
 
 
 class jinjafilters():
