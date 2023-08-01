@@ -135,9 +135,9 @@ class director():
                      job.hostname + "/" + directory)
         try:
             dirlist = os.listdir(directory)
-            for l in dirlist:
-                if re.match(self.regexp_backupdirectory, l):
-                    retlist.append(l)
+            for i in dirlist:
+                if re.match(self.regexp_backupdirectory, i):
+                    retlist.append(i)
         except Exception:
             logger().error(("Error while listing working directory (%s)"
                             " for host (%s)") % (directory, job.hostname))
@@ -186,9 +186,9 @@ class director():
         dirlist = self.getBackups(job)
         ret = False
         backup_id = 0
-        for l in dirlist:
-            if self.getIdfromBackupInstance(l) >= backup_id:
-                ret = backup_id = self.getIdfromBackupInstance(l)
+        for i in dirlist:
+            if self.getIdfromBackupInstance(i) >= backup_id:
+                ret = backup_id = self.getIdfromBackupInstance(i)
         return ret
 
     def backupRotate(self, job, moveCurrent=True):
@@ -225,10 +225,10 @@ class director():
 
         backupRetention = int(getattr(job, workingDirectory + "rotation"))
 
-        for l in self.getBackups(job):
-            if self.getIdfromBackupInstance(l):
-                if self.getIdfromBackupInstance(l) > (backupRetention - 1):
-                    self._unlinkExpiredBackup(job, directory + "/" + l)
+        for i in self.getBackups(job):
+            if self.getIdfromBackupInstance(i):
+                if self.getIdfromBackupInstance(i) > (backupRetention - 1):
+                    self._unlinkExpiredBackup(job, directory + "/" + i)
         return True
 
     def _unlinkExpiredBackup(self, job, backupdirectory):
@@ -355,8 +355,8 @@ class director():
         ret = True
 
         # Check for duplicate id's
-        for l in dirlist:
-            backup_id = self.getIdfromBackupInstance(l)
+        for i in dirlist:
+            backup_id = self.getIdfromBackupInstance(i)
             if backup_id in found_ids:
                 ret = False
             found_ids.append(backup_id)

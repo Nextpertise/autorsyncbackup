@@ -81,10 +81,10 @@ def test_readConfig(test_config, tmp_path):
 
 
 def test_readConfig_load_exception(monkeypatch, capsys):
-    def mock_load(stream):
+    def mock_safe_load(stream):
         raise IOError('Mock load failure')
 
-    monkeypatch.setattr(yaml, 'load', mock_load)
+    monkeypatch.setattr(yaml, 'safe_load', mock_safe_load)
 
     with pytest.raises(SystemExit) as e:
         config().readConfig()
@@ -98,10 +98,10 @@ def test_readConfig_load_exception(monkeypatch, capsys):
 
 
 def test_readConfig_exceptions(monkeypatch):
-    def mock_load(stream):
+    def mock_safe_load(stream):
         return {}
 
-    monkeypatch.setattr(yaml, 'load', mock_load)
+    monkeypatch.setattr(yaml, 'safe_load', mock_safe_load)
 
     config().debugmessages = []
 
