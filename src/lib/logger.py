@@ -65,7 +65,7 @@ class logger():
             # Create and remember instance
             logger.__instance = logger.__impl()
 
-            if(logfile):  # pragma: no cover
+            if (logfile):  # pragma: no cover
                 logdirectory = os.path.dirname(logfile)
                 if not os.path.exists(logdirectory):
                     os.makedirs(logdirectory)
