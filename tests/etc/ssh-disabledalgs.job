@@ -1,0 +1,15 @@
+hostname: localhost
+ssh: True
+ssh_sudo: False
+ssh_username: autorsyncbackup
+ssh_privatekey: /home/autorsyncbackup/.ssh/id_rsa
+ssh_disabledalgs:
+  pubkeys:
+    - rsa-sha2-512
+    - rsa-sha2-256
+backupdir: /tmp
+include: #formerly fileset
+  - /etc
+exclude:
+  - "*.bak"
+  - ".cache/*"

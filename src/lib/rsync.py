@@ -60,9 +60,13 @@ class rsync():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
+                kwargs = {}
+                if job.sshdisabledalgs:
+                    kwargs['disabled_algorithms'] = job.sshdisabledalgs
                 ssh.connect(job.hostname,
                             username=job.sshusername,
-                            key_filename=job.sshprivatekey)
+                            key_filename=job.sshprivatekey,
+                            **kwargs)
                 logger().info(("Successfully connected to host"
                                " via ssh protocol (%s)") % job.hostname)
                 return True
