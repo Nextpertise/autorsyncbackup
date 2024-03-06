@@ -17,6 +17,7 @@ class job():
         self.rsyncshare = None
         self.sshusername = None
         self.sshprivatekey = None
+        self.sshdisabledalgs = None
         self.port = None
         self.backupdir = None
         self.speedlimitkb = None
@@ -111,6 +112,13 @@ class job():
                                % self.filepath)
                 self.enabled = False
                 return False
+
+        try:
+            self.sshdisabledalgs = jobconfig['ssh_disabledalgs']
+        except Exception:
+            self.sshdisabledalgs = {}
+            logger().debug(("%s: No or invalid ssh_disabledalgs is set,"
+                            " using default") % self.filepath)
 
         try:
             self.port = jobconfig['port']

@@ -150,7 +150,10 @@ def test_executeJobs_local(test_config, tmp_path):
 
 
 def test_executeJobs_remote(test_config, tmp_path, monkeypatch):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     def mock_exec_command(self, command):
@@ -280,7 +283,10 @@ def test_executeRsync_remote_before_fail(
                                           caplog,
                                           monkeypatch
                                         ):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     def mock_exec_command(self, command):
@@ -355,7 +361,10 @@ def test_executeRsync_remote_after_fail(
                                          caplog,
                                          monkeypatch
                                        ):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     def mock_exec_command(self, command):
@@ -659,6 +668,63 @@ def test_getBackupsSize(test_config, tmp_path):
 
     for interval in [
                       'daily',
+                      'weekly',
+                      'monthly',
+                    ]:
+        subdir = time.strftime("%Y-%m-%d_%H-%M-%S_backup.0")
+
+        interval_path = os.path.join(
+                                      j.backupdir,
+                                      j.hostname,
+                                      interval,
+                                      subdir,
+                                    )
+
+        os.makedirs(interval_path)
+
+        if interval == 'daily':
+            symlink = os.path.join(
+                                    j.backupdir,
+                                    j.hostname,
+                                    'latest',
+                                  )
+
+            os.symlink(interval_path, symlink)
+
+    jrh = jobrunhistory(check=True)
+
+    backupstatus = {
+                     'hostname':              j.hostname,
+                     'startdatetime':         time.time() - 1,
+                     'rsync_total_file_size': 1337,
+                     'rsync_literal_data':    42,
+                   }
+
+    hooks = []
+
+    jrh.insertJob(backupstatus, hooks)
+
+    time.sleep(0.1)
+
+    (size, avg) = d.getBackupsSize(j)
+
+    assert size != 0
+    assert avg == float(backupstatus['rsync_literal_data'])
+
+
+@pytest.mark.xfail(strict=False)
+def test_getBackupsSize_no_daily(test_config, tmp_path):
+    config().jobspooldirectory = str(tmp_path)
+
+    path = create_job(str(tmp_path))
+
+    j = job(path)
+
+    d = director()
+
+    d.checkBackupEnvironment(j)
+
+    for interval in [
                       'weekly',
                       'monthly',
                     ]:

@@ -1,0 +1,5 @@
+hostname: 'localhost'
+ssh: true
+ssh_sudo: true
+ssh_username: 'autorsyncbackup'
+ssh_privatekey: /home/autorsyncbackup/.ssh/id_rsa

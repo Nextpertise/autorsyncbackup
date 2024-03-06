@@ -9,7 +9,10 @@ from models.job import job
 
 
 def test_checkRemoteHostViaSshProtocol(monkeypatch):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
@@ -28,10 +31,36 @@ def test_checkRemoteHostViaSshProtocol(monkeypatch):
     assert ret is True
 
 
+def test_checkRemoteHostViaSshProtocol_no_disabledalgs(monkeypatch):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
+        return True
+
+    monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'etc/ssh-no-disabledalgs.job',
+                       )
+
+    j = job(path)
+
+    cmd = command()
+
+    ret = cmd.checkRemoteHostViaSshProtocol(j)
+
+    assert ret is True
+
+
 def test_checkRemoteHostViaSshProtocol_exception(monkeypatch, caplog):
     logger().debuglevel = 3
 
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         raise IOError('Mock connection failed')
 
     monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
@@ -53,7 +82,10 @@ def test_checkRemoteHostViaSshProtocol_exception(monkeypatch, caplog):
 
 
 def test_executeRemoteCommand(monkeypatch):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     def mock_exec_command(self, command):
@@ -81,10 +113,45 @@ def test_executeRemoteCommand(monkeypatch):
     assert 'Mock STDOUT' in stdout
 
 
+def test_executeRemoteCommand_no_disabledalgs(monkeypatch):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
+        return True
+
+    def mock_exec_command(self, command):
+        stdin = io.StringIO('')
+        stdout = io.StringIO('Mock STDOUT\n0')
+        stderr = io.StringIO('')
+
+        return stdin, stdout, stderr
+
+    monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
+    monkeypatch.setattr(paramiko.SSHClient, 'exec_command', mock_exec_command)
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'etc/ssh-no-disabledalgs.job',
+                       )
+
+    j = job(path)
+
+    cmd = command()
+
+    (status, stdout, stderr) = cmd.executeRemoteCommand(j, 'uptime')
+
+    assert status == 0
+    assert 'Mock STDOUT' in stdout
+
+
 def test_executeRemoteCommand_exception(monkeypatch, caplog):
     logger().debuglevel = 3
 
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         raise IOError('Mock connection failed')
 
     monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)

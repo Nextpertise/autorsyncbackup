@@ -53,7 +53,10 @@ def test_checkRemoteHost_rsync_fail(test_config, tmp_path):
 
 
 def test_checkRemoteHost_ssh(test_config, tmp_path, monkeypatch):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         return True
 
     monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
@@ -75,8 +78,37 @@ def test_checkRemoteHost_ssh(test_config, tmp_path, monkeypatch):
     assert j.backupstatus['rsync_backup_status'] == int(ret)
 
 
+def test_checkRemoteHost_ssh_disabledalgs(test_config, tmp_path, monkeypatch):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, disabled_algorithms=None,
+    ):
+        return True
+
+    monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)
+
+    config().jobspooldirectory = str(tmp_path)
+
+    path = os.path.join(
+                         os.path.dirname(__file__),
+                         'etc/ssh-disabledalgs.job',
+                       )
+
+    j = job(path)
+
+    r = rsync()
+
+    ret = r.checkRemoteHost(j)
+
+    assert ret is True
+    assert j.backupstatus['rsync_backup_status'] == int(ret)
+
+
 def test_checkRemoteHost_ssh_fail(test_config, tmp_path, monkeypatch):
-    def mock_connect(self, hostname, username=None, key_filename=None):
+    def mock_connect(
+        self, hostname,
+        username=None, key_filename=None, **kwargs,
+    ):
         raise IOError('Mock connection failed')
 
     monkeypatch.setattr(paramiko.SSHClient, 'connect', mock_connect)

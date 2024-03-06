@@ -23,7 +23,7 @@ class director():
         jobArray = []
         if jobpath is None:
             directory = config().jobconfigdirectory.rstrip('/')
-            if(os.path.exists(directory)):
+            if (os.path.exists(directory)):
                 os.chdir(directory)
                 for filename in glob.glob("*.job"):
                     j = job(directory + "/" + filename)
@@ -196,10 +196,10 @@ class director():
         self._unlinkExpiredBackups(job)
 
         # Rotate backups
-        if(self._rotateBackups(job)):
+        if (self._rotateBackups(job)):
             latest = self._moveCurrentBackup(job)
             if latest:
-                if(self._updateLatestSymlink(job, latest)):
+                if (self._updateLatestSymlink(job, latest)):
                     pass
                 else:
                     logger().error(("Error updating current symlink"
@@ -339,10 +339,10 @@ class director():
     def getWorkingDirectory(self):
         """Check in which folder we place the backup today"""
         ret = "daily"
-        if(int(datetime.datetime.today().strftime("%w")) ==
+        if (int(datetime.datetime.today().strftime("%w")) ==
            config().weeklybackup):
             ret = "weekly"
-        if(int(datetime.datetime.today().strftime("%d")) ==
+        if (int(datetime.datetime.today().strftime("%d")) ==
            config().monthlybackup):
             ret = "monthly"
         return ret
@@ -383,7 +383,7 @@ class director():
 
     def processBackupStatus(self, job):
         job.backupstatus['hostname'] = job.hostname
-        if(job.ssh):
+        if (job.ssh):
             ssh = 'True'
             job.backupstatus['username'] = job.sshusername
         else:

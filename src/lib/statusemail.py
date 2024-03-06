@@ -116,7 +116,8 @@ class statusemail():
         return template.render(exc=exc)
 
     def getOverallBackupState(self, jobs):
-        """Overall backup state = 'ok' unless there is at least one failed backup.
+        """Overall backup state = 'ok' unless there is at least one failed
+           backup.
            At the same time reorder the list so errors appear first."""
         ret = "ok"
         good = []

@@ -60,9 +60,13 @@ class rsync():
         time.sleep(initial_wait)
         for x in range(retries):
             try:
+                kwargs = {}
+                if job.sshdisabledalgs:
+                    kwargs['disabled_algorithms'] = job.sshdisabledalgs
                 ssh.connect(job.hostname,
                             username=job.sshusername,
-                            key_filename=job.sshprivatekey)
+                            key_filename=job.sshprivatekey,
+                            **kwargs)
                 logger().info(("Successfully connected to host"
                                " via ssh protocol (%s)") % job.hostname)
                 return True
@@ -103,13 +107,13 @@ class rsync():
 
         # Link files to the same inodes as last backup to save disk space
         # and boost backup performance
-        if(latest):
+        if (latest):
             latest = "--link-dest=%s" % latest
         else:
             latest = ""
 
         # Generate rsync CLI command and execute it
-        if(include):
+        if (include):
             password = "export RSYNC_PASSWORD=\"%s\"" % job.rsyncpassword
             rsyncCommand = "%s %s %s %s %s" % (
                            config().rsyncpath, options, latest, include, dir)
@@ -139,13 +143,13 @@ class rsync():
 
         # Link files to the same inodes as last backup to save disk space
         # and boost backup performance
-        if(latest):
+        if (latest):
             latest = "--link-dest=%s" % latest
         else:
             latest = ""
 
         # Generate rsync CLI command and execute it
-        if(include):
+        if (include):
             command = "%s %s %s %s %s" % (
                       config().rsyncpath, options, latest, include, directory)
             logger().info("Executing rsync command (%s)" % command)

@@ -20,6 +20,7 @@ def test_job():
     assert j.ssh_sudo is False
     assert j.sshusername == 'autorsyncbackup'
     assert j.sshprivatekey == '/home/autorsyncbackup/.ssh/id_rsa'
+    assert j.sshdisabledalgs == {'pubkeys': ['rsa-sha2-512', 'rsa-sha2-256']}
     assert j.rsyncusername == 'autorsyncbackup'
     assert j.rsyncpassword == 'fee-fi-fo-fum'
     assert j.port == 10873
@@ -66,6 +67,7 @@ def test_default_config(test_config):
     assert j.ssh_sudo is False
     assert j.sshusername is None
     assert j.sshprivatekey is None
+    assert j.sshdisabledalgs == {}
     assert j.rsyncusername == 'autorsyncbackup'
     assert j.rsyncpassword == 'fee-fi-fo-fum'
     assert j.rsyncshare == 'backup'
@@ -143,6 +145,23 @@ def test_ssh_no_privatekey():
     assert j.ssh_sudo is True
     assert j.sshusername == 'autorsyncbackup'
     assert j.sshprivatekey is None
+
+
+def test_ssh_no_disabledalgs():
+    path = os.path.join(
+               os.path.dirname(__file__),
+               'etc/ssh-no-disabledalgs.job',
+           )
+
+    j = job(path)
+
+    assert j.enabled is False
+    assert j.hostname == 'localhost'
+    assert j.ssh is True
+    assert j.ssh_sudo is True
+    assert j.sshusername == 'autorsyncbackup'
+    assert j.sshprivatekey == '/home/autorsyncbackup/.ssh/id_rsa'
+    assert j.sshdisabledalgs == {}
 
 
 def test_ssh_no_port():
